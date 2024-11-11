@@ -1,2 +1,2 @@
-# rewrite
-Automatic Python Code Rewrite Tool
+# codemod
+Automatic Python code modifier tool

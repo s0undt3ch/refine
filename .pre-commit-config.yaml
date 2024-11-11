@@ -27,14 +27,14 @@ repos:
     hooks:
       - id: black
         args: [-l 100]
-        exclude: src/rewriter/version.py
+        exclude: src/codemod/version.py
 
   - repo: https://github.com/asottile/blacken-docs
     rev: 1.19.1
     hooks:
       - id: blacken-docs
         args: [--skip-errors]
-        files: ^(docs/.*\.rst|src/rewriter/.*\.py)$
+        files: ^(docs/.*\.rst|src/codemod/.*\.py)$
         additional_dependencies:
           - black==24.10.0
 
@@ -45,7 +45,9 @@ repos:
         name: Run mypy against the code base
         files: ^(src/|tests/|examples/).*\.py$
         args: []
+        exclude: ^tests/([^/]*/)*files/.*
         additional_dependencies:
           - libcst
           - sqlfluff
+          - pydantic
   # <---- Code Formatting and Analysis -----------------------------------------------------------
