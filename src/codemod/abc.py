@@ -3,7 +3,7 @@ Abstract base classes for defining codemod types and their configurations.
 """
 
 from abc import ABC
-from abc import abstractmethod
+from typing import ClassVar
 from typing import Generic
 from typing import TypeVar
 
@@ -21,29 +21,19 @@ class BaseConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-C = TypeVar("C", bound=BaseConfig)
+CodemodConfigType = TypeVar("CodemodConfigType", bound=BaseConfig)
 
 
-class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[C]):
+class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[CodemodConfigType]):
     """
     Base class for codemoders.
     """
 
-    @property
-    @abstractmethod
-    def NAME(self) -> str:  # noqa: N802
-        """
-        Enforce `NAME` to be defined in subclasses and flagged by mypy.
-        """
+    NAME: ClassVar[str]
+    CONFIG_CLS: ClassVar[type[BaseConfig]]
+    PRIORITY: ClassVar[int] = 0
 
-    @property
-    @abstractmethod
-    def CONFIG_CLS(self) -> type[C]:  # noqa: N802
-        """
-        Enforce `CONFIG_CLS` to be defined in subclasses and flagged by mypy.
-        """
-
-    def __init__(self, context: CodemodContext, config: C):
+    def __init__(self, context: CodemodContext, config: CodemodConfigType):
         super().__init__(context)
         self.config = config
         self.__post_codemod_init__()
