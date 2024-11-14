@@ -31,7 +31,7 @@ attrs = "^24.2.0"
 pytest-clarity = "^1.0.1"
 
 [tool.poetry.plugins."codemod"]
-format-sql = "codemod.sql.format_sql"
+format-sql = "codemod.mods.sql.fmt:FormatSQL"
 
 build-backend = "poetry.masonry.api"
 
