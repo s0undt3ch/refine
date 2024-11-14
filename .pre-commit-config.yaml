@@ -50,4 +50,5 @@ repos:
           - libcst
           - sqlfluff
           - pydantic
+          - tomllib >= 1.1.0; python_version < "3.11"
   # <---- Code Formatting and Analysis -----------------------------------------------------------

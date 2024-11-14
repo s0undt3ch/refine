@@ -16,13 +16,14 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-"codemod" = "codemod.__main__:rewrite"
+"codemod" = "codemod.__main__:main"
 
 [tool.poetry.dependencies]
 python = ">3.11,<4"
 libcst = "^1.5.0"
 sqlfluff = "^3.2.5"
 pydantic = "^2.9.2"
+tomllib = {version = ">=1.1.0", python = "<3.11"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -65,21 +66,22 @@ ignore = [
   "D200",    # Reformat to one line
   "D212",    # Remove whitespace after opening quotes
   "ERA",     # eradicate
+  "FBT001",  # Boolean-typed positional argument in function definition
   "FBT002",  # Boolean default positional argument in function definition
+  "FIX002",  # Line contains TODO, consider resolving the issue"
   "PERF203", # `try`-`except` within a loop incurs performance overhead"
   "PERF401", # Use a list comprehension to create a transformed list
   "PERF402", # Use `list` or `list.copy` to create a copy of a list
   "PLR2004", # Magic value used in comparison, consider replacing `2` with a constant variable"
   "PTH",     # Stop complaining about switching to pathlib
   "RET503",  # Missing explicit `return` at the end of function able to return non-`None` value
+  "RUF005",  # Consider iterable unpacking instead of concatenation
   "SIM108",  # Use ternary operator `A = X if Y else Z` instead of `if`-`else`-block
   "SIM110",  # Use `return any( ... etc ...)` instead of `for` loop
-  "RUF005",  # Consider iterable unpacking instead of concatenation
-  "FIX002",  # Line contains TODO, consider resolving the issue"
+  "TCH003",  # Move standard library import `pathlib.Path` into a type-checking block
   "TD002",   # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`"
   "TD003",   # Missing issue link on the line following this TODO
   "UP038",   # Use `X | Y` in `isinstance` call instead of `(X, Y)` - SLOWER CODE
-  "FBT001",  # Boolean-typed positional argument in function definition
 ]
 
 [tool.ruff.lint.per-file-ignores]
