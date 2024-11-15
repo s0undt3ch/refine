@@ -6,15 +6,16 @@ This holds the information about what codemods are available to be used.
 
 import importlib.metadata
 import inspect
+import logging
 import operator
-from collections import OrderedDict
 from collections.abc import Iterator
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 
 from .abc import BaseCodemod
 from .abc import CodemodConfigType
-from .config import Config
+
+log = logging.getLogger(__name__)
 
 
 class Registry:
@@ -22,47 +23,41 @@ class Registry:
     Registry class to hold all available codemods.
     """
 
-    __slots__ = ("_config", "_codemods")
+    __slots__ = ("_codemods",)
 
-    def __init__(self, config: Config) -> None:
-        self._config = config
-        self._codemods: OrderedDict[str, type[BaseCodemod]] = OrderedDict()
+    def __init__(self) -> None:
+        self._codemods: list[type[BaseCodemod]] = []
 
-    def load(self) -> None:
+    def load(self, search_paths: list[Path]) -> None:
         """
         Load all available codemods.
         """
-        self._codemods.clear()
-        codemods: list[type[BaseCodemod]] = []
+        codemods: dict[str, type[BaseCodemod]] = {}
         codemod: type[BaseCodemod]
         for codemod in self._collect_from_entrypoints():
-            codemods.append(codemod)
-        for path in self._config.codemod_paths:
+            if codemod.NAME in codemods:
+                log.warning("Already loaded a codemod by the name of %s", codemod.NAME)
+                continue
+            codemods[codemod.NAME] = codemod
+        for path in search_paths:
             for codemod in self._collect_from_path(path):
-                codemods.append(codemod)
+                if codemod.NAME in codemods:
+                    log.warning("Already loaded a codemod by the name of %s", codemod.NAME)
+                    continue
+                codemods[codemod.NAME] = codemod
+        self._codemods[:] = sorted(codemods.values(), key=operator.attrgetter("PRIORITY"))
 
-        for codemod in sorted(codemods, key=operator.attrgetter("PRIORITY")):
-            codemod_name: str = codemod.NAME
-            self._codemods[codemod_name] = codemod
-
-    def codemods(self, exclude_codemods=(), select_codemods=()):
+    def codemods(self, exclude_codemods=(), select_codemods=()) -> Iterator[type[BaseCodemod]]:
         """
         Returns all available codemods, optionally skipping those passed in `excluded_names`.
         """
-        for name in self._codemods:
-            if select_codemods:
-                if name in select_codemods:
-                    yield name, self._codemods[name]
+        for codemod in self._codemods:
+            if select_codemods and codemod.NAME in select_codemods:
+                yield codemod
                 continue
-            if name in exclude_codemods:
+            if exclude_codemods and codemod.NAME in exclude_codemods:
                 continue
-            yield name, self._codemods[name]
-
-    def fix_names(self):
-        """
-        Returns the list of the fix names.
-        """
-        return list(self.codemods)
+            yield codemod
 
     def _collect_from_entrypoints(self) -> Iterator[type[BaseCodemod[CodemodConfigType]]]:
         for entry_point in importlib.metadata.entry_points(group="codemod"):
