@@ -1,3 +1,4 @@
+import logging
 import pathlib
 import textwrap
 from functools import cache
@@ -16,6 +17,9 @@ from codemod.abc import BaseCodemod
 from codemod.abc import BaseConfig
 
 from .utils import is_sql_query
+
+# Quiet down sqlfluff logs during tests
+logging.getLogger("sqlfluff").setLevel(logging.WARNING)
 
 BUILNTIN_SQLFLUFF_CONFIG_FILE = pathlib.Path(__file__).parent / ".sqlfluff"
 
