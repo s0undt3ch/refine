@@ -46,6 +46,8 @@ class Config(BaseModel):
         extra="allow",
     )
 
+    select: list[str] = Field(default_factory=list)
+    exclude: list[str] = Field(default_factory=list)
     codemod_paths: list[Path] = Field(default_factory=list)
 
     @classmethod
