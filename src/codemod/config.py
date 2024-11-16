@@ -5,6 +5,7 @@ Codemod configuration.
 from __future__ import annotations
 
 import logging
+import os
 import tomllib
 from pathlib import Path
 from typing import Any
@@ -46,9 +47,10 @@ class Config(BaseModel):
         extra="allow",
     )
 
-    select: list[str] = Field(default_factory=list)
-    exclude: list[str] = Field(default_factory=list)
-    codemod_paths: list[Path] = Field(default_factory=list)
+    select: set[str] = Field(default_factory=set)
+    exclude: set[str] = Field(default_factory=set)
+    codemod_paths: set[Path] = Field(default_factory=set)
+    process_pool_size: int = Field(default_factory=os.cpu_count)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Config:
