@@ -8,6 +8,7 @@ import importlib.metadata
 import inspect
 import logging
 import operator
+from collections.abc import Iterable
 from collections.abc import Iterator
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
@@ -47,7 +48,9 @@ class Registry:
                 codemods[codemod.NAME] = codemod
         self._codemods[:] = sorted(codemods.values(), key=operator.attrgetter("PRIORITY"))
 
-    def codemods(self, exclude_codemods=(), select_codemods=()) -> Iterator[type[BaseCodemod]]:
+    def codemods(
+        self, exclude_codemods: Iterable[str] = (), select_codemods: Iterable[str] = ()
+    ) -> Iterator[type[BaseCodemod]]:
         """
         Returns all available codemods, optionally skipping those passed in `excluded_names`.
         """
