@@ -4,6 +4,7 @@ Codemod processor.
 
 import logging
 import multiprocessing
+from collections.abc import Callable
 from pathlib import Path
 
 import libcst as cst
@@ -38,40 +39,35 @@ class Processor:
                 codemod_config = BaseConfig()
             codemod_configs[codemod.NAME] = codemod_config
         self.codemod_configs = codemod_configs
+        self._modified = self._failures = 0
 
     def process(self, paths: list[Path]):
         """
         Process the passed in list of paths.
         """
-        modified = 0
-        failures = 0
-
         log.info("Processing %s files ...", len(paths))
-
-        def _process_completed(path):
-            nonlocal modified
-            if path:
-                log.info("Saved changes to %s", path)
-                modified += 1
-
-        def _process_failed(exception):
-            nonlocal failures
-            failures += 1
+        self._modified = self._failures = 0
 
         with multiprocessing.Pool(self.config.process_pool_size) as pool:
+            process_function: Callable = self.process_file
             for path in paths:
                 pool.apply_async(
-                    self.process_file,
+                    process_function,
                     args=(path,),
-                    callback=_process_completed,
-                    error_callback=_process_failed,
+                    callback=self._process_completed,
+                    error_callback=self._process_failed,
                 )
 
             # Wait for all tasks to complete before exiting the program
             pool.close()
             pool.join()
 
-        log.info("Processed %d files. Modified: %s; Failures: %s", len(paths), modified, failures)
+        log.info(
+            "Processed %d files. Modified: %s; Failures: %s",
+            len(paths),
+            self._modified,
+            self._failures,
+        )
 
     def process_file(self, path: Path) -> Path | None:
         """
@@ -98,3 +94,11 @@ class Processor:
             path.write_text(modified_tree.code)
             return path
         return None
+
+    def _process_completed(self, path: Path) -> None:
+        if path:
+            log.info("Saved changes to %s", path)
+            self._modified += 1
+
+    def _process_failed(self, *_) -> None:
+        self._failures += 1
