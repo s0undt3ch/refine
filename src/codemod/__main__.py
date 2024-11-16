@@ -87,15 +87,15 @@ def main():
 
     if args.list_codemods:
         # Add the additional CLI passed codemod paths
-        config.codemod_paths.update(set(args.codemods_paths))
+        config.codemod_paths[:] = list(set(config.codemod_paths) | set(args.codemods_paths))
 
     if args.select_codemod:
         # Add any additional CLI passed selections
-        config.select.update(set(args.select_codemod))
+        config.select[:] = list(set(config.select) | set(args.select_codemod))
 
     if args.exclude_codemod:
         # Add any additional CLI passed exclusions
-        config.exclude.update(set(args.exclude_codemod))
+        config.exclude[:] = list(set(config.exclude) | set(args.exclude_codemod))
 
     registry = Registry()
     registry.load(config.codemod_paths)

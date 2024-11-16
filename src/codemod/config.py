@@ -41,15 +41,16 @@ class Config(BaseModel):
     """
 
     model_config = ConfigDict(
-        # Allow changes to the configuration once loaded, but pass a freeze instance when processing
-        frozen=False,
+        # Don't allow the config object to be mutable.
+        # Do note that mutable objects(set, list, dict) of the immutable config class remain mutable.
+        frozen=True,
         # Allow extra keys, these will be codemods configs
         extra="allow",
     )
 
-    select: set[str] = Field(default_factory=set)
-    exclude: set[str] = Field(default_factory=set)
-    codemod_paths: set[Path] = Field(default_factory=set)
+    select: list[str] = Field(default_factory=list)
+    exclude: list[str] = Field(default_factory=list)
+    codemod_paths: list[Path] = Field(default_factory=list)
     process_pool_size: int = Field(default_factory=os.cpu_count)
 
     @classmethod
@@ -96,35 +97,4 @@ class Config(BaseModel):
             error = f"Unable to parse {path}: {exc}"
             raise ConfigLoadError(error) from exc
         else:
-            prefix = "tool.codemod"
-            config_data = {}
-            for key, value in data.items():
-                if not key.startswith(prefix):
-                    continue
-                # Handle <prefix>
-                if key == prefix:
-                    config_data[key[len(prefix) :]] = value
-                    continue
-                # Now '<prefix>.'
-                config_data[key[len(prefix) + 1 :]] = value
-            return cls.from_dict(config_data)
-
-    def freeze(self) -> FrozenConfig:
-        """
-        Return a frozen instance of this configuration.
-        """
-        # Clone the model with updated config
-        return FrozenConfig.model_construct(**self.model_dump())
-
-
-class FrozenConfig(Config):
-    """
-    Frozen model definition. Same as the parent, but its not mutable.
-    """
-
-    model_config = ConfigDict(
-        # Allow changes to the configuration once loaded, but pass a freeze instance when processing
-        frozen=True,
-        # Allow extra keys, these will be codemods configs
-        extra="allow",
-    )
+            return cls.from_dict(data.get("tool", {}).get("codemod", {}))
