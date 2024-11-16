@@ -55,10 +55,9 @@ class Registry:
         Returns all available codemods, optionally skipping those passed in `excluded_names`.
         """
         for codemod in self._codemods:
-            if select_codemods and codemod.NAME in select_codemods:
-                yield codemod
-                continue
             if exclude_codemods and codemod.NAME in exclude_codemods:
+                continue
+            if select_codemods and codemod.NAME not in select_codemods:
                 continue
             yield codemod
 
