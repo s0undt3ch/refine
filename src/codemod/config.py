@@ -40,8 +40,8 @@ class Config(BaseModel):
     """
 
     model_config = ConfigDict(
-        # Don't allow changes to the configuration once loaded
-        frozen=True,
+        # Allow changes to the configuration once loaded, but pass a freeze instance when processing
+        frozen=False,
         # Allow extra keys, these will be codemods configs
         extra="allow",
     )
@@ -106,3 +106,23 @@ class Config(BaseModel):
                 # Now '<prefix>.'
                 config_data[key[len(prefix) + 1 :]] = value
             return cls.from_dict(config_data)
+
+    def freeze(self) -> FrozenConfig:
+        """
+        Return a frozen instance of this configuration.
+        """
+        # Clone the model with updated config
+        return FrozenConfig.model_construct(**self.model_dump())
+
+
+class FrozenConfig(Config):
+    """
+    Frozen model definition. Same as the parent, but its not mutable.
+    """
+
+    model_config = ConfigDict(
+        # Allow changes to the configuration once loaded, but pass a freeze instance when processing
+        frozen=True,
+        # Allow extra keys, these will be codemods configs
+        extra="allow",
+    )
