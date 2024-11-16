@@ -158,6 +158,7 @@ max-branches = 25
 [tool.mypy]
 python_version = "3.11"
 disable_error_code = "import-untyped"
+mypy_path = "src"
 exclude = [
   "tests/.*/files/.*\\.py",
   "^tests/([^/]*/)*files/.*"
