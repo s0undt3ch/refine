@@ -85,7 +85,11 @@ class Processor:
         for codemod in self.codemods:
             try:
                 log.info(" - Applying %s", codemod.NAME)
-                mod = codemod(context=context, config=self.codemod_configs[codemod.NAME])
+                mod = codemod(
+                    context=context,
+                    # Pass copies of the configuration
+                    config=self.codemod_configs[codemod.NAME].model_copy(deep=True),
+                )
                 modified_tree = mod.transform_module(modified_tree)
             except SkipFile:
                 continue
