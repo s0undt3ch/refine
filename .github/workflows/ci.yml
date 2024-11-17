@@ -55,8 +55,10 @@ jobs:
           poetry install -v
 
       - name: Run Pre-commit
+        env:
+          PRE_COMMIT_COLOR: always
         run: |
-          poetry run pre-commit run -av
+          poetry run pre-commit run --show-diff-on-failure --color=always --all-files
 
   tests:
     name: Test
@@ -118,7 +120,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          poetry run coverage run -m pytest
+          poetry run coverage run -m pytest --color=yes
 
       - name: Report Coverage
         run: |
