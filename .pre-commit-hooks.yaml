@@ -1,0 +1,10 @@
+---
+-   id: codemod
+    name: codemod
+    entry: codemod
+    language: python
+    language_version: python3
+    args: []
+    require_serial: false
+    additional_dependencies: []
+    types: [python]
