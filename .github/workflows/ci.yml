@@ -42,7 +42,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
-          key: >
+          key: >-
             venv|
             ${{ runner.os }}|
             pre-commit|
@@ -116,7 +116,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .venv
-          key: >
+          key: >-
             venv|
             ${{ runner.os }}|
             pre-commit|
