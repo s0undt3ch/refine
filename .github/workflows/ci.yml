@@ -26,6 +26,7 @@ jobs:
 
       - name: Get Python version checksum
         id: python-version-checksum
+        shell: bash
         run: |
           VERSION_SHA256SUM=$(python --version --version | sha256sum | cut -d ' ' -f 1)
           echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
@@ -33,6 +34,7 @@ jobs:
 
       - name: Get Poetry version checksum
         id: poetry-version-checksum
+        shell: bash
         run: |
           VERSION_SHA256SUM=$(poetry --version | sha256sum | cut -d ' ' -f 1)
           echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
@@ -91,6 +93,7 @@ jobs:
 
       - name: Get Python version checksum
         id: python-version-checksum
+        shell: bash
         run: |
           VERSION_SHA256SUM=$(python --version --version | sha256sum | cut -d ' ' -f 1)
           echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
@@ -98,6 +101,7 @@ jobs:
 
       - name: Get Poetry version checksum
         id: poetry-version-checksum
+        shell: bash
         run: |
           VERSION_SHA256SUM=$(poetry --version | sha256sum | cut -d ' ' -f 1)
           echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
