@@ -27,8 +27,8 @@ tomllib = {version = ">=1.1.0", python = "<3.11"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
-attrs = "^24.2.0"
 pytest-clarity = "^1.0.1"
+coverage = "^7.6.7"
 
 [tool.poetry.plugins."codemod"]
 format-sql = "codemod.mods.sql.fmt:FormatSQL"
