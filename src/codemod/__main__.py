@@ -29,7 +29,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=VERSION)
     parser.add_argument(
-        "files", metavar="FILE", nargs="+", type=pathlib.Path, help="One or more files to process."
+        "files", metavar="FILE", nargs="*", type=pathlib.Path, help="One or more files to process."
     )
     parser.add_argument(
         "--config",
@@ -105,6 +105,10 @@ def main():
             log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
         parser.exit()
 
+    files = args.files
+    if not files:
+        files = pathlib.Path.cwd().glob("**/*.py")
+
     codemods = list(
         registry.codemods(select_codemods=config.select, exclude_codemods=config.exclude)
     )
@@ -113,7 +117,7 @@ def main():
         log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
 
     processor = Processor(config=config.freeze(), registry=registry, codemods=codemods)
-    processor.process(args.files)
+    processor.process(files)
 
 
 if __name__ == "__main__":
