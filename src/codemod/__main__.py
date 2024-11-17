@@ -105,9 +105,17 @@ def main():
             log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
         parser.exit()
 
-    files = args.files
-    if not files:
-        files = pathlib.Path.cwd().glob("**/*.py")
+    paths = args.files
+    if not paths:
+        paths = pathlib.Path.cwd().glob("**/*.py")
+
+    files: list[pathlib.Path] = []
+    for path in paths:
+        if path.is_file():
+            files.append(path)
+            continue
+        for subpath in path.rglob("*.py"):
+            files.append(subpath)
 
     codemods = list(
         registry.codemods(select_codemods=config.select, exclude_codemods=config.exclude)
@@ -116,7 +124,7 @@ def main():
     for codemod in codemods:
         log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
 
-    processor = Processor(config=config.freeze(), registry=registry, codemods=codemods)
+    processor = Processor(config=config, registry=registry, codemods=codemods)
     processor.process(files)
 
 
