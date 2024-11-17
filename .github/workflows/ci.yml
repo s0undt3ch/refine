@@ -21,8 +21,6 @@ jobs:
       - name: Install Package dependencies
         run: |
           pip install pre-commit
-          pip install poetry
-          poetry config virtualenvs.in-project true
 
       - name: Get Python version checksum
         id: python-version-checksum
@@ -32,35 +30,31 @@ jobs:
           echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
           echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
 
-      - name: Get Poetry version checksum
-        id: poetry-version-checksum
+      - name: Get Pre-Commit version checksum
+        id: pre-commit-version-checksum
         shell: bash
         run: |
-          VERSION_SHA256SUM=$(poetry --version | sha256sum | cut -d ' ' -f 1)
+          VERSION_SHA256SUM=$(pre-commit --version | sha256sum | cut -d ' ' -f 1)
           echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
           echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
 
       - name: Set up cache
         uses: actions/cache@v4
         with:
-          path: .venv
+          path: ~/.cache/pre-commit
           key: >
             venv|
             ${{ runner.os }}|
             pre-commit|
             ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
-            ${{ steps.poetry-version-checksum.outputs.version-sha256sum }}|
+            ${{ steps.pre-commit-version-checksum.outputs.version-sha256sum }}|
             ${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install Dependencies
-        run: |
-          poetry install -v
 
       - name: Run Pre-commit
         env:
           PRE_COMMIT_COLOR: always
         run: |
-          poetry run pre-commit run --show-diff-on-failure --color=always --all-files
+          pre-commit run --show-diff-on-failure --color=always --all-files
 
   tests:
     name: Test
