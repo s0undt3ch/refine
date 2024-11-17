@@ -32,6 +32,7 @@ coverage = "^7.6.7"
 
 [tool.poetry.plugins."codemod"]
 format-sql = "codemod.mods.sql.fmt:FormatSQL"
+cli-dashes = "codemod.mods.cli.flags:CliDashes"
 
 build-backend = "poetry.masonry.api"
 
