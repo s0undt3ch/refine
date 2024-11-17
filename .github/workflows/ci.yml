@@ -6,7 +6,7 @@ on:
 
 jobs:
   pre-commit:
-    name: Run Pre-commit Checks
+    name: Pre-commit
     runs-on: ubuntu-latest
 
     steps:
@@ -59,7 +59,7 @@ jobs:
           poetry run pre-commit run -av
 
   tests:
-    name: Run Tests with Coverage
+    name: Test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
