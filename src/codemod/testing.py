@@ -2,19 +2,23 @@
 Codemode testing support.
 """
 
+from __future__ import annotations
+
 import logging
 import textwrap
 from dataclasses import dataclass
 from dataclasses import field
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from libcst import PartialParserConfig
 from libcst import parse_module
 from libcst.codemod import CodemodContext
 from libcst.codemod import SkipFile
 
-from codemod.abc import BaseCodemod
-from codemod.abc import BaseConfig
+if TYPE_CHECKING:
+    from codemod.abc import BaseCodemod
+    from codemod.abc import BaseConfig
 
 log = logging.getLogger(__name__)
 
@@ -28,7 +32,7 @@ class Modcase:
     original: str = field(init=False, repr=False)
     updated: str = field(init=False, repr=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = self.path.stem
         log.debug("Populating ModCase.original from: %s", self.path)
         self.original = self._dedent_contents(self.path)
@@ -42,7 +46,7 @@ class Modcase:
             contents = contents[1:]
         return textwrap.dedent(contents)
 
-    def assert_codemod(self, expected_skip: bool = False):
+    def assert_codemod(self, expected_skip: bool = False) -> None:
         """
         This assertion is inspired by libCST's TestClass implementation.
         """

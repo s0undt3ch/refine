@@ -2,6 +2,8 @@
 Codemod utilities.
 """
 
+from __future__ import annotations
+
 import re
 from ast import literal_eval
 from functools import cache

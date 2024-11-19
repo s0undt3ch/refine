@@ -140,8 +140,16 @@ convention = "google"
 [tool.ruff.lint.isort]
 combine-as-imports = false
 force-single-line = true
-known-first-party = ["src"]
-forced-separate = ["tests"]
+known-first-party = [
+  "src",
+  "codemod",
+]
+forced-separate = [
+  "tests"
+]
+required-imports = [
+  "from __future__ import annotations"
+]
 
 [tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
@@ -160,8 +168,20 @@ max-branches = 25
 [tool.mypy]
 python_version = "3.11"
 disable_error_code = "import-untyped"
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
 mypy_path = "src"
 exclude = [
   "tests/.*/files/.*\\.py",
   "^tests/([^/]*/)*files/.*"
 ]
+[[tool.mypy.overrides]]
+module = [
+  "tests.*"
+]
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false

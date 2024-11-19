@@ -2,6 +2,8 @@
 Abstract base classes for defining codemod types and their configurations.
 """
 
+from __future__ import annotations
+
 from abc import ABC
 from typing import ClassVar
 from typing import Generic

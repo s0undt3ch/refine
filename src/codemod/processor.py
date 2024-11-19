@@ -2,10 +2,13 @@
 Codemod processor.
 """
 
+from __future__ import annotations
+
 import logging
 import multiprocessing
 from collections.abc import Callable
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import libcst as cst
 from libcst.codemod import CodemodContext
@@ -13,8 +16,10 @@ from libcst.codemod import SkipFile
 
 from codemod.abc import BaseCodemod
 from codemod.abc import BaseConfig
-from codemod.config import Config
-from codemod.registry import Registry
+
+if TYPE_CHECKING:
+    from codemod.config import Config
+    from codemod.registry import Registry
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +46,7 @@ class Processor:
         self.codemod_configs = codemod_configs
         self._modified = self._failures = 0
 
-    def process(self, paths: list[Path]):
+    def process(self, paths: list[Path]) -> int:
         """
         Process the passed in list of paths.
         """
@@ -68,6 +73,7 @@ class Processor:
             self._modified,
             self._failures,
         )
+        return 1 if self._failures else 0
 
     def process_file(self, path: Path) -> Path | None:
         """
@@ -100,5 +106,5 @@ class Processor:
             log.info("Saved changes to %s", path)
             self._modified += 1
 
-    def _process_failed(self, *_) -> None:
+    def _process_failed(self, *_: BaseException) -> None:
         self._failures += 1

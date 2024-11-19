@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import pathlib
 from ast import literal_eval
@@ -43,7 +45,7 @@ class CliDashes(BaseCodemod):
             raise SkipFile(skip_reason)
         return True
 
-    def visit_FunctionDef(self, node: cst.FunctionDef):
+    def visit_FunctionDef(self, node: cst.FunctionDef) -> None:
         # Collect type annotations of parameters
         self.typed_parameters = {}
         for param in node.params.params:
@@ -61,14 +63,14 @@ class CliDashes(BaseCodemod):
         self.typed_assignments = {}
         return updated
 
-    def visit_AnnAssign(self, node: cst.AnnAssign):
+    def visit_AnnAssign(self, node: cst.AnnAssign) -> None:
         if isinstance(node.target, cst.Name):
             var_name = node.target.value
             annotation = node.annotation.annotation
             if isinstance(annotation, cst.Name) and annotation.value == "ArgumentParser":
                 self.typed_assignments[var_name] = annotation.value
 
-    def visit_Assign(self, node: cst.Assign):
+    def visit_Assign(self, node: cst.Assign) -> None:
         # NOTE: we're not taking into account import aliases
         assign_target: cst.AssignTarget
         for assign_target in node.targets:

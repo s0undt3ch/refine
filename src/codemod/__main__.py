@@ -4,12 +4,15 @@ Utility to simplify rewriting python code.
 It can be used for one-off rewrites, or, to maintain code styling rules.
 """
 
+from __future__ import annotations
+
 import argparse
 import importlib.metadata
 import logging
 import pathlib
 import sys
 from multiprocessing import freeze_support
+from typing import NoReturn
 
 from codemod.config import Config
 from codemod.processor import Processor
@@ -25,7 +28,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(message)s")
 log = logging.getLogger(__name__)
 
 
-def main():
+def main() -> NoReturn:  # noqa: PLR0915
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=VERSION)
     parser.add_argument(
@@ -81,7 +84,7 @@ def main():
         else:
             config = Config.from_default_file(config_file)
     elif pathlib.Path.cwd().joinpath("pyproject.toml").exists():
-        config = Config.from_toml(pathlib.Path.cwd().joinpath("pyproject.toml"))
+        config = Config.from_pyproject_file(pathlib.Path.cwd().joinpath("pyproject.toml"))
     else:
         config = Config()
 
@@ -125,7 +128,8 @@ def main():
         log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
 
     processor = Processor(config=config, registry=registry, codemods=codemods)
-    processor.process(files)
+    exitcode: int = processor.process(files)
+    parser.exit(status=exitcode)
 
 
 if __name__ == "__main__":

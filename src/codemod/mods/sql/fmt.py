@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import pathlib
 import textwrap
@@ -10,13 +12,15 @@ import libcst.matchers as m
 import sqlfluff.api
 from libcst.codemod import SkipFile
 from sqlfluff.api.simple import get_simple_config
-from sqlfluff.core import FluffConfig
 
 from codemod import utils
 from codemod.abc import BaseCodemod
 from codemod.abc import BaseConfig
 
 from .utils import is_sql_query
+
+if TYPE_CHECKING:
+    from sqlfluff.core import FluffConfig
 
 # Quiet down sqlfluff logs during tests
 logging.getLogger("sqlfluff").setLevel(logging.WARNING)

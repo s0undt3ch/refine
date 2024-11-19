@@ -4,6 +4,8 @@ Codemod registry.
 This holds the information about what codemods are available to be used.
 """
 
+from __future__ import annotations
+
 import importlib.metadata
 import inspect
 import logging
