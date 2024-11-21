@@ -200,7 +200,7 @@ class Processor:
         )
 
         try:
-            with open(filename, "rb") as rfh:
+            with open(filename, encoding="utf-8") as rfh:
                 old_code = rfh.read()
 
             # Run the transform, bail if we failed or if we aren't formatting code
@@ -219,8 +219,7 @@ class Processor:
                     except SkipFile:
                         continue
 
-                new_code = output_tree.bytes
-                encoding = output_tree.encoding
+                new_code = output_tree.code
             except KeyboardInterrupt:
                 return ExecutionResult(
                     filename=filename,
@@ -249,7 +248,7 @@ class Processor:
                 )
             if new_code != old_code:
                 try:
-                    with tempfile.NamedTemporaryFile() as wfh:
+                    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8") as wfh:
                         wfh.write(new_code)
                         # Ensure all data is written to disk
                         wfh.flush()
@@ -272,7 +271,7 @@ class Processor:
                     changed=True,
                     transform_result=TransformSuccess(
                         warning_messages=context.warnings,
-                        code=new_code.decode(encoding),
+                        code=new_code,
                     ),
                 )
             return ExecutionResult(
@@ -280,7 +279,7 @@ class Processor:
                 changed=False,
                 transform_result=TransformSuccess(
                     warning_messages=context.warnings,
-                    code=new_code.decode(encoding),
+                    code=new_code,
                 ),
             )
         except KeyboardInterrupt:
