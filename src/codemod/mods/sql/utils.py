@@ -4,11 +4,14 @@ SQL mod related utility functions.
 
 from __future__ import annotations
 
+import logging
 import re
 
 import libcst as cst
 
 from codemod import utils
+
+log = logging.getLogger(__name__)
 
 SQL_RE = re.compile(
     r"""
@@ -35,5 +38,9 @@ SQL_RE = re.compile(
 
 def is_sql_query(node: cst.CSTNode) -> bool:
     if not isinstance(node, cst.SimpleString):
+        return False
+    evaluated_string = utils.evaluated_string(node)
+    if not isinstance(evaluated_string, str):
+        # We will only process strings
         return False
     return SQL_RE.match(utils.evaluated_string(node)) is not None
