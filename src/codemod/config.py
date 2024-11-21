@@ -17,6 +17,11 @@ from pydantic import Field
 log = logging.getLogger(__name__)
 
 
+def _cpu_count() -> int:
+    # os.cpu_count() can return None, let's not.
+    return os.cpu_count() or 1
+
+
 class ConfigError(ValueError):
     """
     Config related error.
@@ -51,7 +56,7 @@ class Config(BaseModel):
     select: list[str] = Field(default_factory=list)
     exclude: list[str] = Field(default_factory=list)
     codemod_paths: list[Path] = Field(default_factory=list)
-    process_pool_size: int = Field(default_factory=os.cpu_count)
+    process_pool_size: int = Field(default_factory=_cpu_count)
     repo_root: Path = Field(default_factory=Path.cwd)
 
     @classmethod
