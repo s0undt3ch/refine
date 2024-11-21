@@ -8,7 +8,10 @@ from __future__ import annotations
 
 import logging
 import multiprocessing
+import os
+import shutil
 import sys
+import tempfile
 import traceback
 from dataclasses import dataclass
 from functools import partial
@@ -239,8 +242,25 @@ class Processor:
                     ),
                 )
             if new_code != old_code:
-                with open(filename, "wb") as wfh:
-                    wfh.write(new_code)
+                try:
+                    with tempfile.NamedTemporaryFile() as wfh:
+                        wfh.write(new_code)
+                        # Ensure all data is written to disk
+                        wfh.flush()
+                        os.fsync(wfh.fileno())
+                        # Since the writing was successful, copy the temporary file over the file
+                        # we want to change
+                        shutil.copyfile(wfh.name, filename)
+                except Exception as exc:
+                    return ExecutionResult(
+                        filename=filename,
+                        changed=False,
+                        transform_result=TransformFailure(
+                            error=exc,
+                            traceback_str=traceback.format_exc(),
+                            warning_messages=context.warnings,
+                        ),
+                    )
                 return ExecutionResult(
                     filename=filename,
                     changed=True,
