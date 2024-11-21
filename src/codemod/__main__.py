@@ -15,6 +15,7 @@ from multiprocessing import freeze_support
 from typing import NoReturn
 
 from codemod.config import Config
+from codemod.exc import CodemodSystemExit
 from codemod.processor import Processor
 from codemod.registry import Registry
 
@@ -110,7 +111,7 @@ def main() -> NoReturn:  # noqa: PLR0915
 
     paths = args.files
     if not paths:
-        paths = pathlib.Path.cwd().glob("**/*.py")
+        paths = config.repo_root.glob("**/*.py")
 
     files: list[pathlib.Path] = []
     for path in paths:
@@ -128,8 +129,22 @@ def main() -> NoReturn:  # noqa: PLR0915
         log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
 
     processor = Processor(config=config, registry=registry, codemods=codemods)
-    exitcode: int = processor.process(files)
-    parser.exit(status=exitcode)
+    try:
+        result = processor.process(files)
+        if result.failures:
+            parser.exit(status=1)
+    except CodemodSystemExit as exc:
+        parser.exit(status=exc.code, message=exc.message)
+    except SystemExit as exc:
+        code: str | int | None = exc.code
+        if code is None:
+            parser.exit(status=1)
+        if isinstance(code, int):
+            parser.exit(status=code)
+        parser.exit(status=1, message=code)
+    except KeyboardInterrupt:
+        parser.exit(status=1)
+    parser.exit(status=0)
 
 
 if __name__ == "__main__":

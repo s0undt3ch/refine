@@ -52,6 +52,7 @@ class Config(BaseModel):
     exclude: list[str] = Field(default_factory=list)
     codemod_paths: list[Path] = Field(default_factory=list)
     process_pool_size: int = Field(default_factory=os.cpu_count)
+    repo_root: Path = Field(default_factory=Path.cwd)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Config:

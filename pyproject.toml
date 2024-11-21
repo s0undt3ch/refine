@@ -97,16 +97,22 @@ ignore = [
   "PLR0913", # Too many arguments in function definition
 ]
 "src/codemod/mods/*.py" = [
-  "ARG002", #  Unused method argument
-  "D100",   # Missing docstring in public module
-  "D101",   # Missing docstring in public class
-  "D102",   # Missing docstring in public method
-  "N802",   # Function name `leave_Xyz` should be lowercase
+  "ARG002",   #  Unused method argument
+  "D100",     # Missing docstring in public module
+  "D101",     # Missing docstring in public class
+  "D102",     # Missing docstring in public method
+  "N802",     # Function name `leave_Xyz` should be lowercase
+]
+"src/codemod/processor.py" = [
+  "T201",     # `print` found
+  "BLE001",   # Do not catch blind exception: `Exception`
+  "PLR0913",  # Too many arguments in function definition"
+  "PLR0911",  # Too many return statements (7 > 6)"
 ]
 "src/codemod/testing.py" = [
-  "D101",   # Missing docstring in public class
-  "D105",   # Missing docstring in magic method
-  "S101",   # Use of `assert` detected
+  "D101",     # Missing docstring in public class
+  "D105",     # Missing docstring in magic method
+  "S101",     # Use of `assert` detected
 ]
 "tools/**/*.py" = [
   "ANN201",   # Missing return type annotation for public function"
@@ -172,6 +178,7 @@ disallow_untyped_calls = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
+warn_unused_ignores = true
 mypy_path = "src"
 exclude = [
   "tests/.*/files/.*\\.py",
