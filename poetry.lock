@@ -172,6 +172,17 @@ Pygments = ">=2.9.0,<3.0.0"
 toml = ["tomli (>=1.2.1)"]
 
 [[package]]
+name = "distro"
+version = "1.9.0"
+description = "Distro - an OS platform information API"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "distro-1.9.0-py3-none-any.whl", hash = "sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2"},
+    {file = "distro-1.9.0.tar.gz", hash = "sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed"},
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -572,6 +583,31 @@ pytest = ">=3.5.0"
 rich = ">=8.0.0"
 
 [[package]]
+name = "pytest-skip-markers"
+version = "1.5.2"
+description = "Pytest Salt Plugin"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest_skip_markers-1.5.2-py3-none-any.whl", hash = "sha256:416be63bebacb3c17020d6a65b4306cb685161a2071ca5e7a7df529627f7e0f7"},
+    {file = "pytest_skip_markers-1.5.2.tar.gz", hash = "sha256:76d61be67f1fd639cca37830a4756b09cea5521361616e66344f7ef00b4d06c0"},
+]
+
+[package.dependencies]
+attrs = ">=19.2.0"
+distro = "*"
+pytest = ">=7.1.0"
+pywin32 = {version = "*", markers = "sys_platform == \"win32\""}
+
+[package.extras]
+changelog = ["towncrier (==21.9.0rc1)"]
+docker = ["docker"]
+docs = ["furo", "sphinx", "sphinx-copybutton", "sphinx-prompt", "sphinxcontrib-spelling", "sphinxcontrib-towncrier (>=0.2.1a0)"]
+lint = ["black", "flake8 (>=4.0.1)", "flake8-docstrings", "flake8-mypy-fork", "flake8-typing-imports", "pyenchant", "pylint (==2.12.2)", "reorder-python-imports"]
+salt = ["salt (>=3001)"]
+tests = ["cryptography", "docker", "pyfakefs", "pyfakefs (==4.4.0)", "pytest-subtests"]
+
+[[package]]
 name = "pytest-subtests"
 version = "0.13.1"
 description = "unittest subTest() support and subtests fixture"
@@ -585,6 +621,33 @@ files = [
 [package.dependencies]
 attrs = ">=19.2.0"
 pytest = ">=7.0"
+
+[[package]]
+name = "pywin32"
+version = "308"
+description = "Python for Window Extensions"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pywin32-308-cp310-cp310-win32.whl", hash = "sha256:796ff4426437896550d2981b9c2ac0ffd75238ad9ea2d3bfa67a1abd546d262e"},
+    {file = "pywin32-308-cp310-cp310-win_amd64.whl", hash = "sha256:4fc888c59b3c0bef905ce7eb7e2106a07712015ea1c8234b703a088d46110e8e"},
+    {file = "pywin32-308-cp310-cp310-win_arm64.whl", hash = "sha256:a5ab5381813b40f264fa3495b98af850098f814a25a63589a8e9eb12560f450c"},
+    {file = "pywin32-308-cp311-cp311-win32.whl", hash = "sha256:5d8c8015b24a7d6855b1550d8e660d8daa09983c80e5daf89a273e5c6fb5095a"},
+    {file = "pywin32-308-cp311-cp311-win_amd64.whl", hash = "sha256:575621b90f0dc2695fec346b2d6302faebd4f0f45c05ea29404cefe35d89442b"},
+    {file = "pywin32-308-cp311-cp311-win_arm64.whl", hash = "sha256:100a5442b7332070983c4cd03f2e906a5648a5104b8a7f50175f7906efd16bb6"},
+    {file = "pywin32-308-cp312-cp312-win32.whl", hash = "sha256:587f3e19696f4bf96fde9d8a57cec74a57021ad5f204c9e627e15c33ff568897"},
+    {file = "pywin32-308-cp312-cp312-win_amd64.whl", hash = "sha256:00b3e11ef09ede56c6a43c71f2d31857cf7c54b0ab6e78ac659497abd2834f47"},
+    {file = "pywin32-308-cp312-cp312-win_arm64.whl", hash = "sha256:9b4de86c8d909aed15b7011182c8cab38c8850de36e6afb1f0db22b8959e3091"},
+    {file = "pywin32-308-cp313-cp313-win32.whl", hash = "sha256:1c44539a37a5b7b21d02ab34e6a4d314e0788f1690d65b48e9b0b89f31abbbed"},
+    {file = "pywin32-308-cp313-cp313-win_amd64.whl", hash = "sha256:fd380990e792eaf6827fcb7e187b2b4b1cede0585e3d0c9e84201ec27b9905e4"},
+    {file = "pywin32-308-cp313-cp313-win_arm64.whl", hash = "sha256:ef313c46d4c18dfb82a2431e3051ac8f112ccee1a34f29c263c583c568db63cd"},
+    {file = "pywin32-308-cp37-cp37m-win32.whl", hash = "sha256:1f696ab352a2ddd63bd07430080dd598e6369152ea13a25ebcdd2f503a38f1ff"},
+    {file = "pywin32-308-cp37-cp37m-win_amd64.whl", hash = "sha256:13dcb914ed4347019fbec6697a01a0aec61019c1046c2b905410d197856326a6"},
+    {file = "pywin32-308-cp38-cp38-win32.whl", hash = "sha256:5794e764ebcabf4ff08c555b31bd348c9025929371763b2183172ff4708152f0"},
+    {file = "pywin32-308-cp38-cp38-win_amd64.whl", hash = "sha256:3b92622e29d651c6b783e368ba7d6722b1634b8e70bd376fd7610fe1992e19de"},
+    {file = "pywin32-308-cp39-cp39-win32.whl", hash = "sha256:7873ca4dc60ab3287919881a7d4f88baee4a6e639aa6962de25a98ba6b193341"},
+    {file = "pywin32-308-cp39-cp39-win_amd64.whl", hash = "sha256:71b3322d949b4cc20776436a9c9ba0eeedcbc9c650daa536df63f0ff111bb920"},
+]
 
 [[package]]
 name = "pyyaml"
@@ -840,4 +903,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">3.11,<4"
-content-hash = "74d77ef7765599f63b80998032c67f5d28e20726250e8a8e047c7a8889d23ba8"
+content-hash = "cf3fb7a88621b5ad38c627e088aecfb7eda3acb57c4e3940b85c44b41e438b9e"

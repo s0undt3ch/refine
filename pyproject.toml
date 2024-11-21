@@ -30,6 +30,7 @@ pytest = "^8.3.3"
 pytest-clarity = "^1.0.1"
 coverage = "^7.6.7"
 pytest-subtests = "^0.13.1"
+pytest-skip-markers = "^1.5.2"
 
 [tool.poetry.plugins."codemod"]
 format-sql = "codemod.mods.sql.fmt:FormatSQL"

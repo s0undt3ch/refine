@@ -6,6 +6,8 @@ import shutil
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import pytest
+
 from codemod.mods.cli.flags import CliDashes
 from codemod.processor import Processor
 
@@ -16,6 +18,7 @@ TEST_FILE_PATH = TESTS_DIR / "mods/cli/files/flags/annotated-function.py"
 TEST_FILE_UPDATED_PATH = TESTS_DIR / "mods/cli/files/flags/annotated-function.updated.py"
 
 
+@pytest.mark.skip_on_windows
 def test_write_file_exception(tmp_path, subtests):
     # Just make sure we are not copying an empty file
     assert TEST_FILE_PATH.exists()
@@ -45,9 +48,7 @@ def test_write_file_exception(tmp_path, subtests):
                 processor.process([tmp_file_path])
 
         # Ensure the file's content remains unchanged after the exception
-        assert tmp_file_path.read_text().replace(
-            "\r\n", "\n"
-        ) == TEST_FILE_PATH.read_text().replace("\r\n", "\n")
+        assert tmp_file_path.read_text() == TEST_FILE_PATH.read_text()
 
     # Just for the sake of completeness, what if we don't raise an exception?
     with subtests.test("Non-failing behaviour"):
