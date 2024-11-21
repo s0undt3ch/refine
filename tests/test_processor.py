@@ -45,7 +45,9 @@ def test_write_file_exception(tmp_path, subtests):
                 processor.process([tmp_file_path])
 
         # Ensure the file's content remains unchanged after the exception
-        assert tmp_file_path.read_text() == TEST_FILE_PATH.read_text()
+        assert tmp_file_path.read_text().replace(
+            "\r\n", "\n"
+        ) == TEST_FILE_PATH.read_text().replace("\r\n", "\n")
 
     # Just for the sake of completeness, what if we don't raise an exception?
     with subtests.test("Non-failing behaviour"):
