@@ -45,6 +45,13 @@ def main() -> NoReturn:  # noqa: PLR0915
         "--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output."
     )
     parser.add_argument(
+        "--fail-fast",
+        "--ff",
+        action="store_true",
+        default=False,
+        help="Exit as soon as possible on the first processing error",
+    )
+    parser.add_argument(
         "--list-codemods",
         "--list",
         action="store_true",
@@ -100,6 +107,9 @@ def main() -> NoReturn:  # noqa: PLR0915
     if args.exclude_codemod:
         # Add any additional CLI passed exclusions
         config.exclude[:] = list(set(config.exclude) | set(args.exclude_codemod))
+
+    if args.fail_fast:
+        config = config.model_copy(update={"fail_fast": True}, deep=True)
 
     registry = Registry()
     registry.load(config.codemod_paths)

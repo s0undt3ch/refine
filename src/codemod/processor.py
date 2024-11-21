@@ -162,6 +162,12 @@ class Processor:
                     elif isinstance(result.transform_result, (TransformExit, TransformSkip)):
                         skips += 1
 
+                    if (
+                        isinstance(result.transform_result, TransformFailure)
+                        and self.config.fail_fast
+                    ):
+                        break
+
                     warnings += len(result.transform_result.warning_messages)
             finally:
                 progress.clear()

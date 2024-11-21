@@ -58,6 +58,7 @@ class Config(BaseModel):
     codemod_paths: list[Path] = Field(default_factory=list)
     process_pool_size: int = Field(default_factory=_cpu_count)
     repo_root: Path = Field(default_factory=Path.cwd)
+    fail_fast: bool = Field(default=False)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Config:
