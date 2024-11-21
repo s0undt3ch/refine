@@ -74,6 +74,12 @@ class CliDashes(BaseCodemod):
         # NOTE: we're not taking into account import aliases
         assign_target: cst.AssignTarget
         for assign_target in node.targets:
+            if not isinstance(assign_target.target, cst.Name):
+                # We only want to handle simple assignments:
+                # var_a = value_a
+                # We're not handling assignment expansion, ie
+                # var_a, var_b = value_a, value_b
+                continue
             target: cst.Name = cast(cst.Name, assign_target.target)
             var_name = target.value
             if m.matches(
