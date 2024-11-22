@@ -21,19 +21,8 @@ def evaluated_string(node: cst.SimpleString) -> str:
     return literal_eval(node.value)
 
 
-@cache
-def find_indent(text: str) -> str:
-    """
-    Find the indentation of a string.
-    """
-    starting_newline: str = text.startswith("\n") and "\n" or ""
-    indent = ""
-    if starting_newline:
-        text = text[1:]
-    match = INDENT_RE.match(text)
-    if match:
-        indent = match.group("indent")
-    return indent
+def remove_leading_whitespace(string: str) -> str:
+    return "\n".join([line.lstrip() for line in string.splitlines()])
 
 
 def get_full_module_name(module: cst.Module) -> str:

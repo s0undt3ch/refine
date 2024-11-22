@@ -10,6 +10,8 @@ param_style = pyformat
 [sqlfluff:indentation]
 allow_implicit_indents = True
 indented_joins = True
+tab_space_size = 4
+indent_unit = space
 
 [sqlfluff:rules:aliasing.length]
 min_alias_length = 3

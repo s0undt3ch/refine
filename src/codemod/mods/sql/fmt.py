@@ -8,9 +8,9 @@ from typing import TYPE_CHECKING
 from typing import cast
 
 import libcst as cst
-import libcst.matchers as m
 import sqlfluff.api
 from libcst.codemod import SkipFile
+from libcst.metadata import WhitespaceInclusivePositionProvider
 from sqlfluff.api.simple import get_simple_config
 
 from codemod import utils
@@ -25,6 +25,8 @@ if TYPE_CHECKING:
 # Quiet down sqlfluff logs during tests
 logging.getLogger("sqlfluff").setLevel(logging.WARNING)
 
+log = logging.getLogger(__name__)
+
 BUILNTIN_SQLFLUFF_CONFIG_FILE = pathlib.Path(__file__).parent / ".sqlfluff"
 
 
@@ -38,6 +40,8 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
     CONFIG_CLS = FormatSQLConfig
     DESCRIPTION: str = "Format SQL queries using the `sqlfluff` python package"
 
+    METADATA_DEPENDENCIES = (WhitespaceInclusivePositionProvider,)
+
     def visit_Module(self, mod: cst.Module) -> bool:
         filename: str | None = self.context.filename
         if TYPE_CHECKING:
@@ -48,27 +52,35 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
         return True
 
     def leave_Assign(self, original: cst.Assign, updated: cst.Assign) -> cst.Assign:
-        extracts = m.extract(
-            original,
-            m.Assign(
-                value=m.SaveMatchedNode(  # type: ignore[arg-type]
-                    m.MatchIfTrue(is_sql_query),
-                    "query",
-                ),
-            ),
-        )
-        if extracts:
-            string_node = cast(cst.SimpleString, extracts["query"])
-            query = self.__format_sql(utils.evaluated_string(string_node))
-            if string_node.quote.startswith("'"):
-                return updated.with_changes(
-                    value=string_node.__class__(
-                        f"""{string_node.quote}{query}{string_node.quote}"""
-                    )
-                )
+        if not isinstance(updated.value, cst.SimpleString) or not is_sql_query(updated.value):
+            return updated
+
+        string_node = cast(cst.SimpleString, updated.value)
+        unquoted_string = utils.evaluated_string(string_node)
+        if isinstance(unquoted_string, bytes):
+            # We're not handling bytestrings
+            return updated
+
+        # We can only get metadata information from the original node, not the updated one
+        position = self.get_metadata(WhitespaceInclusivePositionProvider, original)
+        query = self.__format_sql(unquoted_string, indent=position.start.column + 4)
+
+        if "\n" in query and string_node.quote in ('"""', "'''"):
+            first_line = "\n"
+            last_line = " " * position.start.column
+        else:
+            last_line = first_line = ""
+        if string_node.quote.startswith("'"):
             return updated.with_changes(
-                value=string_node.__class__(f"""{string_node.quote}{query}{string_node.quote}""")
+                value=string_node.__class__(
+                    f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
+                )
             )
+        return updated.with_changes(
+            value=string_node.__class__(
+                f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
+            )
+        )
         return updated
 
     def leave_Call(self, original: cst.Call, updated: cst.Call) -> cst.Call:
@@ -82,20 +94,27 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
                 args.append(arg)
                 continue
 
-            matched = True
             string_node = cast(cst.SimpleString, arg.value)
             unquoted_string = utils.evaluated_string(string_node)
-            indent = utils.find_indent(unquoted_string)
-            query = self.__format_sql(unquoted_string)
+
+            if isinstance(unquoted_string, bytes):
+                # We're not handling bytestrings
+                continue
+
+            matched = True
+            # We can only get metadata information from the original node, not the updated one
+            position = self.get_metadata(WhitespaceInclusivePositionProvider, string_node)
+            query = self.__format_sql(unquoted_string, indent=position.start.column)
             if "\n" in query and string_node.quote in ('"""', "'''"):
-                last_line = f"{indent}"
+                first_line = "\n"
+                last_line = " " * position.start.column
             else:
-                last_line = ""
+                last_line = first_line = ""
             if string_node.quote.startswith("'"):
                 args.append(
                     arg.with_changes(
                         value=string_node.__class__(
-                            f"""{string_node.quote}{query}{last_line}{string_node.quote}"""
+                            f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
                         )
                     )
                 )
@@ -103,7 +122,7 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
                 args.append(
                     arg.with_changes(
                         value=string_node.__class__(
-                            f"""{string_node.quote}{query}{last_line}{string_node.quote}"""
+                            f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
                         )
                     )
                 )
@@ -116,33 +135,37 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
         # Load config and cache it
         return get_simple_config(config_path=str(self.config.sqlfluff_config_file))
 
-    def __format_sql(self, query: str) -> str:
+    def __format_sql(self, query: str, indent: int) -> str:
         # We want a copy of the config so that we can modify it
         config = self.__get_sqlfluff_config().copy()
         starting_newline: str = query.startswith("\n") and "\n" or ""
-        indent = utils.find_indent(query)
         if starting_newline:
             query = query[1:]
 
-        # Since we will need to indent code, and still want sqlfluff to respect it's max width setting
-        config.set_value("max_linelength", config.get("max_line_length") - len(indent))
+        query = utils.remove_leading_whitespace(query)
 
-        formated = sqlfluff.api.fix(
-            query,
-            dialect="mysql",
-            config=config,
-            fix_even_unparsable=False,
+        # Since we will need to indent code, and still want sqlfluff to respect it's max width setting
+        config.set_value("max_linelength", config.get("max_line_length") - indent)
+
+        formated = (
+            sqlfluff.api.fix(
+                query,
+                dialect="mysql",
+                config=config,
+                fix_even_unparsable=False,
+            )
+            # Remove the ending newline
+            .rstrip()
         )
-        ending_newline: str = (
-            (starting_newline or ("\n" in formated and not formated.endswith("\n"))) and "\n" or ""
-        )
-        indented_query = (
-            f"{starting_newline}{textwrap.indent(formated, prefix=indent)}{ending_newline}"
-        )
-        if indented_query.count("\n") == 1 and indented_query.endswith("\n"):
-            # If we really only have
-            return indented_query[:-1]
-        if indented_query.endswith("\n\n"):
-            # We don't really want two new lines at the end
-            return indented_query[:-1]
-        return indented_query
+        if "\n" not in formated:
+            # If the query is a single line, we don't need to indent it
+            log.debug("Formatted SQL Query >>>>>>>>>%s<<<<<<<<<<<<<<", formated)
+            return formated
+
+        log.debug("Formatted SQL Query >>>>>>>>>\n%s\n<<<<<<<<<<<<<<", formated)
+
+        indent_query = textwrap.indent(formated, prefix=" " * indent)
+        if "\n" in indent_query and not indent_query.endswith("\n"):
+            # Multiline queries must end with a line break
+            return indent_query + "\n"
+        return indent_query
