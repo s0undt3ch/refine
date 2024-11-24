@@ -27,7 +27,7 @@ repos:
     hooks:
       - id: black
         args: [-l 100]
-        exclude: src/codemod/version.py
+        exclude: ^tests/([^/]*/)*files/.*
 
   - repo: https://github.com/asottile/blacken-docs
     rev: 1.19.1
