@@ -1,7 +1,7 @@
 ---
--   id: codemod
-    name: codemod
-    entry: codemod
+-   id: re-code
+    name: re-code
+    entry: re-code
     language: python
     language_version: python3
     args: []

@@ -1,5 +1,5 @@
 """
-Codemod related exceptions.
+re:Code related exceptions.
 """
 
 from __future__ import annotations
@@ -7,15 +7,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 
-class CodemodError(Exception):
+class ReCodeError(Exception):
     """
-    Codemod specific exception.
+    re:Code specific exception.
     """
 
 
-class CodemodSystemExit(SystemExit):
+class ReCodeSystemExit(SystemExit):
     """
-    Codemod system exit exception that accepts a message argument.
+    re:Code system exit exception that accepts a message argument.
     """
 
     code: int

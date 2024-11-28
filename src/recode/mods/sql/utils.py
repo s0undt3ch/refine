@@ -9,7 +9,7 @@ import re
 
 import libcst as cst
 
-from codemod import utils
+from recode import utils
 
 log = logging.getLogger(__name__)
 

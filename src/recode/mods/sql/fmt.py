@@ -13,9 +13,9 @@ from libcst.codemod import SkipFile
 from libcst.metadata import WhitespaceInclusivePositionProvider
 from sqlfluff.api.simple import get_simple_config
 
-from codemod import utils
-from codemod.abc import BaseCodemod
-from codemod.abc import BaseConfig
+from recode import utils
+from recode.abc import BaseCodemod
+from recode.abc import BaseConfig
 
 from .utils import is_sql_query
 

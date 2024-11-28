@@ -1,5 +1,5 @@
 """
-Codemod processor.
+re:Code processor.
 
 A fair chunk of this module just piggybacks on what libCST does, we just adapt to our own way of processing the files.
 """
@@ -33,17 +33,17 @@ from libcst.codemod._runner import TransformSuccess
 from libcst.helpers import calculate_module_and_package
 from libcst.metadata import FullRepoManager
 
-from codemod.abc import BaseCodemod
-from codemod.abc import BaseConfig
-from codemod.exc import CodemodSystemExit
+from recode.abc import BaseCodemod
+from recode.abc import BaseConfig
+from recode.exc import ReCodeSystemExit
 
 if TYPE_CHECKING:
     from multiprocessing.pool import Pool
 
     from libcst.metadata.base_provider import ProviderT
 
-    from codemod.config import Config
-    from codemod.registry import Registry
+    from recode.config import Config
+    from recode.registry import Registry
 
 log = logging.getLogger(__name__)
 
@@ -69,7 +69,7 @@ class ParallelTransformResult:
 
 class Processor:
     """
-    Codemod processor.
+    re:Code codemod processor.
     """
 
     def __init__(
@@ -102,7 +102,7 @@ class Processor:
         )
         if jobs < 1:
             error = "Must have at least one job to process!"
-            raise CodemodSystemExit(code=1, message=error)
+            raise ReCodeSystemExit(code=1, message=error)
 
         if total == 0:
             return ParallelTransformResult(successes=0, failures=0, skips=0, warnings=0, changed=0)
@@ -320,7 +320,7 @@ def _print_parallel_result(
             or (result.skip_reason is SkipReason.GENERATED and hide_generated)
         ):
             progress.clear()
-            print(f"Codemodding {filename}", file=sys.stderr)
+            print(f"ReCoding {filename}", file=sys.stderr)
             print_execution_result(result)
             print(
                 f"Skipped codemodding {filename}: {result.skip_description}\n",
@@ -329,7 +329,7 @@ def _print_parallel_result(
     elif isinstance(result, TransformFailure):
         # Print any exception, don't write the file back.
         progress.clear()
-        print(f"Codemodding {filename}", file=sys.stderr)
+        print(f"ReCoding {filename}", file=sys.stderr)
         print_execution_result(result)
         print(f"Failed to codemod {filename}\n", file=sys.stderr)
     elif isinstance(result, TransformSuccess):
@@ -337,7 +337,7 @@ def _print_parallel_result(
             # Print any warnings, save the changes if there were any.
             progress.clear()
             if show_successes or result.warning_messages:
-                print(f"Codemodding {filename}", file=sys.stderr)
+                print(f"ReCoding {filename}", file=sys.stderr)
             print_execution_result(result)
             print(
                 f"Successfully codemodded {filename}"

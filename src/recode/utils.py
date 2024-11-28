@@ -1,5 +1,5 @@
 """
-Codemod utilities.
+ReCode utilities.
 """
 
 from __future__ import annotations

@@ -1,5 +1,5 @@
 """
-Codemode testing support.
+re:Code testing support.
 """
 
 from __future__ import annotations
@@ -17,8 +17,8 @@ from libcst.codemod import CodemodContext
 from libcst.codemod import SkipFile
 
 if TYPE_CHECKING:
-    from codemod.abc import BaseCodemod
-    from codemod.abc import BaseConfig
+    from recode.abc import BaseCodemod
+    from recode.abc import BaseConfig
 
 log = logging.getLogger(__name__)
 

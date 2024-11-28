@@ -14,13 +14,13 @@ import sys
 from multiprocessing import freeze_support
 from typing import NoReturn
 
-from codemod.config import Config
-from codemod.exc import CodemodSystemExit
-from codemod.processor import Processor
-from codemod.registry import Registry
+from recode.config import Config
+from recode.exc import ReCodeSystemExit
+from recode.processor import Processor
+from recode.registry import Registry
 
 try:
-    VERSION = importlib.metadata.version("codemod")
+    VERSION = importlib.metadata.version("recode")
 except importlib.metadata.PackageNotFoundError:
     VERSION = "0.0.0.not-installed"
 
@@ -38,8 +38,8 @@ def main() -> NoReturn:  # noqa: PLR0915
     parser.add_argument(
         "--config",
         type=pathlib.Path,
-        help="Path to config file. Defaults to '.codemod.ini' on the current directory.",
-        default=".codemod.toml",
+        help="Path to config file. Defaults to '.recode.ini' on the current directory.",
+        default=".recode.toml",
     )
     parser.add_argument(
         "--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output."
@@ -143,7 +143,7 @@ def main() -> NoReturn:  # noqa: PLR0915
         result = processor.process(files)
         if result.failures:
             parser.exit(status=1)
-    except CodemodSystemExit as exc:
+    except ReCodeSystemExit as exc:
         parser.exit(status=exc.code, message=exc.message)
     except SystemExit as exc:
         code: str | int | None = exc.code

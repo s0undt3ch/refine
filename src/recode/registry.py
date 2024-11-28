@@ -1,5 +1,5 @@
 """
-Codemod registry.
+re:Code registry.
 
 This holds the information about what codemods are available to be used.
 """

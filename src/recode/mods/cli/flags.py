@@ -10,8 +10,8 @@ import libcst as cst
 import libcst.matchers as m
 from libcst.codemod import SkipFile
 
-from codemod.abc import BaseCodemod
-from codemod.abc import BaseConfig
+from recode.abc import BaseCodemod
+from recode.abc import BaseConfig
 
 log = logging.getLogger(__name__)
 

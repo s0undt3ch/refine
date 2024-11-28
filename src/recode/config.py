@@ -1,5 +1,5 @@
 """
-Codemod configuration.
+re:Code configuration.
 """
 
 from __future__ import annotations

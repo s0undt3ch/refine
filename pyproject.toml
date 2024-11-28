@@ -3,7 +3,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "codemod"
+name = "re-code"
 version = "0.1.0"
 description = "Automatic Python Code Rewrite Tool"
 authors = [
@@ -12,11 +12,11 @@ authors = [
 license = "Apache-2.0"
 readme = "README.md"
 packages = [
-  {include = "codemod", from = "src" }
+  {include = "recode", from = "src" }
 ]
 
 [tool.poetry.scripts]
-"codemod" = "codemod.__main__:main"
+"re-code" = "recode.__main__:main"
 
 [tool.poetry.dependencies]
 python = ">3.11,<4"
@@ -32,9 +32,9 @@ coverage = "^7.6.7"
 pytest-subtests = "^0.13.1"
 pytest-skip-markers = "^1.5.2"
 
-[tool.poetry.plugins."codemod"]
-format-sql = "codemod.mods.sql.fmt:FormatSQL"
-cli-dashes = "codemod.mods.cli.flags:CliDashes"
+[tool.poetry.plugins."recode"]
+format-sql = "recode.mods.sql.fmt:FormatSQL"
+cli-dashes = "recode.mods.cli.flags:CliDashes"
 
 build-backend = "poetry.masonry.api"
 
@@ -95,23 +95,23 @@ ignore = [
 "src/**/*.pyi" = [
   "D100",   # Missing docstring in public module
 ]
-"src/codemod/__main__.py" = [
+"src/recode/__main__.py" = [
   "PLR0913", # Too many arguments in function definition
 ]
-"src/codemod/mods/*.py" = [
+"src/recode/mods/*.py" = [
   "ARG002",   #  Unused method argument
   "D100",     # Missing docstring in public module
   "D101",     # Missing docstring in public class
   "D102",     # Missing docstring in public method
   "N802",     # Function name `leave_Xyz` should be lowercase
 ]
-"src/codemod/processor.py" = [
+"src/recode/processor.py" = [
   "T201",     # `print` found
   "BLE001",   # Do not catch blind exception: `Exception`
   "PLR0913",  # Too many arguments in function definition"
   "PLR0911",  # Too many return statements (7 > 6)"
 ]
-"src/codemod/testing.py" = [
+"src/recode/testing.py" = [
   "D101",     # Missing docstring in public class
   "D105",     # Missing docstring in magic method
   "S101",     # Use of `assert` detected
@@ -149,8 +149,7 @@ convention = "google"
 combine-as-imports = false
 force-single-line = true
 known-first-party = [
-  "src",
-  "codemod",
+  "recode",
 ]
 forced-separate = [
   "tests"
