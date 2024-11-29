@@ -1,2 +1,1 @@
-# codemod
-Automatic Python code modifier tool
+docs/index.md

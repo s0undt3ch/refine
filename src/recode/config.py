@@ -53,20 +53,59 @@ class Config(BaseModel):
         extra="allow",
     )
 
-    select: list[str] = Field(default_factory=list)
-    exclude: list[str] = Field(default_factory=list)
-    codemod_paths: list[Path] = Field(default_factory=list)
-    process_pool_size: int = Field(default_factory=_cpu_count)
-    repo_root: Path = Field(default_factory=Path.cwd)
-    fail_fast: bool = Field(default=False)
+    select: list[str] = Field(
+        default_factory=list,
+        description="""
+        List of codemods to run.
+
+        When no selection is made, all available codemods are run.
+        """,
+    )
+    exclude: list[str] = Field(
+        default_factory=list,
+        description="""
+        List of codemods to exclude.
+
+        Only makes sense when `select` is empty and all codemods are run.
+    """,
+    )
+    codemod_paths: list[Path] = Field(
+        default_factory=list,
+        description="""
+        List of additional paths to search for codemods.
+        """,
+    )
+    process_pool_size: int = Field(
+        default_factory=_cpu_count,
+        description="""
+        Number of processes to use for parallel processing.
+        Defaults to the number of available CPUs.
+        """,
+    )
+    repo_root: Path = Field(
+        default_factory=Path.cwd,
+        description="""
+        The root directory of the repository.
+        Defaults to the current working directory.
+        """,
+    )
+    fail_fast: bool = Field(
+        default=False,
+        description="""
+        Stop processing as soon as possible after the first error.
+        """,
+    )
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Config:
         """
         Load the configuration from a dictionary.
 
-        :param data: The configuration to load.
-        :return: Config instance.
+        Arguments:
+            data: The configuration to load.
+
+        Returns:
+            Config instance.
         """
         try:
             return Config(**data)
@@ -79,8 +118,11 @@ class Config(BaseModel):
         """
         Load the configuration from a file.
 
-        :param path: The path to the configuration file.
-        :return: Config instance.
+        Arguments:
+            path: The path to the configuration file.
+
+        Returns:
+            Config instance.
         """
         try:
             data = tomllib.loads(path.read_text(encoding="utf-8"))
@@ -95,8 +137,11 @@ class Config(BaseModel):
         """
         Load the configuration from a file.
 
-        :param path: The path to the configuration file.
-        :return: Config instance.
+        Arguments:
+            path: The path to the configuration file.
+
+        Returns:
+            Config instance.
         """
         try:
             data = tomllib.loads(path.read_text(encoding="utf-8"))

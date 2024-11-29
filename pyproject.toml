@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "re-code"
 version = "0.1.0"
-description = "Automatic Python Code Rewrite Tool"
+description = "Tool for transforming and modernizing python codebases with ease"
 authors = [
     "Pedro Algarvio <pedro@algarvio.me>"
 ]
@@ -32,11 +32,17 @@ coverage = "^7.6.7"
 pytest-subtests = "^0.13.1"
 pytest-skip-markers = "^1.5.2"
 
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.5.45"
+griffe-pydantic = "^1.1.0"
+mkdocs-exclude = "^1.0.2"
+mkdocstrings = {extras = ["python"], version = "^0.27.0"}
+mkdocstrings-python-xref = "^1.6.2"
+
 [tool.poetry.plugins."recode"]
 format-sql = "recode.mods.sql.fmt:FormatSQL"
 cli-dashes = "recode.mods.cli.flags:CliDashes"
-
-build-backend = "poetry.masonry.api"
 
 [tool.ruff]
 line-length = 120
