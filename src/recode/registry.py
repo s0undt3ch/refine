@@ -64,7 +64,7 @@ class Registry:
             yield codemod
 
     def _collect_from_entrypoints(self) -> Iterator[type[BaseCodemod[CodemodConfigType]]]:
-        for entry_point in importlib.metadata.entry_points(group="codemod"):
+        for entry_point in importlib.metadata.entry_points(group="recode.mods"):
             cls: type[BaseCodemod[CodemodConfigType]] = entry_point.load()
             if not inspect.isclass(cls):
                 # Don't even bother if it's not a class
