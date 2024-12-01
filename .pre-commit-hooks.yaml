@@ -1,7 +1,7 @@
 ---
--   id: re-code
-    name: re-code
-    entry: re-code
+-   id: recode
+    name: recode
+    entry: recode
     language: python
     language_version: python3
     args: []

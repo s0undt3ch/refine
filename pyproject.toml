@@ -16,7 +16,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-"re-code" = "recode.__main__:main"
+"recode" = "recode.__main__:main"
 
 [tool.poetry.dependencies]
 python = ">3.11,<4"
