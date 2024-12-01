@@ -1,3 +1,9 @@
+"""
+SQL Formatting codemod.
+
+This codemod uses the [sqlfluff](https://docs.sqlfluff.com) python package to format SQL queries.
+"""
+
 from __future__ import annotations
 
 import logging
@@ -5,12 +11,16 @@ import pathlib
 import textwrap
 from functools import cache
 from typing import TYPE_CHECKING
+from typing import Annotated
 from typing import cast
 
 import libcst as cst
 import sqlfluff.api
 from libcst.codemod import SkipFile
 from libcst.metadata import WhitespaceInclusivePositionProvider
+from pydantic import Field
+from pydantic import ValidationError
+from pydantic.functional_validators import AfterValidator
 from sqlfluff.api.simple import get_simple_config
 
 from recode import utils
@@ -29,16 +39,47 @@ log = logging.getLogger(__name__)
 
 BUILNTIN_SQLFLUFF_CONFIG_FILE = pathlib.Path(__file__).parent / ".sqlfluff"
 
+SQL_DIALECTS = tuple(dialect.label for dialect in sqlfluff.list_dialects())
+
+
+def _check_sql_dialect(dialect: str) -> str:
+    if dialect.lower() not in SQL_DIALECTS:
+        err_msg = (
+            f"Invalid SQL dialect {dialect.lower()!r}. Must be one of: {', '.join(SQL_DIALECTS)}"
+        )
+        raise ValidationError(err_msg)
+    return dialect.lower()
+
+
+SqlDialect = Annotated[str, AfterValidator(_check_sql_dialect)]
+
 
 class FormatSQLConfig(BaseConfig):
-    dialect: str = "ansi"
-    sqlfluff_config_file: str = str(BUILNTIN_SQLFLUFF_CONFIG_FILE)
+    """
+    Configuration for the SQL Formatting codemod.
+    """
+
+    dialect: SqlDialect = Field(
+        default="ansi",
+        description="The SQL dialect to use when formatting the SQL queries.",
+    )
+    sqlfluff_config_file: str = Field(
+        default=str(BUILNTIN_SQLFLUFF_CONFIG_FILE),
+        description=(
+            "The path to a sqlfluff configuration file. If not provided, a default, opionated, configuration "
+            "will be used."
+        ),
+    )
 
 
 class FormatSQL(BaseCodemod[FormatSQLConfig]):
+    """
+    Format SQL queries using the `sqlfluff` python package.
+    """
+
     NAME = "sqlfmt"
     CONFIG_CLS = FormatSQLConfig
-    DESCRIPTION: str = "Format SQL queries using the `sqlfluff` python package"
+    DESCRIPTION: str = __doc__
 
     METADATA_DEPENDENCIES = (WhitespaceInclusivePositionProvider,)
 

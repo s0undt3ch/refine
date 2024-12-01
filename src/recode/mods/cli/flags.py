@@ -1,3 +1,16 @@
+"""
+This codemod enforces the use of dashes over underscores in CLI arguments of [ArgumentParser][argparse.ArgumentParser].
+
+For example, it will transform this code:
+```python
+parser.add_argument("--a_command")
+```
+into this code:
+```python
+parser.add_argument("--a-command")
+```
+"""
+
 from __future__ import annotations
 
 import logging
@@ -22,11 +35,14 @@ class CliDashesConfig(BaseConfig):
 
 
 class CliDashes(BaseCodemod):
+    """
+    Replace `_` with `-`, ie, `--a-command` instead of `--a_command` in CLI commands.
+
+    This works if the parser argument is typed and only for ArgumentParser. `def foo(parser: ArgumentParser)`.
+    """
+
     NAME = "cli-dashes-over-underscores"
-    DESCRIPTION = (
-        "Replace `_` with `-`, ie, `--a-command` instead of `--a_command` in CLI commands. This works if the parser "
-        "argument is typed and only for ArgumentParser. 'def foo(parser: ArgumentParser)'."
-    )
+    DESCRIPTION = __doc__
     CONFIG_CLS = CliDashesConfig
 
     def __post_codemod_init__(self) -> None:

@@ -11,7 +11,7 @@ import subprocess
 # Define a few directories
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC_ROOT = REPO_ROOT / "src"
-DOC_REF_ROOT = REPO_ROOT / "docs" / "ref"
+DOC_REF_ROOT = REPO_ROOT / "docs" / "reference"
 
 # Force the working directory to the root of the repository
 os.chdir(REPO_ROOT)
