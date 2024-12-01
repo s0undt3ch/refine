@@ -116,7 +116,9 @@ def main() -> NoReturn:  # noqa: PLR0915
     if args.list_codemods:
         log.info("Available codemods:")
         for codemod in registry.codemods():
-            log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
+            # In case the description is comming from the docstring, we just really want the first line.
+            description = codemod.DESCRIPTION.strip().splitlines()[0]
+            log.info(" - %s: %s", codemod.NAME, description.strip())
         parser.exit()
 
     paths = args.files
