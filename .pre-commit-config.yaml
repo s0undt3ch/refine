@@ -13,6 +13,17 @@ repos:
       - id: check-merge-conflict  # Check for files that contain merge conflict strings.
       - id: check-ast             # Simply check whether files parse as valid python.
 
+  # ----- Local Hooks --------------------------------------------------------------------------->
+  - repo: local
+    hooks:
+      - id: update-doc-stubs
+        name: Update reference documentation stubs
+        language: system
+        entry: python .pre-commit-hooks/ref-doc-stubs.py
+        files: ^(docs/.*\.md|src/recode/.*\.py)$
+        pass_filenames: false
+  # <---- Local Hooks ----------------------------------------------------------------------------
+
   # ----- Code Formatting and Analysis ---------------------------------------------------------->
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: "v0.7.2"
