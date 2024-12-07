@@ -8,8 +8,8 @@ from unittest.mock import patch
 
 import pytest
 
-from codemod.mods.cli.flags import CliDashes
-from codemod.processor import Processor
+from recode.mods.cli.flags import CliDashes
+from recode.processor import Processor
 
 log = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def test_write_file_exception(tmp_path, subtests):
                 "Write error"
             )
             # We are not interested in seeing the output
-            with patch("codemod.processor._print_parallel_result", MagicMock()):
+            with patch("recode.processor._print_parallel_result", MagicMock()):
                 processor.process([tmp_file_path])
 
         # Ensure the file's content remains unchanged after the exception
@@ -53,7 +53,7 @@ def test_write_file_exception(tmp_path, subtests):
     # Just for the sake of completeness, what if we don't raise an exception?
     with subtests.test("Non-failing behaviour"):
         # We are not interested in seeing the output
-        with patch("codemod.processor._print_parallel_result", MagicMock()):
+        with patch("recode.processor._print_parallel_result", MagicMock()):
             processor.process([tmp_file_path])
 
         # Contents should no longer match

@@ -4,9 +4,9 @@ import pathlib
 
 import pytest
 
-from codemod.mods.cli.flags import CliDashes
-from codemod.mods.cli.flags import CliDashesConfig
-from codemod.testing import Modcase
+from recode.mods.cli.flags import CliDashes
+from recode.mods.cli.flags import CliDashesConfig
+from recode.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "flags"
 

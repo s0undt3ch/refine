@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from codemod.abc import BaseCodemod
-from codemod.registry import Registry
+from recode.abc import BaseCodemod
+from recode.registry import Registry
 
 
 class MockCodemod(BaseCodemod):
@@ -39,7 +39,7 @@ def test_registry_initialization(registry):
 def test_load_from_entrypoints(registry):
     """Test loading codemods from entry points."""
     with patch(
-        "codemod.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])
+        "recode.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])
     ) as mock_collect:
         registry.load([])
         assert registry._codemods == [MockCodemod]
@@ -48,8 +48,8 @@ def test_load_from_entrypoints(registry):
 
 def test_load_from_path(registry):
     """Test loading codemods from a specified path."""
-    with patch("codemod.registry.Registry._collect_from_entrypoints", return_value=iter([])), patch(
-        "codemod.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])
+    with patch("recode.registry.Registry._collect_from_entrypoints", return_value=iter([])), patch(
+        "recode.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])
     ) as mock_collect:
         test_path = Path("/some/path")
         registry.load([test_path])
@@ -60,10 +60,10 @@ def test_load_from_path(registry):
 def test_load_combined_sources(registry):
     """Test loading codemods from both entry points and paths."""
     with patch(
-        "codemod.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])
+        "recode.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])
     ) as mock_entry:
         with patch(
-            "codemod.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])
+            "recode.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])
         ) as mock_path:
             test_path = Path("/some/path")
             registry.load([test_path])
@@ -109,8 +109,8 @@ def test_collect_from_path(registry):
     mock_file = MagicMock()
     mock_file.name = "mock_codemod.py"
 
-    with patch("codemod.registry.Path.glob", return_value=[mock_file]) as mock_glob:
-        with patch("codemod.registry.SourceFileLoader") as mock_loader:
+    with patch("recode.registry.Path.glob", return_value=[mock_file]) as mock_glob:
+        with patch("recode.registry.SourceFileLoader") as mock_loader:
             mock_loader.return_value.load_module.return_value = MagicMock()
 
             with patch("inspect.getmembers", return_value=[("MockCodemod", MockCodemod)]):
@@ -124,7 +124,7 @@ def test_collect_from_path(registry):
 def test_duplicate_codemod_handling_with_caplog(registry, caplog):
     """Test handling of duplicate codemod names using caplog."""
     with patch(
-        "codemod.registry.Registry._collect_from_entrypoints",
+        "recode.registry.Registry._collect_from_entrypoints",
         return_value=iter([MockCodemod, MockCodemod]),
     ):
         with caplog.at_level("WARNING"):

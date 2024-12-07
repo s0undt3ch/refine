@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from codemod.config import Config
-from codemod.config import InvalidConfigError
+from recode.config import Config
+from recode.config import InvalidConfigError
 
 
 @pytest.fixture
@@ -49,7 +49,7 @@ def test_config_from_dict_invalid(invalid_config):
 
 def test_config_from_default_file(tmp_path, valid_config):
     """Test loading configuration from a valid TOML file."""
-    config_path = tmp_path / ".codemod.toml"
+    config_path = tmp_path / ".recode.toml"
     config_path.write_text(
         """
         select = ["codemod1", "codemod2"]
@@ -85,7 +85,7 @@ def test_config_from_pyproject_file(tmp_path, valid_config):
     pyproject_path = tmp_path / "pyproject.toml"
     pyproject_path.write_text(
         """
-        [tool.codemod]
+        [tool.recode]
         select = ["codemod1", "codemod2"]
         exclude = ["codemod3"]
         codemod_paths = ["/path/to/codemod1", "/path/to/codemod2"]
@@ -105,7 +105,7 @@ def test_config_from_pyproject_file_invalid(tmp_path):
     pyproject_path = tmp_path / "pyproject.toml"
     pyproject_path.write_text(
         """
-        [tool.codemod]
+        [tool.recode]
         select = "codemod1"  # Invalid type
         """,
         encoding="utf-8",
