@@ -40,6 +40,7 @@ mkdocs-exclude = "^1.0.2"
 mkdocstrings = {extras = ["python"], version = "^0.27.0"}
 mkdocstrings-python-xref = "^1.6.2"
 black = "^24.10.0"
+markdown-include = "^0.8.1"
 
 [tool.poetry.plugins."recode.mods"]
 format-sql = "recode.mods.sql.fmt:FormatSQL"
