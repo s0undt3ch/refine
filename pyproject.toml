@@ -1,50 +1,64 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
 
-[tool.poetry]
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.hooks.version]
+path = "src/recode/version.py"
+template = "# Version attribute defined and written at build time\n\n__version__ = \"{version}\"\n"
+
+
+[project]
 name = "re-code"
-version = "0.1.0"
 description = "Tool for transforming and modernizing python codebases with ease"
-authors = [
-    "Pedro Algarvio <pedro@algarvio.me>"
-]
-license = "Apache-2.0"
+authors = [{ name = "Pedro Algarvio", email = "pedro@algarvio.me" }]
+requires-python = ">3.11,<4"
 readme = "README.md"
-packages = [
-  {include = "recode", from = "src" }
+license = "Apache-2.0"
+dynamic = ["version"]
+dependencies = [
+    "libcst>=1.5.0,<2",
+    "sqlfluff>=3.2.5,<4",
+    "pydantic>=2.9.2,<3",
+    "tomllib>=1.1.0 ; python_version < '3.11'",
 ]
 
-[tool.poetry.scripts]
-"recode" = "recode.__main__:main"
+[project.scripts]
+recode = "recode.__main__:main"
 
-[tool.poetry.dependencies]
-python = ">3.11,<4"
-libcst = "^1.5.0"
-sqlfluff = "^3.2.5"
-pydantic = "^2.9.2"
-tomllib = {version = ">=1.1.0", python = "<3.11"}
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-pytest-clarity = "^1.0.1"
-coverage = "^7.6.7"
-pytest-subtests = "^0.13.1"
-pytest-skip-markers = "^1.5.2"
-
-[tool.poetry.group.docs.dependencies]
-mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.45"
-griffe-pydantic = "^1.1.0"
-mkdocs-exclude = "^1.0.2"
-mkdocstrings = {extras = ["python"], version = "^0.27.0"}
-mkdocstrings-python-xref = "^1.6.2"
-black = "^24.10.0"
-markdown-include = "^0.8.1"
-
-[tool.poetry.plugins."recode.mods"]
+[project.entry-points."recode.mods"]
 format-sql = "recode.mods.sql.fmt:FormatSQL"
 cli-dashes = "recode.mods.cli.flags:CliDashes"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.3,<9",
+    "pytest-clarity>=1.0.1,<2",
+    "coverage>=7.6.7,<8",
+    "pytest-subtests>=0.13.1,<0.14",
+    "pytest-skip-markers>=1.5.2,<2",
+]
+docs = [
+    "mkdocs>=1.6.1,<2",
+    "mkdocs-material>=9.5.45,<10",
+    "griffe-pydantic>=1.1.0,<2",
+    "mkdocs-exclude>=1.0.2,<2",
+    "mkdocstrings[python]>=0.27.0,<0.28",
+    "mkdocstrings-python-xref>=1.6.2,<2",
+    "black>=24.10.0,<25",
+    "markdown-include>=0.8.1,<0.9",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/recode"]
+
+[tool.hatch.build.targets.wheel]
+include = ["src/recode"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/recode" = "recode"
 
 [tool.ruff]
 line-length = 120
@@ -149,6 +163,7 @@ ignore = [
 "tests/**/files/*" = [
   "INP001",   # implicit namespace packages
 ]
+
 [tool.ruff.lint.pydocstyle]
 # Use Google-style docstrings.
 convention = "google"
@@ -193,6 +208,7 @@ exclude = [
   "tests/.*/files/.*\\.py",
   "^tests/([^/]*/)*files/.*"
 ]
+
 [[tool.mypy.overrides]]
 module = [
   "tests.*"
