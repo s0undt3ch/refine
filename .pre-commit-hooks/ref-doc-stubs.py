@@ -47,6 +47,7 @@ def main():
             [
                 "**/__init__.py",
                 "recode/__main__.py",
+                "recode/version.py",
             ]
         )
 
