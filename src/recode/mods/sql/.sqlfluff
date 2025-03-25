@@ -1,0 +1,45 @@
+[sqlfluff]
+dialect = mysql
+templater = placeholder
+max_line_length = 120
+processes = -1
+
+[sqlfluff:templater:placeholder]
+param_style = pyformat
+
+[sqlfluff:indentation]
+allow_implicit_indents = True
+indented_joins = True
+tab_space_size = 4
+indent_unit = space
+
+[sqlfluff:rules:aliasing.length]
+min_alias_length = 3
+
+# The default configuration for capitalisation rules is "consistent"
+# which will auto-detect the setting from the rest of the file. This
+# is less desirable in a new project and you may find this (slightly
+# more strict) setting more useful.
+# Typically we find users rely on syntax highlighting rather than
+# capitalisation to distinguish between keywords and identifiers.
+# Clearly, if your organisation has already settled on uppercase
+# formatting for any of these syntax elements then set them to "upper".
+# See https://stackoverflow.com/questions/608196/why-should-i-capitalize-my-sql-keywords-is-there-a-good-reason
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = lower
+
+# The default configuration for the not equal convention rule is "consistent"
+# which will auto-detect the setting from the rest of the file. This
+# is less desirable in a new project and you may find this (slightly
+# more strict) setting more useful.
+[sqlfluff:rules:convention.not_equal]
+# Default to preferring the "c_style" (i.e. `!=`)
+preferred_not_equal_style = c_style

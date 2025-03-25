@@ -1,0 +1,10 @@
+---
+-   id: recode
+    name: recode
+    entry: recode
+    language: python
+    language_version: python3
+    args: []
+    require_serial: false
+    additional_dependencies: []
+    types: [python]

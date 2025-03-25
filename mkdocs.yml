@@ -1,0 +1,104 @@
+site_name: Codemod Documentation
+strict: true
+theme:
+  name: material
+  logo: imgs/recode.png
+  icon: imgs/recode.png
+  favicon: imgs/recode.png
+  palette:
+    primary: indigo
+    accent: organge
+    scheme: slate
+
+  features:
+    - announce.dismiss
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.preview
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.suggest
+    - toc.follow
+
+docs_dir: docs
+site_dir: site
+
+# https://www.mkdocs.org/user-guide/configuration/#validation
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
+plugins:
+  - autorefs:
+      resolve_closest: true
+  - search
+  - exclude:
+      glob:
+      - plugins/*
+      - __pycache__/*
+  - mkdocstrings:
+      default_handler: python
+      enable_inventory: true
+      handlers:
+        python_xref:
+          import:
+            - https://docs.pydantic.dev/latest/objects.inv
+            - https://docs.python.org/3/objects.inv
+          options:
+            docstring_style: "sphinx"
+            docstring_section_style: "list"
+            relative_crossrefs: true
+            show_root_heading: true
+            show_signature: true
+            unwrap_annotated: true
+        python:
+          paths: [.]
+          options:
+            allow_inspection: true
+            show_source: true
+            find_stubs_package: true
+            members_order: source
+            separate_signature: true
+            filters: ["!^_"]
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            show_signature_annotations: true
+            signature_crossrefs: true
+            extensions:
+            - griffe_pydantic:
+                schema: false
+          import:
+            - https://docs.pydantic.dev/latest/objects.inv
+            - https://docs.python.org/3/objects.inv
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - toc:
+      permalink: true
+      separator: "-"
+  - attr_list
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - markdown_include.include:
+      base_path: .
+
+watch:
+  - src
+  - docs
