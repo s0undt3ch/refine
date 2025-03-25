@@ -7,22 +7,17 @@ It can be used for one-off rewrites, or, to maintain code styling rules.
 from __future__ import annotations
 
 import argparse
-import importlib.metadata
 import logging
 import pathlib
 import sys
 from multiprocessing import freeze_support
 from typing import NoReturn
 
+from recode import __version__
 from recode.config import Config
 from recode.exc import ReCodeSystemExit
 from recode.processor import Processor
 from recode.registry import Registry
-
-try:
-    VERSION = importlib.metadata.version("recode")
-except importlib.metadata.PackageNotFoundError:
-    VERSION = "0.0.0.not-installed"
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(message)s")
 
@@ -31,7 +26,7 @@ log = logging.getLogger(__name__)
 
 def main() -> NoReturn:  # noqa: PLR0915
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--version", action="version", version=VERSION)
+    parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument("files", metavar="FILE", nargs="*", type=pathlib.Path, help="One or more files to process.")
     parser.add_argument(
         "--config",
