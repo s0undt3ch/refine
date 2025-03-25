@@ -41,13 +41,14 @@ dev = [
     "pytest-skip-markers>=1.5.2,<2",
 ]
 docs = [
-    "mkdocs>=1.6.1,<2",
-    "mkdocs-material>=9.5.45,<10",
-    "griffe-pydantic>=1.1.0,<2",
-    "mkdocs-exclude>=1.0.2,<2",
-    "mkdocstrings[python]>=0.27.0,<0.28",
-    "mkdocstrings-python-xref>=1.6.2,<2",
-    "markdown-include>=0.8.1,<0.9",
+    "mkdocs",
+    "mkdocs-material",
+    "griffe-pydantic",
+    "mkdocs-exclude",
+    "mkdocstrings[python]",
+    "mkdocstrings-python-xref",
+    "markdown-include",
+    "ruff>=0.11.2",
 ]
 
 [tool.hatch.build.targets.sdist]

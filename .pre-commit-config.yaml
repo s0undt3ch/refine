@@ -48,4 +48,9 @@ repos:
           - sqlfluff
           - pydantic
           - tomllib >= 1.1.0; python_version < "3.11"
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
   # <---- Code Formatting and Analysis -----------------------------------------------------------
