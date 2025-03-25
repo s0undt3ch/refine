@@ -109,10 +109,6 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
             last_line = " " * position.start.column
         else:
             last_line = first_line = ""
-        if string_node.quote.startswith("'"):
-            return updated.with_changes(
-                value=string_node.__class__(f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}""")
-            )
         return updated.with_changes(
             value=string_node.__class__(f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}""")
         )
