@@ -1,3 +1,0 @@
-# recode.exc
-
-::: recode.exc
