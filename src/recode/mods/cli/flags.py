@@ -135,8 +135,7 @@ class CliDashes(BaseCodemod):
                 if "_" not in flag:
                     args.append(arg)
                     continue
-                quote = '"' if simple_string.quote == "'" else "'"
-                updated_flag_value = f"{quote}{flag.replace('_', '-')}{quote}"
+                updated_flag_value = f"{simple_string.quote}{flag.replace('_', '-')}{simple_string.quote}"
                 updated_simple_string = simple_string.with_changes(value=updated_flag_value)
                 updated_arg = arg.with_changes(value=updated_simple_string)
                 args.append(updated_arg)
