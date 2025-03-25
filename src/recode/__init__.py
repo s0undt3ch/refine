@@ -3,7 +3,7 @@ from __future__ import annotations
 import contextlib
 
 try:
-    from .version import __version__
+    from .version import __version__  # type: ignore[import-not-found]
 except ImportError:  # pragma: no cover
     __version__ = "0.0.0.not-installed"
     from importlib.metadata import PackageNotFoundError
