@@ -71,9 +71,7 @@ class CliDashes(BaseCodemod):
                 if isinstance(annotation, cst.Name) and annotation.value == "ArgumentParser":
                     self.typed_parameters[param_name] = annotation.value
 
-    def leave_FunctionDef(
-        self, original: cst.FunctionDef, updated: cst.FunctionDef
-    ) -> cst.FunctionDef:
+    def leave_FunctionDef(self, original: cst.FunctionDef, updated: cst.FunctionDef) -> cst.FunctionDef:
         # Clear state when leaving the function
         self.typed_parameters = {}
         self.typed_assignments = {}
@@ -96,7 +94,7 @@ class CliDashes(BaseCodemod):
                 # We're not handling assignment expansion, ie
                 # var_a, var_b = value_a, value_b
                 continue
-            target: cst.Name = cast(cst.Name, assign_target.target)
+            target: cst.Name = cast("cst.Name", assign_target.target)
             var_name = target.value
             if m.matches(
                 node.value,
@@ -104,9 +102,7 @@ class CliDashes(BaseCodemod):
                     # blah = ArgumentParser
                     m.Call(func=m.Name("ArgumentParser")),
                     # blah = argparse.ArgumentParser
-                    m.Call(
-                        func=m.Attribute(value=m.Name("argparse"), attr=m.Name("ArgumentParser"))
-                    ),
+                    m.Call(func=m.Attribute(value=m.Name("argparse"), attr=m.Name("ArgumentParser"))),
                 ),
             ):
                 self.typed_assignments[var_name] = "ArgumentParser"
@@ -118,15 +114,12 @@ class CliDashes(BaseCodemod):
             m.Attribute(attr=m.Name("add_argument"), value=m.Name()),
         ):
             # The `<something>` in `<something>.add_argument`
-            caller_func_attribute = cast(cst.Attribute, original.func)
-            caller_func_attribute_name = cast(cst.Name, caller_func_attribute.value)
+            caller_func_attribute = cast("cst.Attribute", original.func)
+            caller_func_attribute_name = cast("cst.Name", caller_func_attribute.value)
             caller_name = caller_func_attribute_name.value
 
             # Verify if the caller object is typed as ArgumentParser
-            if (
-                caller_name not in self.typed_parameters
-                and caller_name not in self.typed_assignments
-            ):
+            if caller_name not in self.typed_parameters and caller_name not in self.typed_assignments:
                 return updated
 
             args: list[cst.Arg] = []
@@ -142,7 +135,7 @@ class CliDashes(BaseCodemod):
                 if "_" not in flag:
                     args.append(arg)
                     continue
-                quote = '"' if simple_string.quote == "'" else '"'
+                quote = '"' if simple_string.quote == "'" else "'"
                 updated_flag_value = f"{quote}{flag.replace('_', '-')}{quote}"
                 updated_simple_string = simple_string.with_changes(value=updated_flag_value)
                 updated_arg = arg.with_changes(value=updated_simple_string)

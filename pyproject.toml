@@ -47,7 +47,6 @@ docs = [
     "mkdocs-exclude>=1.0.2,<2",
     "mkdocstrings[python]>=0.27.0,<0.28",
     "mkdocstrings-python-xref>=1.6.2,<2",
-    "black>=24.10.0,<25",
     "markdown-include>=0.8.1,<0.9",
 ]
 
@@ -103,7 +102,7 @@ ignore = [
   "RUF005",  # Consider iterable unpacking instead of concatenation
   "SIM108",  # Use ternary operator `A = X if Y else Z` instead of `if`-`else`-block
   "SIM110",  # Use `return any( ... etc ...)` instead of `for` loop
-  "TCH003",  # Move standard library import `pathlib.Path` into a type-checking block
+  "TC003",   # Move standard library import `pathlib.Path` into a type-checking block
   "TD002",   # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`"
   "TD003",   # Missing issue link on the line following this TODO
   "UP038",   # Use `X | Y` in `isinstance` call instead of `(X, Y)` - SLOWER CODE
@@ -158,7 +157,6 @@ ignore = [
   "SIM117",   # Use a single `with` statement with multiple contexts instead of nested `with` statements
   "SLF001",   # Private member accessed
   "TCH002",   # Move third-party import into a type-checking block
-  "TCH003",   # Move standard library import `pathlib` into a type-checking block
 ]
 "tests/**/files/*" = [
   "INP001",   # implicit namespace packages

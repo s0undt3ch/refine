@@ -32,18 +32,14 @@ log = logging.getLogger(__name__)
 def main() -> NoReturn:  # noqa: PLR0915
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=VERSION)
-    parser.add_argument(
-        "files", metavar="FILE", nargs="*", type=pathlib.Path, help="One or more files to process."
-    )
+    parser.add_argument("files", metavar="FILE", nargs="*", type=pathlib.Path, help="One or more files to process.")
     parser.add_argument(
         "--config",
         type=pathlib.Path,
         help="Path to config file. Defaults to '.recode.ini' on the current directory.",
         default=".recode.toml",
     )
-    parser.add_argument(
-        "--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output."
-    )
+    parser.add_argument("--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output.")
     parser.add_argument(
         "--fail-fast",
         "--ff",
@@ -133,9 +129,7 @@ def main() -> NoReturn:  # noqa: PLR0915
         for subpath in path.rglob("*.py"):
             files.append(subpath)
 
-    codemods = list(
-        registry.codemods(select_codemods=config.select, exclude_codemods=config.exclude)
-    )
+    codemods = list(registry.codemods(select_codemods=config.select, exclude_codemods=config.exclude))
     log.info("Selected codemods:")
     for codemod in codemods:
         log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)

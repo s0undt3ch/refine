@@ -38,9 +38,7 @@ def test_registry_initialization(registry):
 
 def test_load_from_entrypoints(registry):
     """Test loading codemods from entry points."""
-    with patch(
-        "recode.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])
-    ) as mock_collect:
+    with patch("recode.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])) as mock_collect:
         registry.load([])
         assert registry._codemods == [MockCodemod]
         mock_collect.assert_called_once()
@@ -48,9 +46,10 @@ def test_load_from_entrypoints(registry):
 
 def test_load_from_path(registry):
     """Test loading codemods from a specified path."""
-    with patch("recode.registry.Registry._collect_from_entrypoints", return_value=iter([])), patch(
-        "recode.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])
-    ) as mock_collect:
+    with (
+        patch("recode.registry.Registry._collect_from_entrypoints", return_value=iter([])),
+        patch("recode.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])) as mock_collect,
+    ):
         test_path = Path("/some/path")
         registry.load([test_path])
         assert registry._codemods == [AnotherCodemod]
@@ -59,12 +58,8 @@ def test_load_from_path(registry):
 
 def test_load_combined_sources(registry):
     """Test loading codemods from both entry points and paths."""
-    with patch(
-        "recode.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])
-    ) as mock_entry:
-        with patch(
-            "recode.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])
-        ) as mock_path:
+    with patch("recode.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])) as mock_entry:
+        with patch("recode.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])) as mock_path:
             test_path = Path("/some/path")
             registry.load([test_path])
             assert registry._codemods == [AnotherCodemod, MockCodemod]

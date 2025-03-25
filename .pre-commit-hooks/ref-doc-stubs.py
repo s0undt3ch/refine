@@ -2,6 +2,7 @@
 """
 This tool will create documentation stubs for the whole codebase.
 """
+
 import os
 import shutil
 import argparse

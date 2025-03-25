@@ -26,31 +26,17 @@ repos:
 
   # ----- Code Formatting and Analysis ---------------------------------------------------------->
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.7.2"
+    rev: "v0.11.2"
     hooks:
       - id: ruff
         args:
           - --fix
         exclude: (.pre-commit-hooks/.*|docs/.*)\.py
 
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
-    hooks:
-      - id: black
-        args: [-l 100]
-        exclude: ^tests/([^/]*/)*files/.*
-
-  - repo: https://github.com/asottile/blacken-docs
-    rev: 1.19.1
-    hooks:
-      - id: blacken-docs
-        args: [--skip-errors]
-        files: ^(docs/.*\.rst|src/recode/.*\.py)$
-        additional_dependencies:
-          - black==24.10.0
+      - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.15.0
     hooks:
       - id: mypy
         name: Run mypy against the code base

@@ -44,9 +44,7 @@ SQL_DIALECTS = tuple(dialect.label for dialect in sqlfluff.list_dialects())
 
 def _check_sql_dialect(dialect: str) -> str:
     if dialect.lower() not in SQL_DIALECTS:
-        err_msg = (
-            f"Invalid SQL dialect {dialect.lower()!r}. Must be one of: {', '.join(SQL_DIALECTS)}"
-        )
+        err_msg = f"Invalid SQL dialect {dialect.lower()!r}. Must be one of: {', '.join(SQL_DIALECTS)}"
         raise ValidationError(err_msg)
     return dialect.lower()
 
@@ -96,7 +94,7 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
         if not isinstance(updated.value, cst.SimpleString) or not is_sql_query(updated.value):
             return updated
 
-        string_node = cast(cst.SimpleString, updated.value)
+        string_node = cast("cst.SimpleString", updated.value)
         unquoted_string = utils.evaluated_string(string_node)
         if isinstance(unquoted_string, bytes):
             # We're not handling bytestrings
@@ -113,14 +111,10 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
             last_line = first_line = ""
         if string_node.quote.startswith("'"):
             return updated.with_changes(
-                value=string_node.__class__(
-                    f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
-                )
+                value=string_node.__class__(f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}""")
             )
         return updated.with_changes(
-            value=string_node.__class__(
-                f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
-            )
+            value=string_node.__class__(f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}""")
         )
         return updated
 
@@ -135,7 +129,7 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
                 args.append(arg)
                 continue
 
-            string_node = cast(cst.SimpleString, arg.value)
+            string_node = cast("cst.SimpleString", arg.value)
             unquoted_string = utils.evaluated_string(string_node)
 
             if isinstance(unquoted_string, bytes):
@@ -179,7 +173,7 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
     def __format_sql(self, query: str, indent: int) -> str:
         # We want a copy of the config so that we can modify it
         config = self.__get_sqlfluff_config().copy()
-        starting_newline: str = query.startswith("\n") and "\n" or ""
+        starting_newline: str = (query.startswith("\n") and "\n") or ""
         if starting_newline:
             query = query[1:]
 

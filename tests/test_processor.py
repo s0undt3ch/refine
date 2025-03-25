@@ -40,9 +40,7 @@ def test_write_file_exception(tmp_path, subtests):
     with subtests.test("Failing behaviour"):
         # Patch the file-writing operation to raise an exception
         with patch("tempfile.NamedTemporaryFile") as mock_tempfile:
-            mock_tempfile.return_value.__enter__.return_value.write.side_effect = Exception(
-                "Write error"
-            )
+            mock_tempfile.return_value.__enter__.return_value.write.side_effect = Exception("Write error")
             # We are not interested in seeing the output
             with patch("recode.processor._print_parallel_result", MagicMock()):
                 processor.process([tmp_file_path])

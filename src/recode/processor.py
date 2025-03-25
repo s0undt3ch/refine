@@ -72,9 +72,7 @@ class Processor:
     re:Code codemod processor.
     """
 
-    def __init__(
-        self, config: Config, registry: Registry, codemods: list[type[BaseCodemod]]
-    ) -> None:
+    def __init__(self, config: Config, registry: Registry, codemods: list[type[BaseCodemod]]) -> None:
         self.config = config
         self.registry = registry
         self.codemods = codemods
@@ -162,10 +160,7 @@ class Processor:
                     elif isinstance(result.transform_result, (TransformExit, TransformSkip)):
                         skips += 1
 
-                    if (
-                        isinstance(result.transform_result, TransformFailure)
-                        and self.config.fail_fast
-                    ):
+                    if isinstance(result.transform_result, TransformFailure) and self.config.fail_fast:
                         break
 
                     warnings += len(result.transform_result.warning_messages)
@@ -178,12 +173,9 @@ class Processor:
         )
 
     def _process_path(self, metadata_manager: FullRepoManager, filename: str) -> ExecutionResult:
-
         # determine the module and package name for this file
         try:
-            module_name_and_package = calculate_module_and_package(
-                self.config.repo_root or ".", filename
-            )
+            module_name_and_package = calculate_module_and_package(self.config.repo_root or ".", filename)
             mod_name = module_name_and_package.name
             pkg_name = module_name_and_package.package
         except ValueError as exc:
@@ -340,8 +332,7 @@ def _print_parallel_result(
                 print(f"ReCoding {filename}", file=sys.stderr)
             print_execution_result(result)
             print(
-                f"Successfully codemodded {filename}"
-                + (" with warnings\n" if result.warning_messages else "\n"),
+                f"Successfully codemodded {filename}" + (" with warnings\n" if result.warning_messages else "\n"),
                 file=sys.stderr,
             )
 
