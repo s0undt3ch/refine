@@ -42,7 +42,6 @@ class CliDashes(BaseCodemod):
     """
 
     NAME = "cli-dashes-over-underscores"
-    DESCRIPTION = __doc__
     CONFIG_CLS = CliDashesConfig
 
     def __post_codemod_init__(self) -> None:

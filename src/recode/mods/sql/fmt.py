@@ -77,7 +77,6 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
 
     NAME = "sqlfmt"
     CONFIG_CLS = FormatSQLConfig
-    DESCRIPTION: str = __doc__
 
     METADATA_DEPENDENCIES = (WhitespaceInclusivePositionProvider,)
 
