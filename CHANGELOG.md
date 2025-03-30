@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2025-03-30
+
+### 🚀 Features
+
+- Implement `get_short_description` classmethod
+- Fail if no codemods are selected
+
+### ⚙️ Miscellaneous Tasks
+
+- Quied down mypy
+- *(release)* Add changelog file
+
 ## [0.9.0] - 2025-03-25
 
 ### 🚀 Features
