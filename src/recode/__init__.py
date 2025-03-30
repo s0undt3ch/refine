@@ -1,4 +1,4 @@
-# type: ignore
+# mypy: disable-error-code="attr-defined,import-not-found"
 from __future__ import annotations
 
 import contextlib
