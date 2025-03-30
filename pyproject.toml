@@ -117,6 +117,9 @@ ignore = [
 "src/**/*.pyi" = [
   "D100",   # Missing docstring in public module
 ]
+"src/recode/__init__.py" = [
+  "PGH003",   # Use specific rule codes when ignoring type issues
+]
 "src/recode/__main__.py" = [
   "PLR0913", # Too many arguments in function definition
 ]
