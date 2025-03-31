@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] - 2025-03-31
+
+### 🚀 Features
+
+- *(release)* Rename package to avoid conflicts on PyPi
+
 ## [0.9.2] - 2025-03-31
 
 ### 💼 Other
@@ -23,7 +29,7 @@ All notable changes to this project will be documented in this file.
 
 ### ⚙️ Miscellaneous Tasks
 
-- Quied down mypy
+- Quiet down mypy
 - *(release)* Add changelog file
 
 ## [0.9.0] - 2025-03-25
