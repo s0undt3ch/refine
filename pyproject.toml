@@ -1,12 +1,12 @@
 [build-system]
-requires = ["hatchling", "uv-dynamic-versioning"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-source = "uv-dynamic-versioning"
+source = "vcs"
 
-[tool.hatch.build.hooks.version]
-path = "src/recode/_version.py"
+[tool.hatch.build.hooks.vcs]
+version-file = "src/recode/_version.py"
 template = "# Version attribute defined and written at build time\n\n__version__ = \"{version}\"\n"
 
 
