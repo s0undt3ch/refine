@@ -37,7 +37,11 @@ repos:
         pass_filenames: false
   # <---- Local Hooks ----------------------------------------------------------------------------
 
-  # ----- Code Formatting and Analysis ---------------------------------------------------------->
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.11
+    hooks:
+      - id: uv-lock
+
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: "v0.11.2"
     hooks:
@@ -66,4 +70,3 @@ repos:
     rev: v1.7.7
     hooks:
       - id: actionlint
-  # <---- Code Formatting and Analysis -----------------------------------------------------------
