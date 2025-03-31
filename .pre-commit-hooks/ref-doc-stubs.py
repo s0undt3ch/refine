@@ -47,7 +47,8 @@ def main():
             [
                 "**/__init__.py",
                 "refine/__main__.py",
-                "refine/version.py",
+                "refine/_version.py",
+                "refine/_version.pyi",
             ]
         )
 
