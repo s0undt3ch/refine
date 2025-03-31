@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 source = "uv-dynamic-versioning"
 
 [tool.hatch.build.hooks.version]
-path = "src/recode/version.py"
+path = "src/recode/_version.py"
 template = "# Version attribute defined and written at build time\n\n__version__ = \"{version}\"\n"
 
 
@@ -50,15 +50,6 @@ docs = [
     "markdown-include",
     "ruff>=0.11.2",
 ]
-
-[tool.hatch.build.targets.sdist]
-include = ["src/recode"]
-
-[tool.hatch.build.targets.wheel]
-include = ["src/recode"]
-
-[tool.hatch.build.targets.wheel.sources]
-"src/recode" = "recode"
 
 [tool.ruff]
 line-length = 120
