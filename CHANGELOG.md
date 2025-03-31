@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.1] - 2025-03-31
+
+### 📚 Documentation
+
+- Bring focus to the project message
+- Generate the reference docs
+- *(release)* Update changelog
+
+### ⚙️ Miscellaneous Tasks
+
+- *(pre-commit)* Make sure we don't commit a `uv.lock` file not up to date
+
 ## [0.10.0] - 2025-03-31
 
 ### 🚀 Features
