@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img width="240px" src="docs/imgs/refine.png" alt="refine"/>
+  <img width="240px" src="https://raw.githubusercontent.com/s0undt3ch/refine/main/docs/imgs/refine.png" alt="refine"/>
 </h1>
 
 <h2 align="center">
