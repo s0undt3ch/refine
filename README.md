@@ -2,8 +2,9 @@
   <img width="240px" src="docs/imgs/refine.png" alt="refine"/>
 </h1>
 
-
-_Polishing and improving codebases automatically._
+<h2 align="center">
+  <em>Polishing and improving codebases automatically</em>
+</h2>
 
 `refine` leverages the capabilities of [libCST](https://libcst.readthedocs.io/) (Library for Concrete Syntax Trees), a Python
 library designed for parsing, manipulating, and generating Python code in a syntax-preserving way. It builds upon libCST's
