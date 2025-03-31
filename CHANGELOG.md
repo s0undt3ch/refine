@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.2] - 2025-03-31
+
+### 📚 Documentation
+
+- Provide a full URL to the logo so it shows on PyPi
+
 ## [0.10.1] - 2025-03-31
 
 ### 📚 Documentation
