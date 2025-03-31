@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.2] - 2025-03-31
+
+### 💼 Other
+
+- Update changelog for release
+
+### ⚙️ Miscellaneous Tasks
+
+- Address mypy complaints, again.
+- *(release)* Fix dynamic release version support
+- *(release)* Switch to `hatch-vcs` for the dynamic version support
+
 ## [0.9.1] - 2025-03-30
 
 ### 🚀 Features
