@@ -1,8 +1,11 @@
 <h1 align="center">
-  <img width="240px" src="docs/imgs/recode.png" alt="recode"/>
+  <img width="240px" src="docs/imgs/refine.png" alt="refine"/>
 </h1>
 
-`recode` leverages the capabilities of [libCST](https://libcst.readthedocs.io/) (Library for Concrete Syntax Trees), a Python
+
+_Polishing and improving codebases automatically._
+
+`refine` leverages the capabilities of [libCST](https://libcst.readthedocs.io/) (Library for Concrete Syntax Trees), a Python
 library designed for parsing, manipulating, and generating Python code in a syntax-preserving way. It builds upon libCST's
 [codemod](https://libcst.readthedocs.io/en/latest/codemods_tutorial.html) module, which provides utilities for transforming code
 programmatically.
@@ -11,7 +14,7 @@ programmatically.
 
 ### Chained Codemod Execution
 
-`recode` enables running multiple `codemod`'s in a single CLI execution, streamlining workflows compared to libCST's one-codemod-per-execution approach.
+`refine` enables running multiple `codemod`'s in a single CLI execution, streamlining workflows compared to libCST's one-codemod-per-execution approach.
 
 ### Priority Management
 
@@ -25,4 +28,4 @@ Chained execution minimizes redundant parsing and tree-building processes, impro
 
 ### Focus on Developer Productivity
 
-By reducing the need for multiple executions, `recode` enhances developer workflows, especially in CI/CD pipelines or batch processing.
+By reducing the need for multiple executions, `refine` enhances developer workflows, especially in CI/CD pipelines or batch processing.

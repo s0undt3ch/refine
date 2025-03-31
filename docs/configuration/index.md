@@ -1,13 +1,13 @@
 # Configuration
 
-`recode` can be configured at the root of your repository with a `.recode.toml` file or in your project's `pyproject.toml`.
+`refine` can be configured at the root of your repository with a `.refine.toml` file or in your project's `pyproject.toml`.
 
-All configuration options can seen on the [Config][recode.config.Config] class reference, but here are a few examples.
+All configuration options can seen on the [Config][refine.config.Config] class reference, but here are a few examples.
 
-## Example `.recode.toml`
+## Example `.refine.toml`
 
 ```toml
-[recode]
+[refine]
 select = [
     "sqlfmt",
 ]
@@ -25,7 +25,7 @@ process_pool_size = 2
 ## Example `pyproject.toml`
 
 ```toml
-[tool.recode]
+[tool.refine]
 select = [
     "sqlfmt",
 ]

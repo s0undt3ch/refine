@@ -46,8 +46,8 @@ def main():
         args.ignore_pattern.extend(
             [
                 "**/__init__.py",
-                "recode/__main__.py",
-                "recode/version.py",
+                "refine/__main__.py",
+                "refine/version.py",
             ]
         )
 

@@ -6,13 +6,13 @@ build-backend = "hatchling.build"
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/recode/_version.py"
+version-file = "src/refine/_version.py"
 template = "# Version attribute defined and written at build time\n\n__version__ = \"{version}\"\n"
 
 
 [project]
-name = "re-code"
-description = "Tool for transforming and modernizing python codebases with ease"
+name = "refine"
+description = "Polishing and improving codebases automatically"
 authors = [{ name = "Pedro Algarvio", email = "pedro@algarvio.me" }]
 requires-python = ">3.11,<4"
 readme = "README.md"
@@ -26,11 +26,11 @@ dependencies = [
 ]
 
 [project.scripts]
-recode = "recode.__main__:main"
+refine = "refine.__main__:main"
 
-[project.entry-points."recode.mods"]
-format-sql = "recode.mods.sql.fmt:FormatSQL"
-cli-dashes = "recode.mods.cli.flags:CliDashes"
+[project.entry-points."refine.mods"]
+format-sql = "refine.mods.sql.fmt:FormatSQL"
+cli-dashes = "refine.mods.cli.flags:CliDashes"
 
 [dependency-groups]
 dev = [
@@ -108,26 +108,26 @@ ignore = [
 "src/**/*.pyi" = [
   "D100",   # Missing docstring in public module
 ]
-"src/recode/__init__.py" = [
+"src/refine/__init__.py" = [
   "PGH003",   # Use specific rule codes when ignoring type issues
 ]
-"src/recode/__main__.py" = [
+"src/refine/__main__.py" = [
   "PLR0913", # Too many arguments in function definition
 ]
-"src/recode/mods/*.py" = [
+"src/refine/mods/*.py" = [
   "ARG002",   #  Unused method argument
   "D100",     # Missing docstring in public module
   "D101",     # Missing docstring in public class
   "D102",     # Missing docstring in public method
   "N802",     # Function name `leave_Xyz` should be lowercase
 ]
-"src/recode/processor.py" = [
+"src/refine/processor.py" = [
   "T201",     # `print` found
   "BLE001",   # Do not catch blind exception: `Exception`
   "PLR0913",  # Too many arguments in function definition"
   "PLR0911",  # Too many return statements (7 > 6)"
 ]
-"src/recode/testing.py" = [
+"src/refine/testing.py" = [
   "D101",     # Missing docstring in public class
   "D105",     # Missing docstring in magic method
   "S101",     # Use of `assert` detected
@@ -165,7 +165,7 @@ convention = "google"
 combine-as-imports = false
 force-single-line = true
 known-first-party = [
-  "recode",
+  "refine",
 ]
 forced-separate = [
   "tests"

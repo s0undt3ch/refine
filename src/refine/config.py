@@ -149,4 +149,4 @@ class Config(BaseModel):
             error = f"Unable to parse {path}: {exc}"
             raise ConfigLoadError(error) from exc
         else:
-            return cls.from_dict(data.get("tool", {}).get("recode", {}))
+            return cls.from_dict(data.get("tool", {}).get("refine", {}))

@@ -13,11 +13,11 @@ import sys
 from multiprocessing import freeze_support
 from typing import NoReturn
 
-from recode import __version__
-from recode.config import Config
-from recode.exc import ReCodeSystemExit
-from recode.processor import Processor
-from recode.registry import Registry
+from refine import __version__
+from refine.config import Config
+from refine.exc import ReCodeSystemExit
+from refine.processor import Processor
+from refine.registry import Registry
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(message)s")
 
@@ -31,8 +31,8 @@ def main() -> NoReturn:  # noqa: PLR0915
     parser.add_argument(
         "--config",
         type=pathlib.Path,
-        help="Path to config file. Defaults to '.recode.ini' on the current directory.",
-        default=".recode.toml",
+        help="Path to config file. Defaults to '.refine.ini' on the current directory.",
+        default=".refine.toml",
     )
     parser.add_argument("--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output.")
     parser.add_argument(

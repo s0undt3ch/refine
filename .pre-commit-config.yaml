@@ -33,7 +33,7 @@ repos:
         name: Update reference documentation stubs
         language: system
         entry: python .pre-commit-hooks/ref-doc-stubs.py
-        files: ^(docs/.*\.md|src/recode/.*\.py)$
+        files: ^(docs/.*\.md|src/refine/.*\.py)$
         pass_filenames: false
   # <---- Local Hooks ----------------------------------------------------------------------------
 

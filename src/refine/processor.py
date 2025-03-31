@@ -33,17 +33,17 @@ from libcst.codemod._runner import TransformSuccess
 from libcst.helpers import calculate_module_and_package
 from libcst.metadata import FullRepoManager
 
-from recode.abc import BaseCodemod
-from recode.abc import BaseConfig
-from recode.exc import ReCodeSystemExit
+from refine.abc import BaseCodemod
+from refine.abc import BaseConfig
+from refine.exc import ReCodeSystemExit
 
 if TYPE_CHECKING:
     from multiprocessing.pool import Pool
 
     from libcst.metadata.base_provider import ProviderT
 
-    from recode.config import Config
-    from recode.registry import Registry
+    from refine.config import Config
+    from refine.registry import Registry
 
 log = logging.getLogger(__name__)
 

@@ -2,9 +2,9 @@ site_name: Codemod Documentation
 strict: true
 theme:
   name: material
-  logo: imgs/recode.png
-  icon: imgs/recode.png
-  favicon: imgs/recode.png
+  logo: imgs/refine.png
+  icon: imgs/refine.png
+  favicon: imgs/refine.png
   palette:
     primary: indigo
     accent: organge

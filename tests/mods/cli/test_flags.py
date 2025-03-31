@@ -4,9 +4,9 @@ import pathlib
 
 import pytest
 
-from recode.mods.cli.flags import CliDashes
-from recode.mods.cli.flags import CliDashesConfig
-from recode.testing import Modcase
+from refine.mods.cli.flags import CliDashes
+from refine.mods.cli.flags import CliDashesConfig
+from refine.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "flags"
 

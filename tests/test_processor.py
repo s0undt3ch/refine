@@ -8,8 +8,8 @@ from unittest.mock import patch
 
 import pytest
 
-from recode.mods.cli.flags import CliDashes
-from recode.processor import Processor
+from refine.mods.cli.flags import CliDashes
+from refine.processor import Processor
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def test_write_file_exception(tmp_path, subtests):
         with patch("tempfile.NamedTemporaryFile") as mock_tempfile:
             mock_tempfile.return_value.__enter__.return_value.write.side_effect = Exception("Write error")
             # We are not interested in seeing the output
-            with patch("recode.processor._print_parallel_result", MagicMock()):
+            with patch("refine.processor._print_parallel_result", MagicMock()):
                 processor.process([tmp_file_path])
 
         # Ensure the file's content remains unchanged after the exception
@@ -51,7 +51,7 @@ def test_write_file_exception(tmp_path, subtests):
     # Just for the sake of completeness, what if we don't raise an exception?
     with subtests.test("Non-failing behaviour"):
         # We are not interested in seeing the output
-        with patch("recode.processor._print_parallel_result", MagicMock()):
+        with patch("refine.processor._print_parallel_result", MagicMock()):
             processor.process([tmp_file_path])
 
         # Contents should no longer match

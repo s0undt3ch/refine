@@ -23,9 +23,9 @@ from pydantic import ValidationError
 from pydantic.functional_validators import AfterValidator
 from sqlfluff.api.simple import get_simple_config
 
-from recode import utils
-from recode.abc import BaseCodemod
-from recode.abc import BaseConfig
+from refine import utils
+from refine.abc import BaseCodemod
+from refine.abc import BaseConfig
 
 from .utils import is_sql_query
 

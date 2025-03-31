@@ -17,8 +17,8 @@ from libcst.codemod import CodemodContext
 from libcst.codemod import SkipFile
 
 if TYPE_CHECKING:
-    from recode.abc import BaseCodemod
-    from recode.abc import BaseConfig
+    from refine.abc import BaseCodemod
+    from refine.abc import BaseConfig
 
 log = logging.getLogger(__name__)
 

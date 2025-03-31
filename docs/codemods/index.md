@@ -1,15 +1,15 @@
 # Codemods
 
-Codemods are python modules which provide a subclass of [BaseCodemod][recode.abc.BaseCodemod], these classes
+Codemods are python modules which provide a subclass of [BaseCodemod][refine.abc.BaseCodemod], these classes
 are resposible for the code modifications.
 
 How to modify code can be read on [libCST's](https://libcst.readthedocs.io/en/latest/codemods_tutorial.html) documentation.
-Do note that our [BaseCodemod][recode.abc.BaseCodemod] differs from the libCST implementation.
-A good place to know how to implement a codemod can be see in this project's source tree under `src/recode/mods`.
+Do note that our [BaseCodemod][refine.abc.BaseCodemod] differs from the libCST implementation.
+A good place to know how to implement a codemod can be see in this project's source tree under `src/refine/mods`.
 
 # Included codemods
 
-There are a few `codemod`'s included with the project, and issuing a `--list` on the `recode` CLI will show
+There are a few `codemod`'s included with the project, and issuing a `--list` on the `refine` CLI will show
 you what's available.
 
 ```
@@ -21,16 +21,16 @@ Available codemods:
 ## Project Specific Codemods
 
 Probably some of the `codemods` of a project are quite tailored to the project and not that broad that could be
-contributed to the `recode` project.
+contributed to the `refine` project.
 
-In such cases, a project can host their own codemods in a directory and configure the [codemod_paths][recode.config.Config.codemod_paths]
+In such cases, a project can host their own codemods in a directory and configure the [codemod_paths][refine.config.Config.codemod_paths]
 configuration setting.
 
 When properly configured, issuing `--list` will now include the project codemods.
 
 ## Testing codemods
 
-We include [Modcase][recode.testing.Modcase] which is a dataclass prepared to test codemods from files which serve as
+We include [Modcase][refine.testing.Modcase] which is a dataclass prepared to test codemods from files which serve as
 before and after examples, as long as a pattern is followed.
 
 For example:
@@ -41,9 +41,9 @@ import pathlib
 
 import pytest
 
-from codemod.mods.sql.fmt import FormatSQL
-from codemod.mods.sql.fmt import FormatSQLConfig
-from codemod.testing import Modcase
+from refine.mods.sql.fmt import FormatSQL
+from refine.mods.sql.fmt import FormatSQLConfig
+from refine.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "fmt"
 

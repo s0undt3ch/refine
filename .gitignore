@@ -166,4 +166,4 @@ cython_debug/
 *.code-workspace
 
 # Ignore the auto-generated version file
-src/recode/version.py
+src/refine/_version.py

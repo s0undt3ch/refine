@@ -4,9 +4,9 @@ import pathlib
 
 import pytest
 
-from recode.mods.sql.fmt import FormatSQL
-from recode.mods.sql.fmt import FormatSQLConfig
-from recode.testing import Modcase
+from refine.mods.sql.fmt import FormatSQL
+from refine.mods.sql.fmt import FormatSQLConfig
+from refine.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "fmt"
 
