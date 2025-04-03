@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(message)s")
 log = logging.getLogger(__name__)
 
 
-def main() -> NoReturn:  # noqa: PLR0915
+def main() -> NoReturn:  # noqa: PLR0915,C901
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument("files", metavar="FILE", nargs="*", type=pathlib.Path, help="One or more files to process.")
@@ -67,7 +67,7 @@ def main() -> NoReturn:  # noqa: PLR0915
         type=pathlib.Path,
         action="append",
         default=[],
-        dest="codemods_paths",
+        dest="codemod_paths",
         help="Path to a codemods directory. Can be passed multiple times.",
     )
     args = parser.parse_args()
@@ -89,27 +89,37 @@ def main() -> NoReturn:  # noqa: PLR0915
 
     if args.list_codemods:
         # Add the additional CLI passed codemod paths
-        config.codemod_paths[:] = list(set(config.codemod_paths) | set(args.codemods_paths))
+        config.codemod_paths[:] = list(set(config.codemod_paths) | set(args.codemod_paths))
+
+    registry = Registry()
+    registry.load(config.codemod_paths)
+
+    available_codemods = {codemod.NAME: codemod.get_short_description() for codemod in registry.codemods()}
 
     if args.select_codemod:
         # Add any additional CLI passed selections
         config.select[:] = list(set(config.select) | set(args.select_codemod))
+        bad_codemods = set(config.select) - set(available_codemods)
+        if bad_codemods:
+            log.error("Invalid codemods selected: %s", ", ".join(bad_codemods))
+            parser.exit(status=1)
 
     if args.exclude_codemod:
         # Add any additional CLI passed exclusions
         config.exclude[:] = list(set(config.exclude) | set(args.exclude_codemod))
+        bad_codemods = set(config.exclude) - set(available_codemods)
+        if bad_codemods:
+            log.error("Invalid codemods excluded: %s", ", ".join(bad_codemods))
+            parser.exit(status=1)
 
     if args.fail_fast:
         config = config.model_copy(update={"fail_fast": True}, deep=True)
 
-    registry = Registry()
-    registry.load(config.codemod_paths)
     if args.list_codemods:
         log.info("Available codemods:")
-        for codemod in registry.codemods():
+        for name, description in sorted(available_codemods.items()):
             # In case the description is comming from the docstring, we just really want the first line.
-            description = codemod.DESCRIPTION.strip().splitlines()[0]
-            log.info(" - %s: %s", codemod.NAME, description.strip())
+            log.info(" - %s: %s", name, description.strip())
         parser.exit()
 
     paths = args.files
@@ -125,9 +135,13 @@ def main() -> NoReturn:  # noqa: PLR0915
             files.append(subpath)
 
     codemods = list(registry.codemods(select_codemods=config.select, exclude_codemods=config.exclude))
+    if not codemods:
+        log.error("No codemods selected. Exiting.")
+        parser.exit(status=1)
+
     log.info("Selected codemods:")
     for codemod in codemods:
-        log.info(" - %s: %s", codemod.NAME, codemod.DESCRIPTION)
+        log.info(" - %s: %s", codemod.NAME, codemod.get_short_description())
 
     processor = Processor(config=config, registry=registry, codemods=codemods)
     try:

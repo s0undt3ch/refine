@@ -112,7 +112,8 @@ ignore = [
   "PGH003",   # Use specific rule codes when ignoring type issues
 ]
 "src/refine/__main__.py" = [
-  "PLR0913", # Too many arguments in function definition
+  "PLR0912",  # Too many branches"
+  "PLR0913",  # Too many arguments in function definition
 ]
 "src/refine/mods/*.py" = [
   "ARG002",   #  Unused method argument
