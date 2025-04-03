@@ -57,7 +57,7 @@ class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[CodemodConfigType]):
         custom description.
         """
         doc = cls.__doc__
-        if cls is None:
+        if doc is None:
             error_msg = f"Codemod {cls.__name__} must have a docstring to be used in the CLI."
             raise TypeError(error_msg)
         if TYPE_CHECKING:
