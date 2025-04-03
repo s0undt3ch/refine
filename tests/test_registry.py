@@ -113,7 +113,7 @@ def test_collect_from_path(registry):
 
             assert collected == [MockCodemod]
             mock_glob.assert_called_once()
-            mock_loader.assert_called_once_with(mock_file.name, str(mock_file))
+            mock_loader.assert_called_once_with(mock_file.stem, str(mock_file))
 
 
 def test_duplicate_codemod_handling_with_caplog(registry, caplog):

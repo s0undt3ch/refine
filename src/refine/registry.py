@@ -10,6 +10,7 @@ import importlib.metadata
 import inspect
 import logging
 import operator
+import sys
 from collections.abc import Iterable
 from collections.abc import Iterator
 from importlib.machinery import SourceFileLoader
@@ -78,8 +79,12 @@ class Registry:
             yield cls
 
     def _collect_from_path(self, path: Path) -> Iterator[type[BaseCodemod[CodemodConfigType]]]:
+        # Make sure custom codemod paths are in sys.path
+        strpath = str(path)
+        if strpath not in sys.path:
+            sys.path.insert(0, strpath)
         for fpath in path.glob("*.py"):
-            loader = SourceFileLoader(fpath.name, str(fpath))
+            loader = SourceFileLoader(fpath.stem, str(fpath))
             module = loader.load_module()
             for _, cls in inspect.getmembers(module, inspect.isclass):
                 if not issubclass(cls, BaseCodemod):
