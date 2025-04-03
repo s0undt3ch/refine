@@ -31,7 +31,7 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
     parser.add_argument(
         "--config",
         type=pathlib.Path,
-        help="Path to config file. Defaults to '.refine.ini' on the current directory.",
+        help="Path to config file. Defaults to '%(default)s' on the current directory.",
         default=".refine.toml",
     )
     parser.add_argument("--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output.")
