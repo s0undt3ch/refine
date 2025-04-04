@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2025-04-04
+
+### 🚀 Features
+
+- Improve codemod CLI handling
+- *(dependencies)* Add `py-walk` as a dependency
+- *(codemods)* Allow configuring `exclude` for each codemod
+- *(testing)* Allow `assert_codemod` to also validate equality
+- *(gitignore)* Allow respecting `.gitignore` when excluding collected files
+
+### 🐛 Bug Fixes
+
+- Fix logical check variable
+- Make sure custom codemod paths are importable
+- *(cli)* Fix help message about default config file
+- *(entry-points)* Don't blowup when failing to load an entry-point
+- *(project name)* Fixed references to the old project names
+
 ## [0.10.2] - 2025-03-31
 
 ### 📚 Documentation
