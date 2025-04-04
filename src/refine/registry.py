@@ -66,7 +66,11 @@ class Registry:
 
     def _collect_from_entrypoints(self) -> Iterator[type[BaseCodemod[CodemodConfigType]]]:
         for entry_point in importlib.metadata.entry_points(group="refine.mods"):
-            cls: type[BaseCodemod[CodemodConfigType]] = entry_point.load()
+            try:
+                cls: type[BaseCodemod[CodemodConfigType]] = entry_point.load()
+            except Exception as exc:  # noqa: BLE001
+                log.warning("Failed to load entry point %s: %s", entry_point.name, exc)
+                continue
             if not inspect.isclass(cls):
                 # Don't even bother if it's not a class
                 continue
