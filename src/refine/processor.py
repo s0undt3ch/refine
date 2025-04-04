@@ -9,6 +9,7 @@ from __future__ import annotations
 import logging
 import multiprocessing
 import os
+import os.path
 import shutil
 import sys
 import tempfile
@@ -90,7 +91,7 @@ class Processor:
         """
         Process the passed in list of paths.
         """
-        _files = sorted({str(f.resolve()) for f in files})
+        _files = sorted({str(fpath) for fpath in files})
         total = len(_files)
         progress = Progress(enabled=True, total=total)
         chunk_size = 4
@@ -143,6 +144,7 @@ class Processor:
                     _print_parallel_result(
                         result,
                         progress,
+                        repo_root=self.config.repo_root,
                         unified_diff=False,
                         show_changed=True,
                         show_successes=False,
@@ -179,7 +181,10 @@ class Processor:
             mod_name = module_name_and_package.name
             pkg_name = module_name_and_package.package
         except ValueError as exc:
-            print(f"Failed to determine module name for {filename}: {exc}", file=sys.stderr)
+            print(
+                f"Failed to determine module name for {os.path.relpath(filename, self.config.repo_root)}: {exc}",
+                file=sys.stderr,
+            )
             mod_name = None
             pkg_name = None
 
@@ -208,7 +213,13 @@ class Processor:
                             config=self.codemod_configs[codemod.NAME].model_copy(deep=True),
                         )
                         output_tree = mod.transform_module(output_tree)
-                    except SkipFile:
+                    except SkipFile as exc:
+                        log.info(
+                            " - Skipping %s on %s: %s",
+                            codemod.NAME,
+                            os.path.relpath(filename, self.config.repo_root),
+                            exc,
+                        )
                         continue
 
                 new_code = output_tree.code
@@ -296,13 +307,14 @@ def _print_parallel_result(
     exec_result: ExecutionResult,
     progress: Progress,
     *,
+    repo_root: Path,
     unified_diff: bool,
     show_successes: bool,
     show_changed: bool,
     hide_generated: bool,
     hide_blacklisted: bool,
 ) -> None:
-    filename = exec_result.filename
+    filename = os.path.relpath(exec_result.filename, repo_root)
     result = exec_result.transform_result
 
     if isinstance(result, TransformSkip):
