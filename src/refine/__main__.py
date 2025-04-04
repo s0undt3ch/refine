@@ -13,6 +13,8 @@ import sys
 from multiprocessing import freeze_support
 from typing import NoReturn
 
+import py_walk
+
 from refine import __version__
 from refine.config import Config
 from refine.exc import ReCodeSystemExit
@@ -33,6 +35,13 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
         type=pathlib.Path,
         help="Path to config file. Defaults to '%(default)s' on the current directory.",
         default=".refine.toml",
+    )
+    parser.add_argument(
+        "--respect-gitignore",
+        "--rgi",
+        action="store_true",
+        default=False,
+        help="Respect .gitignore files when searching for files to process.",
     )
     parser.add_argument("--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output.")
     parser.add_argument(
@@ -124,15 +133,25 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
 
     paths = args.files
     if not paths:
-        paths = config.repo_root.glob("**/*.py")
+        paths.append(config.repo_root)
+
+    ignore_patterns: list[str] = config.exclude_patterns
+    gitignore_file = config.repo_root.joinpath(".gitignore")
+    respect_gitignore: bool = args.respect_gitignore or config.respect_gitignore
+    if respect_gitignore and gitignore_file.exists():
+        ignore_patterns.extend(
+            pattern for pattern in gitignore_file.read_text().splitlines() if pattern and not pattern.startswith("#")
+        )
 
     files: list[pathlib.Path] = []
     for path in paths:
         if path.is_file():
-            files.append(path)
+            if _append_path(path, repo_root=config.repo_root, files=files) is False:
+                parser.exit(status=1)
             continue
-        for subpath in path.rglob("*.py"):
-            files.append(subpath)
+        for subpath in py_walk.walk(path, match=["*.py"], mode="only-files", ignore=ignore_patterns):
+            if _append_path(subpath, repo_root=config.repo_root, files=files) is False:
+                parser.exit(status=1)
 
     codemods = list(registry.codemods(select_codemods=config.select, exclude_codemods=config.exclude))
     if not codemods:
@@ -160,6 +179,27 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
     except KeyboardInterrupt:
         parser.exit(status=1)
     parser.exit(status=0)
+
+
+def _append_path(path: pathlib.Path, repo_root: pathlib.Path, files: list[pathlib.Path]) -> bool:
+    """
+    Append a path to the list of paths if it is not already present.
+    """
+    resolved_path: pathlib.Path = path.resolve()
+    try:
+        # Check if the file is inside the repo root
+        resolved_path.relative_to(repo_root)
+    except ValueError:
+        log.error(  # noqa: TRY400
+            "File %s is not inside the repo root %s",
+            path,
+            repo_root,
+        )
+        return False
+    else:
+        if resolved_path not in files:
+            files.append(resolved_path)
+        return True
 
 
 if __name__ == "__main__":

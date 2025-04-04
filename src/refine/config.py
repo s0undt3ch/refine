@@ -95,6 +95,18 @@ class Config(BaseModel):
         Stop processing as soon as possible after the first error.
         """,
     )
+    respect_gitignore: bool = Field(
+        default=False,
+        description="""
+        Ignore files and directories listed in `.gitignore`.
+        """,
+    )
+    exclude_patterns: list[str] = Field(
+        default_factory=list,
+        description="""
+        List of glob path patterns to exclude from processing. Note that the full path is checked against the glob.
+        """,
+    )
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Config:
