@@ -31,6 +31,7 @@ class Modcase:
     name: str = field(init=False)
     original: str = field(init=False, repr=False)
     updated: str = field(init=False, repr=False)
+    require_changes: bool = field(init=False, default=True)
 
     def __post_init__(self) -> None:
         self.name = self.path.stem
@@ -39,6 +40,7 @@ class Modcase:
         updated_path = self.path.with_stem(f"{self.path.stem}.updated")
         log.debug("Populating ModCase.updated from: %s", updated_path)
         self.updated = self._dedent_contents(updated_path)
+        self.require_changes = self.original != self.updated
 
     def _dedent_contents(self, path: Path, strip_first_newline: bool = True) -> str:
         contents = path.read_text()
@@ -67,7 +69,12 @@ class Modcase:
                 error = "Expected SkipFile but was not raised"
                 raise AssertionError(error)
 
-        # Make sure changes were made
-        assert output_tree.code != self.original
+        if self.require_changes:
+            # Make sure changes were made
+            assert output_tree.code != self.original
+        else:
+            # Make sure no changes were made
+            assert output_tree.code == self.original
+
         # Match what we have on file
         assert output_tree.code == self.updated
