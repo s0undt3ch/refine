@@ -1,5 +1,5 @@
 """
-re:Code testing support.
+Refine testing support.
 """
 
 from __future__ import annotations

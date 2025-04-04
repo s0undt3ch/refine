@@ -1,5 +1,5 @@
 """
-re:Code related exceptions.
+Refine related exceptions.
 """
 
 from __future__ import annotations
@@ -7,15 +7,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 
-class ReCodeError(Exception):
+class RefineError(Exception):
     """
-    re:Code specific exception.
+    Refine specific exception.
     """
 
 
-class ReCodeSystemExit(SystemExit):
+class RefineSystemExit(SystemExit):
     """
-    re:Code system exit exception that accepts a message argument.
+    Refine system exit exception that accepts a message argument.
     """
 
     code: int

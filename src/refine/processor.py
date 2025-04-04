@@ -1,5 +1,5 @@
 """
-re:Code processor.
+Refine processor.
 
 A fair chunk of this module just piggybacks on what libCST does, we just adapt to our own way of processing the files.
 """
@@ -36,7 +36,7 @@ from libcst.metadata import FullRepoManager
 
 from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
-from refine.exc import ReCodeSystemExit
+from refine.exc import RefineSystemExit
 
 if TYPE_CHECKING:
     from multiprocessing.pool import Pool
@@ -70,7 +70,7 @@ class ParallelTransformResult:
 
 class Processor:
     """
-    re:Code codemod processor.
+    Refine codemod processor.
     """
 
     def __init__(self, config: Config, registry: Registry, codemods: list[type[BaseCodemod]]) -> None:
@@ -101,7 +101,7 @@ class Processor:
         )
         if jobs < 1:
             error = "Must have at least one job to process!"
-            raise ReCodeSystemExit(code=1, message=error)
+            raise RefineSystemExit(code=1, message=error)
 
         if total == 0:
             return ParallelTransformResult(successes=0, failures=0, skips=0, warnings=0, changed=0)
@@ -324,7 +324,7 @@ def _print_parallel_result(
             or (result.skip_reason is SkipReason.GENERATED and hide_generated)
         ):
             progress.clear()
-            print(f"ReCoding {filename}", file=sys.stderr)
+            print(f"Modifying {filename}", file=sys.stderr)
             print_execution_result(result)
             print(
                 f"Skipped codemodding {filename}: {result.skip_description}\n",
@@ -333,7 +333,7 @@ def _print_parallel_result(
     elif isinstance(result, TransformFailure):
         # Print any exception, don't write the file back.
         progress.clear()
-        print(f"ReCoding {filename}", file=sys.stderr)
+        print(f"Modifying {filename}", file=sys.stderr)
         print_execution_result(result)
         print(f"Failed to codemod {filename}\n", file=sys.stderr)
     elif isinstance(result, TransformSuccess):
@@ -341,7 +341,7 @@ def _print_parallel_result(
             # Print any warnings, save the changes if there were any.
             progress.clear()
             if show_successes or result.warning_messages:
-                print(f"ReCoding {filename}", file=sys.stderr)
+                print(f"Modifying {filename}", file=sys.stderr)
             print_execution_result(result)
             print(
                 f"Successfully codemodded {filename}" + (" with warnings\n" if result.warning_messages else "\n"),

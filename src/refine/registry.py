@@ -1,5 +1,5 @@
 """
-re:Code registry.
+Refine registry.
 
 This holds the information about what codemods are available to be used.
 """

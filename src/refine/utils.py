@@ -1,5 +1,5 @@
 """
-ReCode utilities.
+Refine utilities.
 """
 
 from __future__ import annotations

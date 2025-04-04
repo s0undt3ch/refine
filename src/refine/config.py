@@ -1,5 +1,5 @@
 """
-re:Code configuration.
+Refine configuration.
 """
 
 from __future__ import annotations

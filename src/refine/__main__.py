@@ -17,7 +17,7 @@ import py_walk
 
 from refine import __version__
 from refine.config import Config
-from refine.exc import ReCodeSystemExit
+from refine.exc import RefineSystemExit
 from refine.processor import Processor
 from refine.registry import Registry
 
@@ -167,7 +167,7 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
         result = processor.process(files)
         if result.failures:
             parser.exit(status=1)
-    except ReCodeSystemExit as exc:
+    except RefineSystemExit as exc:
         parser.exit(status=exc.code, message=exc.message)
     except SystemExit as exc:
         code: str | int | None = exc.code
