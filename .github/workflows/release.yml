@@ -1,0 +1,136 @@
+
+name: Release
+run-name: "Release (branch: ${{ github.ref_name }}; version: ${{ inputs.release_tag }})"
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag (e.g., 1.2.3)"
+        required: true
+        type: string
+      dry_run:
+        description: "Dry run (build and test but do not publish)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    environment: release
+
+    steps:
+      - name: Check For Admin Permission
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: admin
+          username: ${{ github.triggering_actor }}
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cleanup Release Tag
+        run: |
+          echo "RELEASE_TAG=$(echo '${{ inputs.release_tag }}' | sed 's/^v//')" >> "$GITHUB_ENV"
+
+      - name: Check if tag already exists
+        run: |
+          if git rev-parse "refs/tags/${{ env.RELEASE_TAG }}" >/dev/null 2>&1; then
+            echo "❌ Tag '${{ env.RELEASE_TAG }}' already exists!"
+            exit 1
+          fi
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache build dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            .venv
+          key: ${{ runner.os }}-build-${{ hashFiles('**/pyproject.toml', 'uv.lock') }}
+
+      - name: Generate changelog for GH release
+        id: git-cliff
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --unreleased --strip all
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Update CHANGELOG.md
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --verbose --unreleased --tag '${{ env.RELEASE_TAG }}' --prepend CHANGELOG.md
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Preare GH Release changelog
+        run: |
+          echo "GH_CHANGELOG=$(echo "${{ steps.git-cliff.outputs.content }}" | tail -n +3)" >> "$GITHUB_ENV"
+
+      - name: Commit changelog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          set +e
+          git add CHANGELOG.md
+          git commit -m "chore(release): Update changelog for ${{ env.RELEASE_TAG }} release"
+          git push
+
+      - name: Tag the release
+        run: |
+          git tag -a "${{ env.RELEASE_TAG }}" -m "Release ${{ env.RELEASE_TAG }}"
+          git push origin "refs/tags/${{ env.RELEASE_TAG }}"
+
+      - name: Build distribution
+        run: uv build
+
+      - name: Upload artifacts to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: dist/*
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          body: ${{ env.GH_CHANGELOG }}
+          files: dist/*
+          draft: false
+          prerelease: false
+          make_latest: true
+
+      - name: Publish to PyPI (trusted publishing)
+        if: ${{ inputs.dry_run != true }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
+
+      - name: Dry run complete
+        if: ${{ inputs.dry_run == true }}
+        run: echo "✅ Dry run completed. No artifacts were published to PyPI."
