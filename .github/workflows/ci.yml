@@ -145,6 +145,7 @@ jobs:
 
     needs:
       - pre-commit
+      - tests
 
     permissions:
       contents: write
