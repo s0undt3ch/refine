@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.11.0] - 2025-04-04
+## [0.11.0](https://github.com/s0undt3ch/refine/releases/tag/0.11.0) - 2025-04-04
 
 ### 🚀 Features
 
@@ -20,13 +20,13 @@ All notable changes to this project will be documented in this file.
 - *(entry-points)* Don't blowup when failing to load an entry-point
 - *(project name)* Fixed references to the old project names
 
-## [0.10.2] - 2025-03-31
+## [0.10.2](https://github.com/s0undt3ch/refine/releases/tag/0.10.2) - 2025-03-31
 
 ### 📚 Documentation
 
 - Provide a full URL to the logo so it shows on PyPi
 
-## [0.10.1] - 2025-03-31
+## [0.10.1](https://github.com/s0undt3ch/refine/releases/tag/0.10.1) - 2025-03-31
 
 ### 📚 Documentation
 
@@ -38,7 +38,7 @@ All notable changes to this project will be documented in this file.
 
 - *(pre-commit)* Make sure we don't commit a `uv.lock` file not up to date
 
-## [0.10.0] - 2025-03-31
+## [0.10.0](https://github.com/s0undt3ch/refine/releases/tag/0.10.0) - 2025-03-31
 
 ### 🚀 Features
 
@@ -53,7 +53,7 @@ All notable changes to this project will be documented in this file.
 
 - *(pre-commit)* Make sure we don't commit a `uv.lock` file not up to date
 
-## [0.9.2] - 2025-03-31
+## [0.9.2](https://github.com/s0undt3ch/refine/releases/tag/0.9.2) - 2025-03-31
 
 ### 💼 Other
 
@@ -65,7 +65,7 @@ All notable changes to this project will be documented in this file.
 - *(release)* Fix dynamic release version support
 - *(release)* Switch to `hatch-vcs` for the dynamic version support
 
-## [0.9.1] - 2025-03-30
+## [0.9.1](https://github.com/s0undt3ch/refine/releases/tag/0.9.1) - 2025-03-30
 
 ### 🚀 Features
 
@@ -77,7 +77,7 @@ All notable changes to this project will be documented in this file.
 - Quiet down mypy
 - *(release)* Add changelog file
 
-## [0.9.0] - 2025-03-25
+## [0.9.0](https://github.com/s0undt3ch/refine/releases/tag/0.9.0) - 2025-03-25
 
 ### 🚀 Features
 
