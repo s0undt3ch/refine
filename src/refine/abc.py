@@ -11,24 +11,21 @@ from typing import ClassVar
 from typing import Generic
 from typing import TypeVar
 
+import msgspec
 from libcst.codemod import CodemodContext
 from libcst.codemod import SkipFile
 from libcst.codemod import VisitorBasedCodemodCommand
-from pydantic import BaseModel
-from pydantic import ConfigDict
-from pydantic import Field
 
 
-class BaseConfig(BaseModel):
+class BaseConfig(msgspec.Struct, kw_only=True, frozen=True, forbid_unknown_fields=True):
     """
     Base configuration class for codemoders.
     """
 
-    model_config = ConfigDict(frozen=True)
-    exclude: list[str] = Field(
-        default_factory=list,
-        description="List of glob patterns to exclude paths from being processed.",
-    )
+    exclude: list[str] = msgspec.field(default_factory=list)
+    """
+    List of glob patterns to exclude paths from being processed.
+    """
 
 
 CodemodConfigType = TypeVar("CodemodConfigType", bound=BaseConfig)

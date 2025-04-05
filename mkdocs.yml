@@ -52,7 +52,6 @@ plugins:
       handlers:
         python_xref:
           import:
-            - https://docs.pydantic.dev/latest/objects.inv
             - https://docs.python.org/3/objects.inv
           options:
             docstring_style: "sphinx"
@@ -75,11 +74,7 @@ plugins:
             merge_init_into_class: true
             show_signature_annotations: true
             signature_crossrefs: true
-            extensions:
-            - griffe_pydantic:
-                schema: false
           import:
-            - https://docs.pydantic.dev/latest/objects.inv
             - https://docs.python.org/3/objects.inv
 
 markdown_extensions:

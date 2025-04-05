@@ -79,7 +79,7 @@ class Processor:
         self.codemods = codemods
         codemod_configs = {}
         for codemod in codemods:
-            config_dict = getattr(config, codemod.NAME, {})
+            config_dict = config.__remaining_config__.get(codemod.NAME, {})
             try:
                 codemod_config = codemod.CONFIG_CLS(**config_dict)
             except AttributeError:
@@ -210,7 +210,7 @@ class Processor:
                         mod = codemod(
                             context=context,
                             # Pass copies of the configuration
-                            config=self.codemod_configs[codemod.NAME].model_copy(deep=True),
+                            config=self.codemod_configs[codemod.NAME],
                         )
                         output_tree = mod.transform_module(output_tree)
                     except SkipFile as exc:
@@ -307,7 +307,7 @@ def _print_parallel_result(
     exec_result: ExecutionResult,
     progress: Progress,
     *,
-    repo_root: Path,
+    repo_root: str,
     unified_diff: bool,
     show_successes: bool,
     show_changed: bool,

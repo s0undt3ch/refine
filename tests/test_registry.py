@@ -104,7 +104,7 @@ def test_collect_from_path(registry):
     mock_file = MagicMock()
     mock_file.name = "mock_codemod.py"
 
-    with patch("refine.registry.Path.glob", return_value=[mock_file]) as mock_glob:
+    with patch("refine.registry.pathlib.Path.glob", return_value=[mock_file]) as mock_glob:
         with patch("refine.registry.SourceFileLoader") as mock_loader:
             mock_loader.return_value.load_module.return_value = MagicMock()
 

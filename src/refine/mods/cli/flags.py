@@ -29,7 +29,7 @@ from refine.abc import BaseConfig
 log = logging.getLogger(__name__)
 
 
-class CliDashesConfig(BaseConfig):
+class CliDashesConfig(BaseConfig, frozen=True):
     django_base_command_package: str = "django.core.management"
     django_base_command_class_name: str = "BaseCommand"
 

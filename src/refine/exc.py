@@ -6,11 +6,29 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import msgspec
+
 
 class RefineError(Exception):
     """
     Refine specific exception.
     """
+
+
+class InvalidConfigError(msgspec.ValidationError):
+    """
+    Validation error.
+    """
+
+
+class ConfigLoadError(RefineError):
+    """
+    Configuration loading error.
+    """
+
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
 
 
 class RefineSystemExit(SystemExit):

@@ -13,6 +13,7 @@ import sys
 from multiprocessing import freeze_support
 from typing import NoReturn
 
+import msgspec.structs
 import py_walk
 
 from refine import __version__
@@ -122,7 +123,7 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
             parser.exit(status=1)
 
     if args.fail_fast:
-        config = config.model_copy(update={"fail_fast": True}, deep=True)
+        config = msgspec.structs.replace(config, fail_fast=True)
 
     if args.list_codemods:
         log.info("Available codemods:")
@@ -131,12 +132,13 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
             log.info(" - %s: %s", name, description.strip())
         parser.exit()
 
-    paths = args.files
+    repo_root: pathlib.Path = pathlib.Path(config.repo_root)
+    paths: list[pathlib.Path] = args.files
     if not paths:
-        paths.append(config.repo_root)
+        paths.append(repo_root)
 
     ignore_patterns: list[str] = config.exclude_patterns
-    gitignore_file = config.repo_root.joinpath(".gitignore")
+    gitignore_file = repo_root / ".gitignore"
     respect_gitignore: bool = args.respect_gitignore or config.respect_gitignore
     if respect_gitignore and gitignore_file.exists():
         ignore_patterns.extend(
@@ -146,11 +148,11 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
     files: list[pathlib.Path] = []
     for path in paths:
         if path.is_file():
-            if _append_path(path, repo_root=config.repo_root, files=files) is False:
+            if _append_path(path, repo_root=repo_root, files=files) is False:
                 parser.exit(status=1)
             continue
         for subpath in py_walk.walk(path, match=["*.py"], mode="only-files", ignore=ignore_patterns):
-            if _append_path(subpath, repo_root=config.repo_root, files=files) is False:
+            if _append_path(subpath, repo_root=repo_root, files=files) is False:
                 parser.exit(status=1)
 
     codemods = list(registry.codemods(select_codemods=config.select, exclude_codemods=config.exclude))

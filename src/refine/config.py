@@ -10,103 +10,71 @@ import tomllib
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel
-from pydantic import ConfigDict
-from pydantic import Field
+import msgspec
+
+from refine.exc import ConfigLoadError
+from refine.exc import InvalidConfigError
 
 log = logging.getLogger(__name__)
 
 
 def _cpu_count() -> int:
     # os.cpu_count() can return None, let's not.
-    return os.cpu_count() or 1
+    return max((os.cpu_count() or 1) - 1, 1)
 
 
-class ConfigError(ValueError):
-    """
-    Config related error.
-    """
-
-
-class ConfigLoadError(ConfigError):
-    """
-    Exception raised when failing to load the configuration from file.
-    """
-
-
-class InvalidConfigError(ConfigError):
-    """
-    Exception raised when the loaded configuration is not valid.
-    """
-
-
-class Config(BaseModel):
+class Config(msgspec.Struct, kw_only=True, frozen=True):
     """
     Main codemod configuration schema.
     """
 
-    model_config = ConfigDict(
-        # Don't allow the config object to be mutable.
-        # Do note that mutable objects(set, list, dict) of the immutable config class remain mutable.
-        frozen=True,
-        # Allow extra keys, these will be codemods configs
-        extra="allow",
-    )
+    select: list[str] = msgspec.field(default_factory=list)
+    """
+    List of codemods to run.
 
-    select: list[str] = Field(
-        default_factory=list,
-        description="""
-        List of codemods to run.
+    When no selection is made, all available codemods are run.
+    """
 
-        When no selection is made, all available codemods are run.
-        """,
-    )
-    exclude: list[str] = Field(
-        default_factory=list,
-        description="""
-        List of codemods to exclude.
+    exclude: list[str] = msgspec.field(default_factory=list)
+    """
+    List of codemods to exclude.
 
-        Only makes sense when `select` is empty and all codemods are run.
-    """,
-    )
-    codemod_paths: list[Path] = Field(
-        default_factory=list,
-        description="""
-        List of additional paths to search for codemods.
-        """,
-    )
-    process_pool_size: int = Field(
-        default_factory=_cpu_count,
-        description="""
-        Number of processes to use for parallel processing.
-        Defaults to the number of available CPUs.
-        """,
-    )
-    repo_root: Path = Field(
-        default_factory=Path.cwd,
-        description="""
-        The root directory of the repository.
-        Defaults to the current working directory.
-        """,
-    )
-    fail_fast: bool = Field(
-        default=False,
-        description="""
-        Stop processing as soon as possible after the first error.
-        """,
-    )
-    respect_gitignore: bool = Field(
-        default=False,
-        description="""
-        Ignore files and directories listed in `.gitignore`.
-        """,
-    )
-    exclude_patterns: list[str] = Field(
-        default_factory=list,
-        description="""
-        List of glob path patterns to exclude from processing. Note that the full path is checked against the glob.
-        """,
-    )
+    Only makes sense when `select` is empty and all codemods are run.
+    """
+
+    codemod_paths: list[str] = msgspec.field(default_factory=list)
+    """
+    List of additional paths to search for codemods.
+    """
+
+    process_pool_size: int = msgspec.field(default_factory=_cpu_count)
+    """
+    Number of processes to use for parallel processing.
+    Defaults to the number of available CPUs.
+    """
+
+    repo_root: str = msgspec.field(default_factory=os.getcwd)
+    """
+    The root directory of the repository.
+    Defaults to the current working directory.
+    """
+
+    fail_fast: bool = False
+    """
+    Stop processing as soon as possible after the first error.
+    """
+
+    respect_gitignore: bool = False
+    """
+    Ignore files and directories listed in `.gitignore`.
+    """
+
+    exclude_patterns: list[str] = msgspec.field(default_factory=list)
+    """
+    List of glob path patterns to exclude from processing. Note that the full path is checked against the glob.
+    """
+
+    __remaining_config__: dict[str, Any] = msgspec.field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Config:
@@ -120,10 +88,13 @@ class Config(BaseModel):
             Config instance.
         """
         try:
-            return Config(**data)
-        except ValueError as exc:
+            config = msgspec.convert(data, type=Config)
+            config.__remaining_config__.update({k: v for (k, v) in data.items() if k not in config.__struct_fields__})
+        except msgspec.ValidationError as exc:
             error = f"Invalid configuration: {exc}"
             raise InvalidConfigError(error) from exc
+        else:
+            return config
 
     @classmethod
     def from_default_file(cls, path: Path) -> Config:

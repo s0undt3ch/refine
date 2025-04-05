@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
-
+import msgspec
 import pytest
 
 from refine.config import Config
-from refine.config import InvalidConfigError
+from refine.exc import InvalidConfigError
 
 
 @pytest.fixture
@@ -15,8 +14,8 @@ def valid_config():
         "select": ["codemod1", "codemod2"],
         "exclude": ["codemod3"],
         "codemod_paths": [
-            Path("/path/to/codemod1"),
-            Path("/path/to/codemod2"),
+            "/path/to/codemod1",
+            "/path/to/codemod2",
         ],
         "process_pool_size": 4,
     }
@@ -36,15 +35,15 @@ def test_config_from_dict_valid(valid_config):
     config = Config.from_dict(valid_config)
     assert config.select == ["codemod1", "codemod2"]
     assert config.exclude == ["codemod3"]
-    assert config.codemod_paths == [Path("/path/to/codemod1"), Path("/path/to/codemod2")]
+    assert config.codemod_paths == ["/path/to/codemod1", "/path/to/codemod2"]
     assert config.process_pool_size == 4
 
 
 def test_config_from_dict_invalid(invalid_config):
     """Test loading an invalid configuration dictionary."""
-    with pytest.raises(InvalidConfigError) as exc_info:
+    with pytest.raises(msgspec.ValidationError) as exc_info:
         Config.from_dict(invalid_config)
-    assert "Invalid configuration" in str(exc_info.value)
+    assert "Invalid configuration: Expected `array`, got `int` - at `$.select`" in str(exc_info.value)
 
 
 def test_config_from_default_file(tmp_path, valid_config):

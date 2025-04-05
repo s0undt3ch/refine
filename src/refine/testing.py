@@ -56,7 +56,7 @@ class Modcase:
         log.debug("Testing %s", self)
         assert self.original != self.updated
         context = CodemodContext(filename=str(self.path))
-        transform_instance = self.codemod(context, self.codemod_config.model_copy())
+        transform_instance = self.codemod(context, self.codemod_config)
         input_tree = parse_module(self.original, config=PartialParserConfig())
         try:
             output_tree = transform_instance.transform_module(input_tree)

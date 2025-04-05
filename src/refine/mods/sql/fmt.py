@@ -11,21 +11,18 @@ import pathlib
 import textwrap
 from functools import cache
 from typing import TYPE_CHECKING
-from typing import Annotated
 from typing import cast
 
 import libcst as cst
 import sqlfluff.api
 from libcst.codemod import SkipFile
 from libcst.metadata import WhitespaceInclusivePositionProvider
-from pydantic import Field
-from pydantic import ValidationError
-from pydantic.functional_validators import AfterValidator
 from sqlfluff.api.simple import get_simple_config
 
 from refine import utils
 from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
+from refine.exc import InvalidConfigError
 
 from .utils import is_sql_query
 
@@ -38,36 +35,37 @@ logging.getLogger("sqlfluff").setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 
 BUILNTIN_SQLFLUFF_CONFIG_FILE = pathlib.Path(__file__).parent / ".sqlfluff"
-
-SQL_DIALECTS = tuple(dialect.label for dialect in sqlfluff.list_dialects())
-
-
-def _check_sql_dialect(dialect: str) -> str:
-    if dialect.lower() not in SQL_DIALECTS:
-        err_msg = f"Invalid SQL dialect {dialect.lower()!r}. Must be one of: {', '.join(SQL_DIALECTS)}"
-        raise ValidationError(err_msg)
-    return dialect.lower()
+SUPPORTED_SQLFLUFF_DIALECTS: tuple[str, ...] = tuple(dialect.label for dialect in sqlfluff.list_dialects())
 
 
-SqlDialect = Annotated[str, AfterValidator(_check_sql_dialect)]
-
-
-class FormatSQLConfig(BaseConfig):
+class FormatSQLConfig(BaseConfig, frozen=True):
     """
     Configuration for the SQL Formatting codemod.
     """
 
-    dialect: SqlDialect = Field(
-        default="ansi",
-        description="The SQL dialect to use when formatting the SQL queries.",
-    )
-    sqlfluff_config_file: str = Field(
-        default=str(BUILNTIN_SQLFLUFF_CONFIG_FILE),
-        description=(
-            "The path to a sqlfluff configuration file. If not provided, a default, opionated, configuration "
-            "will be used."
-        ),
-    )
+    dialect: str = "ansi"
+    """The SQL dialect to use when formatting the SQL queries."""
+
+    sqlfluff_config_file: str = str(BUILNTIN_SQLFLUFF_CONFIG_FILE)
+    """
+    The path to a sqlfluff configuration file.
+
+    If not provided, a default, opionated, configuration will be used.
+    """
+
+    def __post_init__(self) -> None:
+        """
+        This method can implement additional codemod initialization.
+        """
+        if not pathlib.Path(self.sqlfluff_config_file).exists():
+            error_msg = f"SQLFluff config file not found: {self.sqlfluff_config_file}"
+            raise InvalidConfigError(error_msg)
+        if self.dialect not in SUPPORTED_SQLFLUFF_DIALECTS:
+            error_msg = (
+                f"Unsupported SQL dialect: {self.dialect}. Supported dialects are: "
+                f"{', '.join(SUPPORTED_SQLFLUFF_DIALECTS)}"
+            )
+            raise InvalidConfigError(error_msg)
 
 
 class FormatSQL(BaseCodemod[FormatSQLConfig]):

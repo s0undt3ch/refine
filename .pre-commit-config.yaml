@@ -63,9 +63,9 @@ repos:
         additional_dependencies:
           - libcst
           - sqlfluff
-          - pydantic
-          - tomllib >= 1.1.0; python_version < "3.11"
           - py-walk
+          - msgspec
+          - tomllib >= 1.1.0; python_version < "3.11"
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.7

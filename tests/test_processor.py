@@ -32,6 +32,7 @@ def test_write_file_exception(tmp_path, subtests):
     config = MagicMock()
     config.repo_root = tmp_path
     config.process_pool_size = 1
+    config.__remaining_config__ = {}
 
     registry = MagicMock()
     codemods = [CliDashes]
