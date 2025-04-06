@@ -26,6 +26,12 @@ dependencies = [
     "msgspec>=0.19.0",
 ]
 
+[project.urls]
+Repository = "https://github.com/s0undt3ch/refine"
+Documentation = "https://s0undt3ch.github.io/refine"
+Issues = "https://github.com/s0undt3ch/refine/issues"
+Changelog = "https://github.com/s0undt3ch/refine/blob/main/CHANGELOG.md"
+
 [project.scripts]
 refine = "refine.__main__:main"
 
