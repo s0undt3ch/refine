@@ -52,9 +52,13 @@ class Modcase:
         """
         This assertion is inspired by libCST's TestClass implementation.
         """
-        # Make sure the original content does not match the updated content
         log.debug("Testing %s", self)
-        assert self.original != self.updated
+        if self.require_changes:
+            # Make sure the original content does not match the updated content
+            assert self.original != self.updated
+        else:
+            # Make sure the original content matches the updated content
+            assert self.original == self.updated
         context = CodemodContext(filename=str(self.path))
         transform_instance = self.codemod(context, self.codemod_config)
         input_tree = parse_module(self.original, config=PartialParserConfig())
