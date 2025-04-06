@@ -97,11 +97,12 @@ jobs:
           config: cliff.toml
           args: --unreleased --strip all
         env:
+          OUTPUT: .release-changes.md
           GITHUB_REPO: ${{ github.repository }}
 
       - name: Preare GH Release changelog
         run: |
-          echo "GH_CHANGELOG=$(echo "${{ steps.git-cliff.outputs.content }}" | tail -n +3)" >> "$GITHUB_ENV"
+          tail -n +3 .release-changes.md > .final-release-notes.md
 
       - name: Update CHANGELOG.md
         uses: orhun/git-cliff-action@v4
@@ -140,7 +141,7 @@ jobs:
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
-          body: ${{ env.GH_CHANGELOG }}
+          body_path: .final-release-notes.md
           files: dist/*
           draft: false
           prerelease: false
