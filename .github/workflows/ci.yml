@@ -121,7 +121,7 @@ jobs:
           key: >-
             venv|
             ${{ runner.os }}|
-            pre-commit|
+            tests|
             ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
             ${{ steps.uv-version-checksum.outputs.version-sha256sum }}|
             ${{ hashFiles('**/uv.lock') }}
@@ -185,7 +185,7 @@ jobs:
           key: >-
             venv|
             ${{ runner.os }}|
-            pre-commit|
+            docs|
             ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
             ${{ steps.uv-version-checksum.outputs.version-sha256sum }}|
             ${{ hashFiles('**/uv.lock') }}

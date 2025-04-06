@@ -62,13 +62,33 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Cache build dependencies
+      - name: Get Python version checksum
+        id: python-version-checksum
+        shell: bash
+        run: |
+          VERSION_SHA256SUM=$(python --version --version | sha256sum | cut -d ' ' -f 1)
+          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
+          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
+
+      - name: Get UV version checksum
+        id: uv-version-checksum
+        shell: bash
+        run: |
+          VERSION_SHA256SUM=$(uv --version | sha256sum | cut -d ' ' -f 1)
+          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
+          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
+
+      - name: Set up cache
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache/pip
-            .venv
-          key: ${{ runner.os }}-build-${{ hashFiles('**/pyproject.toml', 'uv.lock') }}
+          path: .venv
+          key: >-
+            venv|
+            ${{ runner.os }}|
+            pre-commit|
+            ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
+            ${{ steps.uv-version-checksum.outputs.version-sha256sum }}|
+            ${{ hashFiles('**/uv.lock') }}
 
       - name: Generate changelog for GH release
         id: git-cliff
@@ -79,6 +99,10 @@ jobs:
         env:
           GITHUB_REPO: ${{ github.repository }}
 
+      - name: Preare GH Release changelog
+        run: |
+          echo "GH_CHANGELOG=$(echo "${{ steps.git-cliff.outputs.content }}" | tail -n +3)" >> "$GITHUB_ENV"
+
       - name: Update CHANGELOG.md
         uses: orhun/git-cliff-action@v4
         with:
@@ -86,10 +110,6 @@ jobs:
           args: --verbose --unreleased --tag '${{ env.RELEASE_TAG }}' --prepend CHANGELOG.md
         env:
           GITHUB_REPO: ${{ github.repository }}
-
-      - name: Preare GH Release changelog
-        run: |
-          echo "GH_CHANGELOG=$(echo "${{ steps.git-cliff.outputs.content }}" | tail -n +3)" >> "$GITHUB_ENV"
 
       - name: Commit changelog
         run: |
@@ -106,7 +126,8 @@ jobs:
           git push origin "refs/tags/${{ env.RELEASE_TAG }}"
 
       - name: Build distribution
-        run: uv build
+        run: |
+          uv build
 
       - name: Upload artifacts to GitHub
         uses: actions/upload-artifact@v4
@@ -133,4 +154,5 @@ jobs:
 
       - name: Dry run complete
         if: ${{ inputs.dry_run == true }}
-        run: echo "✅ Dry run completed. No artifacts were published to PyPI."
+        run: |
+          echo "✅ Dry run completed. No artifacts were published to PyPI."
