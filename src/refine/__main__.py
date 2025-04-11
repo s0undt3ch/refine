@@ -44,7 +44,21 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
         default=False,
         help="Respect .gitignore files when searching for files to process.",
     )
-    parser.add_argument("--quiet", "-q", action="store_true", default=False, help="Quiet down the tool output.")
+    verbosity_group = parser.add_mutually_exclusive_group()
+    verbosity_group.add_argument(
+        "--quiet",
+        "-q",
+        action="store_true",
+        default=False,
+        help="Quiet down the tool output.",
+    )
+    verbosity_group.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        default=False,
+        help="Enable verbose output.",
+    )
     parser.add_argument(
         "--fail-fast",
         "--ff",
@@ -83,6 +97,8 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
     args = parser.parse_args()
     if args.quiet:
         logging.getLogger().setLevel(logging.ERROR)
+    elif args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
     if not args.config.is_absolute():
         config_file = pathlib.Path.cwd().joinpath(args.config).resolve()
     else:
