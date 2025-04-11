@@ -50,16 +50,6 @@ plugins:
       default_handler: python
       enable_inventory: true
       handlers:
-        python_xref:
-          import:
-            - https://docs.python.org/3/objects.inv
-          options:
-            docstring_style: "sphinx"
-            docstring_section_style: "list"
-            relative_crossrefs: true
-            show_root_heading: true
-            show_signature: true
-            unwrap_annotated: true
         python:
           paths: [.]
           options:
@@ -74,8 +64,9 @@ plugins:
             merge_init_into_class: true
             show_signature_annotations: true
             signature_crossrefs: true
-          import:
+          inventories:
             - https://docs.python.org/3/objects.inv
+            - https://libcst.readthedocs.io/en/latest/objects.inv
 
 markdown_extensions:
   - admonition

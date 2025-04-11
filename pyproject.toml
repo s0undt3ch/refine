@@ -163,6 +163,9 @@ ignore = [
 "tests/**/files/*" = [
   "INP001",   # implicit namespace packages
 ]
+"tests/abc/__init__.py" = [
+  "A005",     # Module `abc` shadows a Python standard-library module
+]
 
 [tool.ruff.lint.pydocstyle]
 # Use Google-style docstrings.
