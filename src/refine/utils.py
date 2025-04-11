@@ -4,13 +4,10 @@ Refine utilities.
 
 from __future__ import annotations
 
-import re
 from ast import literal_eval
 from functools import cache
 
 import libcst as cst
-
-INDENT_RE = re.compile(r"(?P<indent>[ ]+)(.*)")
 
 
 @cache
