@@ -72,12 +72,20 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
         action="store_true",
         help="List all available codemods",
     )
-    parser.add_argument(
+    exclude_group = parser.add_mutually_exclusive_group()
+    exclude_group.add_argument(
         "--exclude-codemod",
         "--exclude",
         default=[],
         action="append",
-        help="Exclude codemods from available codemods.",
+        help="Exclude codemods from available codemods. Ignores the config file.",
+    )
+    exclude_group.add_argument(
+        "--exclude-codemod-extend",
+        "--exclude-extend",
+        default=[],
+        action="append",
+        help="Extend the existing exclude codemods from config file.",
     )
     parser.add_argument(
         "--select-codemod",
@@ -132,7 +140,17 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
 
     if args.exclude_codemod:
         # Add any additional CLI passed exclusions
-        config.exclude[:] = list(set(config.exclude) | set(args.exclude_codemod))
+        config.exclude[:] = list(args.exclude_codemod)
+        bad_codemods = set(config.exclude) - set(available_codemods)
+        if bad_codemods:
+            log.error("Invalid codemods excluded: %s", ", ".join(bad_codemods))
+            parser.exit(status=1)
+
+    if args.exclude_codemod_extend:
+        # Add any additional CLI passed exclusions
+        for name in args.exclude_codemod_extend:
+            if name not in self.config.exclude:
+                config.exclude.append(name)
         bad_codemods = set(config.exclude) - set(available_codemods)
         if bad_codemods:
             log.error("Invalid codemods excluded: %s", ", ".join(bad_codemods))
