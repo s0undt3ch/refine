@@ -102,12 +102,21 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
         action="append",
         help="Extend selected codemods from the configuration file.",
     )
-    parser.add_argument(
+    codemod_paths_group = parser.add_mutually_exclusive_group()
+    codemod_paths_group.add_argument(
         "--codemods-path",
         type=pathlib.Path,
         action="append",
         default=[],
         dest="codemod_paths",
+        help="Path to a codemods directory. Can be passed multiple times.",
+    )
+    codemod_paths_group.add_argument(
+        "--codemods-path-extend",
+        type=pathlib.Path,
+        action="append",
+        default=[],
+        dest="codemod_paths_extend",
         help="Path to a codemods directory. Can be passed multiple times.",
     )
     args = parser.parse_args()
@@ -129,9 +138,24 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
     else:
         config = Config()
 
-    if args.list_codemods:
+    if args.codemod_paths:
+        config.codemod_paths.clear()
+        for codemod_path in args.codemod_paths:
+            if not codemod_path.is_dir():
+                log.error("Codemod path %s is not a directory", codemod_path)
+                parser.exit(status=1)
+            config.codemod_paths.append(str(codemod_path))
+
+    if args.codemod_paths_extend:
         # Add the additional CLI passed codemod paths
-        config.codemod_paths[:] = list(set(config.codemod_paths) | set(args.codemod_paths))
+        for codemod_path in args.codemod_paths_extend:
+            if not codemod_path.is_dir():
+                log.error("Codemod path %s is not a directory", codemod_path)
+                parser.exit(status=1)
+            strpath = str(codemod_path)
+            if strpath in config.codemod_paths:
+                continue
+            config.codemod_paths.append(strpath)
 
     registry = Registry()
     registry.load(config.codemod_paths)
