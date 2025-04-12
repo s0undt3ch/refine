@@ -87,12 +87,20 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
         action="append",
         help="Extend the existing exclude codemods from config file.",
     )
-    parser.add_argument(
+    select_group = parser.add_mutually_exclusive_group()
+    select_group.add_argument(
         "--select-codemod",
         "--select",
         default=[],
         action="append",
-        help="Explicitly select codemod names from available codemods.",
+        help="Explicitly select codemod names from available codemods. Ignores the config file.",
+    )
+    select_group.add_argument(
+        "--select-codemod-extend",
+        "--select-extend",
+        default=[],
+        action="append",
+        help="Extend selected codemods from the configuration file.",
     )
     parser.add_argument(
         "--codemods-path",
@@ -132,7 +140,17 @@ def main() -> NoReturn:  # noqa: PLR0915,C901
 
     if args.select_codemod:
         # Add any additional CLI passed selections
-        config.select[:] = list(set(config.select) | set(args.select_codemod))
+        config.select[:] = list(args.select_codemod)
+        bad_codemods = set(config.select) - set(available_codemods)
+        if bad_codemods:
+            log.error("Invalid codemods selected: %s", ", ".join(bad_codemods))
+            parser.exit(status=1)
+
+    if args.select_codemod_extend:
+        # Add any additional CLI passed selections
+        for name in args.select_codemod_extend:
+            if name not in self.config.select:
+                config.select.append(name)
         bad_codemods = set(config.select) - set(available_codemods)
         if bad_codemods:
             log.error("Invalid codemods selected: %s", ", ".join(bad_codemods))
