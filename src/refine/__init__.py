@@ -11,3 +11,5 @@ except ImportError:  # pragma: no cover
 
     with contextlib.suppress(PackageNotFoundError):
         __version__ = version("re-code")
+
+__all__ = ["__version__"]
