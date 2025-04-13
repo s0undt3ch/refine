@@ -133,3 +133,9 @@ class Config(msgspec.Struct, kw_only=True, frozen=True):
             raise ConfigLoadError(error) from exc
         else:
             return cls.from_dict(data.get("tool", {}).get("refine", {}))
+
+    def as_dict(self) -> dict[str, Any]:
+        """
+        Convert the configuration to a dictionary.
+        """
+        return {k: getattr(self, k) for k in self.__struct_fields__}
