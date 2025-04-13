@@ -15,7 +15,6 @@ from typing import cast
 
 import libcst as cst
 import sqlfluff.api
-from libcst.codemod import SkipFile
 from libcst.metadata import WhitespaceInclusivePositionProvider
 from sqlfluff.api.simple import get_simple_config
 
@@ -80,13 +79,6 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
     METADATA_DEPENDENCIES = (WhitespaceInclusivePositionProvider,)
 
     def visit_Module(self, mod: cst.Module) -> bool:
-        filename: str | None = self.context.filename
-        if TYPE_CHECKING:
-            assert filename is not None
-        if pathlib.Path(filename).name.startswith("test_"):
-            skip_reason = "Not touching test files"
-            raise SkipFile(skip_reason)
-
         # Let's just check if there's any SQL like query in the source code
         return cst_module_has_query_strings(mod)
 
