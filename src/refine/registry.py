@@ -36,20 +36,7 @@ class Registry:
         """
         Load all available codemods.
         """
-        codemods: dict[str, type[BaseCodemod]] = {}
-        codemod: type[BaseCodemod]
-        for codemod in self._collect_from_entrypoints():
-            if codemod.NAME in codemods:
-                log.warning("Already loaded a codemod by the name of %s", codemod.NAME)
-                continue
-            codemods[codemod.NAME] = codemod
-        for path in search_paths:
-            for codemod in self._collect_from_path(path):
-                if codemod.NAME in codemods:
-                    log.warning("Already loaded a codemod by the name of %s", codemod.NAME)
-                    continue
-                codemods[codemod.NAME] = codemod
-        self._codemods[:] = sorted(codemods.values(), key=operator.attrgetter("PRIORITY"))
+        self._codemods[:] = sorted(self._load(search_paths).values(), key=operator.attrgetter("PRIORITY"))
 
     def codemods(
         self, exclude_codemods: Iterable[str] = (), select_codemods: Iterable[str] = ()
@@ -63,6 +50,25 @@ class Registry:
             if select_codemods and codemod.NAME not in select_codemods:
                 continue
             yield codemod
+
+    def _load(self, search_paths: list[str]) -> dict[str, type[BaseCodemod]]:
+        """
+        Load all available codemods.
+        """
+        codemods: dict[str, type[BaseCodemod]] = {}
+        codemod: type[BaseCodemod]
+        for codemod in self._collect_from_entrypoints():
+            if codemod.NAME in codemods:
+                log.warning("Already loaded a codemod by the name of %s", codemod.NAME)
+                continue
+            codemods[codemod.NAME] = codemod
+        for path in search_paths:
+            for codemod in self._collect_from_path(path):
+                if codemod.NAME in codemods:
+                    log.warning("Already loaded a codemod by the name of %s", codemod.NAME)
+                    continue
+                codemods[codemod.NAME] = codemod
+        return codemods
 
     def _collect_from_entrypoints(self) -> Iterator[type[BaseCodemod[CodemodConfigType]]]:
         for entry_point in importlib.metadata.entry_points(group="refine.mods"):
