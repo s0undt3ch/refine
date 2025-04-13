@@ -24,6 +24,7 @@ from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
 from refine.exc import InvalidConfigError
 
+from .utils import cst_module_has_query_strings
 from .utils import is_sql_query
 
 if TYPE_CHECKING:
@@ -85,7 +86,9 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
         if pathlib.Path(filename).name.startswith("test_"):
             skip_reason = "Not touching test files"
             raise SkipFile(skip_reason)
-        return True
+
+        # Let's just check if there's any SQL like query in the source code
+        return cst_module_has_query_strings(mod)
 
     def leave_Assign(self, original: cst.Assign, updated: cst.Assign) -> cst.Assign:
         if not isinstance(updated.value, cst.SimpleString) or not is_sql_query(updated.value):
@@ -93,6 +96,9 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
 
         string_node = cast("cst.SimpleString", updated.value)
         unquoted_string = utils.evaluated_string(string_node)
+        if unquoted_string is None:
+            # We will only process strings
+            return updated
         if isinstance(unquoted_string, bytes):
             # We're not handling bytestrings
             return updated
@@ -125,8 +131,14 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
             string_node = cast("cst.SimpleString", arg.value)
             unquoted_string = utils.evaluated_string(string_node)
 
+            if unquoted_string is None:
+                # We will only process strings
+                args.append(arg)
+                continue
+
             if isinstance(unquoted_string, bytes):
                 # We're not handling bytestrings
+                args.append(arg)
                 continue
 
             matched = True

@@ -65,3 +65,33 @@ def match_sql_query_string(string: str) -> re.Match[str] | None:
     Check if a string is a SQL query.
     """
     return SQL_RE.match(string)
+
+
+def cst_module_has_query_strings(module: cst.Module) -> bool:
+    """
+    Check if a module has SQL query strings.
+    """
+    try:
+        module.visit(_FindSQLStringsVisitor())
+    except _FoundSQLStringException:
+        return True
+    return False
+
+
+class _FoundSQLStringException(Exception):  # noqa: N818
+    """
+    Exception raised when a SQL string is found.
+
+    This way we can stop early in the visitor.
+    """
+
+
+class _FindSQLStringsVisitor(cst.CSTVisitor):
+    """
+    Visitor to find SQL strings in a module.
+    """
+
+    def visit_SimpleString(self, node: cst.SimpleString) -> None:
+        if is_sql_query(node):
+            # We found a SQL string, let's stop the visitor
+            raise _FoundSQLStringException
