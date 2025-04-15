@@ -66,6 +66,7 @@ repos:
           - py-walk
           - msgspec
           - tomllib >= 1.1.0; python_version < "3.11"
+          - tomli-w
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.7

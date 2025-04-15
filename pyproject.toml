@@ -46,6 +46,7 @@ dev = [
     "coverage>=7.6.7,<8",
     "pytest-subtests>=0.13.1,<0.14",
     "pytest-skip-markers>=1.5.2,<2",
+    "tomli-w>=1.2.0",
 ]
 docs = [
     "mkdocs",
