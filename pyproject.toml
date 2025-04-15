@@ -33,7 +33,7 @@ Issues = "https://github.com/s0undt3ch/refine/issues"
 Changelog = "https://github.com/s0undt3ch/refine/blob/main/CHANGELOG.md"
 
 [project.scripts]
-refine = "refine.__main__:main"
+refine = "refine.cli:main"
 
 [project.entry-points."refine.mods"]
 format-sql = "refine.mods.sql.fmt:FormatSQL"
@@ -117,9 +117,11 @@ ignore = [
 "src/refine/__init__.py" = [
   "PGH003",   # Use specific rule codes when ignoring type issues
 ]
-"src/refine/__main__.py" = [
+"src/refine/cli.py" = [
+  "C901",     # `run` is too complex
   "PLR0912",  # Too many branches"
   "PLR0913",  # Too many arguments in function definition
+  "PLR0915",  # Too many statements
 ]
 "src/refine/mods/*.py" = [
   "ARG002",   #  Unused method argument
