@@ -98,15 +98,17 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
         # We can only get metadata information from the original node, not the updated one
         position = self.get_metadata(WhitespaceInclusivePositionProvider, original)
         query = self.__format_sql(unquoted_string, indent=position.start.column + 4)
-
+        quote = string_node.quote
         if "\n" in query and string_node.quote in ('"""', "'''"):
             first_line = "\n"
             last_line = " " * position.start.column
+        elif "\n" in query and string_node.quote in ('"', "'"):
+            first_line = "\n"
+            last_line = " " * position.start.column
+            quote = '"""'
         else:
             last_line = first_line = ""
-        return updated.with_changes(
-            value=string_node.__class__(f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}""")
-        )
+        return updated.with_changes(value=string_node.__class__(f"""{quote}{first_line}{query}{last_line}{quote}"""))
         return updated
 
     def leave_Call(self, original: cst.Call, updated: cst.Call) -> cst.Call:
@@ -137,27 +139,19 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
             # We can only get metadata information from the original node, not the updated one
             position = self.get_metadata(WhitespaceInclusivePositionProvider, string_node)
             query = self.__format_sql(unquoted_string, indent=position.start.column)
+            quote = string_node.quote
             if "\n" in query and string_node.quote in ('"""', "'''"):
                 first_line = "\n"
                 last_line = " " * position.start.column
+            elif "\n" in query and string_node.quote in ('"', "'"):
+                first_line = "\n"
+                last_line = " " * position.start.column
+                quote = '"""'
             else:
                 last_line = first_line = ""
-            if string_node.quote.startswith("'"):
-                args.append(
-                    arg.with_changes(
-                        value=string_node.__class__(
-                            f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
-                        )
-                    )
-                )
-            else:
-                args.append(
-                    arg.with_changes(
-                        value=string_node.__class__(
-                            f"""{string_node.quote}{first_line}{query}{last_line}{string_node.quote}"""
-                        )
-                    )
-                )
+            args.append(
+                arg.with_changes(value=string_node.__class__(f"""{quote}{first_line}{query}{last_line}{quote}"""))
+            )
         if matched:
             return updated.with_changes(args=args)
         return updated
@@ -199,5 +193,6 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
         indent_query = textwrap.indent(formated, prefix=" " * indent)
         if "\n" in indent_query and not indent_query.endswith("\n"):
             # Multiline queries must end with a line break
-            return indent_query + "\n"
+            indent_query += "\n"
+        log.debug("Indented SQL Query >>>>>>>>>\n%s\n<<<<<<<<<<<<<<", indent_query)
         return indent_query
