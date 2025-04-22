@@ -55,6 +55,7 @@ class CLI:
             logging.getLogger().setLevel(logging.ERROR)
         elif args.verbose:
             logging.getLogger().setLevel(logging.DEBUG)
+            logging.getLogger("py_walk").setLevel(logging.INFO)
 
         self.config = self._load_config(args.config)
 
