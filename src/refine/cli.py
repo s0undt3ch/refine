@@ -134,7 +134,10 @@ class CLI:
         if not paths:
             paths.append(repo_root)
 
-        ignore_patterns: list[str] = self.config.exclude_patterns
+        ignore_patterns: list[str] = [
+            *self.config.exclude_patterns,
+            "**/__pycache__/**",
+        ]
         gitignore_file = repo_root / ".gitignore"
         respect_gitignore: bool = args.respect_gitignore or self.config.respect_gitignore
         if respect_gitignore and gitignore_file.exists():
