@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import libcst as cst
+import msgspec
 from libcst.codemod import CodemodContext
 from libcst.codemod import SkipFile
 from libcst.codemod._cli import ExecutionResult
@@ -36,6 +37,7 @@ from libcst.metadata import FullRepoManager
 
 from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
+from refine.exc import InvalidConfigError
 from refine.exc import RefineSystemExit
 
 if TYPE_CHECKING:
@@ -81,9 +83,15 @@ class Processor:
         for codemod in codemods:
             config_dict = config.__remaining_config__.get(codemod.NAME, {})
             try:
-                codemod_config = codemod.CONFIG_CLS(**config_dict)
+                codemod_config_cls = codemod.CONFIG_CLS
             except AttributeError:
                 codemod_config = BaseConfig()
+            else:
+                try:
+                    codemod_config = msgspec.convert(config_dict, codemod_config_cls)
+                except msgspec.ValidationError as exc:
+                    error_msg = f"Invalid configuration for codemod {codemod.NAME}: {exc}"
+                    raise InvalidConfigError(error_msg) from exc
             codemod_configs[codemod.NAME] = codemod_config
         self.codemod_configs = codemod_configs
 

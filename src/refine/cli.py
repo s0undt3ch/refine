@@ -19,6 +19,7 @@ import py_walk
 
 from refine import __version__
 from refine.config import Config
+from refine.exc import InvalidConfigError
 from refine.exc import RefineSystemExit
 from refine.processor import ParallelTransformResult
 from refine.processor import Processor
@@ -167,7 +168,11 @@ class CLI:
         for codemod in self.codemods:
             log.info(" - %s: %s", codemod.NAME, codemod.get_short_description())
 
-        self.processor = Processor(config=self.config, registry=self.registry, codemods=self.codemods)
+        try:
+            self.processor = Processor(config=self.config, registry=self.registry, codemods=self.codemods)
+        except InvalidConfigError as exc:
+            log.error(str(exc))  # noqa: TRY400
+            self.parser.exit(status=1)
         try:
             result: ParallelTransformResult = self.processor.process(self.files)
             if result.failures:
