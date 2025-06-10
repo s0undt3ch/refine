@@ -4,6 +4,8 @@ from argparse import ArgumentParser
 def main() -> None:
     parser: ArgumentParser = ArgumentParser()
     parser.add_argument('--company-id', type=int, required=True)
+    parser.add_argument('''--company-id-1''', type=int, required=True)
+    parser.add_argument("""--company-id-2""", type=int, required=True)
     parser.add_argument(
         '--customer-ids',
         type=str,
