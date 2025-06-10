@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.3](https://github.com/s0undt3ch/refine/releases/tag/0.12.3) - 2025-06-10
+
+### 🚀 Features
+
+- *(flags)* Reduced complexity of the `cli-dashes-over-underscores` codemod
+
+### 🐛 Bug Fixes
+
+- *(sqlfluff)* Set `sqlfluff` logging level to `INFO` on verbose
+- *(cli)* Hardcode `**/__pycache__/**` into the exclude filters
+- *(config)* Properly run validation checks on codemos configs
+
+### 💼 Other
+
+- *(deps)* Bump astral-sh/setup-uv from 5 to 6
+
+### ⚙️ Miscellaneous Tasks
+
+- *(dependencies)* Upgrade to ``sqlfluff==3.4.0``
+- *(pre-commit)* Update pre-commit hook versions
+- *(pre-commit)* Lock `libcst` version in pre-commit config
+- *(pre-commit)* Update ruff check pre-commit hook to `ruff-check`
+- *(release)* Lock to `action-gh-release@2.2.2` since 2.3.0 is broken
+
 ## [0.12.2](https://github.com/s0undt3ch/refine/releases/tag/0.12.2) - 2025-04-21
 
 ### 🚀 Features
