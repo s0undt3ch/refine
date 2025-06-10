@@ -963,6 +963,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#refine.mods.cli.flags.CliDashesConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      CliDashesConfig
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#refine.mods.cli.flags.CliDashes" class="md-nav__link">
     <span class="md-ellipsis">
       CliDashes
@@ -1146,6 +1155,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#refine.mods.cli.flags.CliDashesConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      CliDashesConfig
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#refine.mods.cli.flags.CliDashes" class="md-nav__link">
     <span class="md-ellipsis">
       CliDashes
@@ -1180,13 +1198,15 @@
 <a id="refine.mods.cli.flags"></a>
     <div class="doc doc-contents first">
 
-        <p>This codemod enforces the use of dashes over underscores in CLI arguments of <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser">ArgumentParser</a>.</p>
+        <p>This codemod enforces the use of dashes over underscores in CLI arguments.</p>
 <p>For example, it will transform this code:
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--a_command&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 into this code:
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--a-command&quot;</span><span class="p">)</span>
 </span></code></pre></div></p>
+<p>It handles all CLI arguments by looking for strings matching the pattern <code>--[\w]+_[\w]+</code> that are arguments to a
+function call.</p>
 
 
 
@@ -1209,6 +1229,51 @@ into this code:
 
 
 
+<h2 id="refine.mods.cli.flags.CliDashesConfig" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">CliDashesConfig</span>
+
+
+<a href="#refine.mods.cli.flags.CliDashesConfig" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" href="../../../abc/#refine.abc.BaseConfig">BaseConfig</a></code></p>
+
+
+        <p>Config for the <code>CliDashes</code> codemod.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="refine.mods.cli.flags.CliDashes" class="doc doc-heading">
             <span class="doc doc-object-name doc-class-name">CliDashes</span>
 
@@ -1225,7 +1290,6 @@ into this code:
 
 
         <p>Replace <code>_</code> with <code>-</code>, ie, <code>--a-command</code> instead of <code>--a_command</code> in CLI commands.</p>
-<p>This works if the parser argument is typed and only for ArgumentParser. <code>def foo(parser: ArgumentParser)</code>.</p>
 
 
 
