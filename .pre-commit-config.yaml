@@ -61,7 +61,7 @@ repos:
         args: []
         exclude: ^tests/([^/]*/)*files/.*
         additional_dependencies:
-          - libcst
+          - libcst==1.7.0
           - sqlfluff
           - py-walk
           - msgspec
