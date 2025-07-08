@@ -59,8 +59,13 @@ class CLI:
             logging.getLogger("py_walk").setLevel(logging.INFO)
 
         self.config = self._load_config(args.config)
+        config_overrides = {}
+        if args.fail_fast:
+            config_overrides["fail_fast"] = True
         if args.hide_progress:
-            self.config = msgspec.structs.replace(self.config, hide_progress=True)
+            config_overrides["hide_progress"] = True
+        if args.respect_gitignore:
+            config_overrides["respect_gitignore"] = True
 
         if args.codemod_paths:
             self.config.codemod_paths.clear()
@@ -122,15 +127,19 @@ class CLI:
                 log.error("Invalid codemods exclude extend: %s", ", ".join(bad_codemods))
                 self.parser.exit(status=1)
 
-        if args.fail_fast:
-            self.config = msgspec.structs.replace(self.config, fail_fast=True)
-
         if args.list_codemods:
             log.info("Available codemods:")
             for name, description in sorted(available_codemods.items()):
                 # In case the description is comming from the docstring, we just really want the first line.
                 log.info(" - %s: %s", name, description.strip())
             self.parser.exit()
+
+        # Reconstruct the config with any overrides
+        if config_overrides:
+            log.debug("Applying config overrides: %s", config_overrides)
+            # Use msgspec.structs.replace to create a new Config instance with the overrides
+            # This ensures that we don't modify the original config instance directly.
+            self.config = msgspec.structs.replace(self.config, **config_overrides)
 
         repo_root: pathlib.Path = pathlib.Path(self.config.repo_root)
         paths: list[pathlib.Path] = args.files
@@ -142,8 +151,7 @@ class CLI:
             "**/__pycache__/**",
         ]
         gitignore_file = repo_root / ".gitignore"
-        respect_gitignore: bool = args.respect_gitignore or self.config.respect_gitignore
-        if respect_gitignore and gitignore_file.exists():
+        if self.config.respect_gitignore and gitignore_file.exists():
             ignore_patterns.extend(
                 pattern
                 for pattern in gitignore_file.read_text().splitlines()

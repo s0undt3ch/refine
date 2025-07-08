@@ -45,9 +45,7 @@ def test_config_from_dict_invalid(invalid_config):
     """Test loading an invalid configuration dictionary."""
     with pytest.raises(msgspec.ValidationError) as exc_info:
         Config.from_dict(invalid_config)
-    assert "Invalid configuration: Expected `array`, got `int` - at `$.select`" in str(
-        exc_info.value
-    )
+    assert "Invalid configuration: Expected `array`, got `int` - at `$.select`" in str(exc_info.value)
 
 
 def test_config_from_default_file(tmp_path, valid_config):

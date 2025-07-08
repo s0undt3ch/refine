@@ -131,93 +131,122 @@ def test_codemods_path_extend_extends_config(cli, file_to_modify):
 
 
 # Tests for hide_progress config override
-def test_hide_progress_cli_flag_overrides_config_false(cli, file_to_modify):
+def test_hide_progress_functionality(cli, file_to_modify, subtests):
     """
-    Test that --hide-progress CLI flag overrides config when config has hide_progress=False.
+    Test all hide_progress CLI flag and config functionality using subtests.
     """
-    cli.with_config(hide_progress=False)
-    exitcode = cli.run("--hide-progress", file_to_modify)
-    assert exitcode == 0
-    assert cli.config.hide_progress is True
+    with subtests.test("CLI flag overrides config when config has hide_progress=False"):
+        cli.with_config(hide_progress=False)
+        exitcode = cli.run("--hide-progress", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is True
 
+    with subtests.test("CLI flag overrides config when config has hide_progress=True"):
+        cli.with_config(hide_progress=True)
+        exitcode = cli.run("--hide-progress", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is True
 
-def test_hide_progress_cli_flag_overrides_config_true(cli, file_to_modify):
-    """
-    Test that --hide-progress CLI flag overrides config when config has hide_progress=True.
-    """
-    cli.with_config(hide_progress=True)
-    exitcode = cli.run("--hide-progress", file_to_modify)
-    assert exitcode == 0
-    assert cli.config.hide_progress is True
+    with subtests.test("CLI flag works with default config (hide_progress=False)"):
+        cli.with_config()  # Reset to default config
+        exitcode = cli.run("--hide-progress", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is True
 
+    with subtests.test("Config setting is preserved when no CLI flag is provided"):
+        cli.with_config(hide_progress=True)
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is True
 
-def test_hide_progress_cli_flag_with_default_config(cli, file_to_modify):
-    """
-    Test that --hide-progress CLI flag works with default config (hide_progress=False).
-    """
-    exitcode = cli.run("--hide-progress", file_to_modify)
-    assert exitcode == 0
-    assert cli.config.hide_progress is True
-
-
-def test_hide_progress_config_without_cli_flag(cli, file_to_modify):
-    """
-    Test that config hide_progress setting is preserved when no CLI flag is provided.
-    """
-    cli.with_config(hide_progress=True)
-    exitcode = cli.run(file_to_modify)
-    assert exitcode == 0
-    assert cli.config.hide_progress is True
-
-
-def test_hide_progress_default_without_config_or_flag(cli, file_to_modify):
-    """
-    Test that hide_progress defaults to False when neither config nor CLI flag is set.
-    """
-    exitcode = cli.run(file_to_modify)
-    assert exitcode == 0
-    assert cli.config.hide_progress is False
+    with subtests.test("Defaults to False when neither config nor CLI flag is set"):
+        cli.with_config()  # Reset to default config
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is False
 
 
 # Tests for other config overrides
-def test_fail_fast_cli_flag_overrides_config(cli, file_to_modify):
+def test_fail_fast_functionality(cli, file_to_modify, subtests):
     """
-    Test that --fail-fast CLI flag overrides config.
+    Test all fail_fast CLI flag and config functionality using subtests.
     """
-    cli.with_config(fail_fast=False)
-    exitcode = cli.run("--fail-fast", file_to_modify)
-    assert exitcode == 0
-    assert cli.config.fail_fast is True
+    with subtests.test("CLI flag overrides config when config has fail_fast=False"):
+        cli.with_config(fail_fast=False)
+        exitcode = cli.run("--fail-fast", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.fail_fast is True
+
+    with subtests.test("Config setting is preserved when no CLI flag is provided"):
+        cli.with_config(fail_fast=True)
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 0
+        assert cli.config.fail_fast is True
+
+    with subtests.test("Defaults to False when neither config nor CLI flag is set"):
+        cli.with_config()  # Reset to default config
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 0
+        assert cli.config.fail_fast is False
 
 
-def test_fail_fast_config_without_cli_flag(cli, file_to_modify):
-    """
-    Test that config fail_fast setting is preserved when no CLI flag is provided.
-    """
-    cli.with_config(fail_fast=True)
-    exitcode = cli.run(file_to_modify)
-    assert exitcode == 0
-    assert cli.config.fail_fast is True
-
-
-def test_respect_gitignore_cli_flag_overrides_config(cli, file_to_modify):
+def test_respect_gitignore_functionality(cli, file_to_modify, subtests):
     """
     Test that --respect-gitignore CLI flag works correctly.
     """
-    cli.with_config(respect_gitignore=False)
-    exitcode = cli.run("--respect-gitignore", file_to_modify)
-    assert exitcode == 0
+    with subtests.test("CLI flag overrides config when config has respect_gitignore=False"):
+        cli.with_config(respect_gitignore=False)
+        exitcode = cli.run("--respect-gitignore", file_to_modify)
+        assert exitcode == 0
+        # CLI flag should override config setting
+        assert cli.config.respect_gitignore is True
+
+    with subtests.test("CLI flag overrides config when config has respect_gitignore=True"):
+        cli.with_config(respect_gitignore=True)
+        exitcode = cli.run("--respect-gitignore", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.respect_gitignore is True
+
+    with subtests.test("No CLI flag preserves config setting"):
+        cli.with_config(respect_gitignore=True)
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 0
+        assert cli.config.respect_gitignore is True
+
+    with subtests.test("Default config has respect_gitignore=False"):
+        cli.with_config()  # Reset to default config
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 0
+        assert cli.config.respect_gitignore is False
 
 
-def test_multiple_cli_flag_overrides(cli, file_to_modify):
+def test_multiple_cli_flag_overrides(cli, file_to_modify, subtests):
     """
-    Test that multiple CLI flags can override config simultaneously.
+    Test that multiple CLI flags can override config simultaneously using subtests.
     """
-    cli.with_config(hide_progress=False, fail_fast=False)
-    exitcode = cli.run("--hide-progress", "--fail-fast", file_to_modify)
-    assert exitcode == 0
-    assert cli.config.hide_progress is True
-    assert cli.config.fail_fast is True
+    with subtests.test("Multiple flags override config values"):
+        cli.with_config(hide_progress=False, fail_fast=False, respect_gitignore=False)
+        exitcode = cli.run("--hide-progress", "--fail-fast", "--respect-gitignore", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is True
+        assert cli.config.fail_fast is True
+        assert cli.config.respect_gitignore is True
+
+    with subtests.test("Partial flags override only specified config values"):
+        cli.with_config(hide_progress=False, fail_fast=True, respect_gitignore=False)
+        exitcode = cli.run("--hide-progress", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is True
+        assert cli.config.fail_fast is True  # Preserved from config
+        assert cli.config.respect_gitignore is False  # Preserved from config
+
+    with subtests.test("Mixed flags work with default config"):
+        cli.with_config()  # Reset to default config
+        exitcode = cli.run("--hide-progress", "--fail-fast", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.hide_progress is True
+        assert cli.config.fail_fast is True
+        assert cli.config.respect_gitignore is False  # Default value preserved
 
 
 # Tests for system exits and error handling
@@ -334,24 +363,16 @@ def test_file_outside_repo_root_system_exit(cli, caplog, tmp_path):
         ),
         (pytest.param(SystemExit(42), 42, None, id="SystemExit-int")),
         (pytest.param(SystemExit(None), 1, None, id="SystemExit-None")),
-        (
-            pytest.param(
-                SystemExit("error message"), 1, "error message", id="SystemExit-string"
-            )
-        ),
+        (pytest.param(SystemExit("error message"), 1, "error message", id="SystemExit-string")),
         (pytest.param(KeyboardInterrupt(), 1, None, id="KeyboardInterrupt")),
     ],
 )
-def test_processor_exceptions(
-    cli, caplog, file_to_modify, exception, expected_code, expected_message
-):
+def test_processor_exceptions(cli, caplog, file_to_modify, exception, expected_code, expected_message):
     """
     Test that CLI handles various processor exceptions correctly.
     """
     # Convert the generic Exception to InvalidConfigError for the first test case
-    if isinstance(exception, Exception) and not isinstance(
-        exception, (SystemExit, KeyboardInterrupt)
-    ):
+    if isinstance(exception, Exception) and not isinstance(exception, (SystemExit, KeyboardInterrupt)):
         exception = InvalidConfigError(str(exception))
 
     with patch("refine.cli.Processor") as mock_processor:
@@ -379,9 +400,7 @@ def test_processor_refine_system_exit(cli, file_to_modify):
     """
     with patch("refine.cli.Processor") as mock_processor:
         mock_processor_instance = mock_processor.return_value
-        mock_processor_instance.process.side_effect = RefineSystemExit(
-            code=42, message="Custom exit message"
-        )
+        mock_processor_instance.process.side_effect = RefineSystemExit(code=42, message="Custom exit message")
 
         exitcode = cli.run(file_to_modify)
         assert exitcode == 42
@@ -418,14 +437,10 @@ def test_quiet_flag_suppresses_info_logs(cli, caplog, file_to_modify):
         cli.run("--quiet", file_to_modify)
 
     # With quiet flag, INFO messages should not appear in logs
-    info_messages = [
-        record for record in caplog.records if record.levelno == logging.INFO
-    ]
+    info_messages = [record for record in caplog.records if record.levelno == logging.INFO]
     # The quiet flag should suppress most INFO logs, but some might still appear from setup
     # The key test is that normal processing INFO logs are suppressed
-    assert len(info_messages) == 0 or all(
-        "Selected codemods:" not in msg.message for msg in info_messages
-    )
+    assert len(info_messages) == 0 or all("Selected codemods:" not in msg.message for msg in info_messages)
 
 
 def test_verbose_flag_shows_debug_logs(cli, caplog, file_to_modify):
@@ -436,9 +451,7 @@ def test_verbose_flag_shows_debug_logs(cli, caplog, file_to_modify):
         cli.run("--verbose", file_to_modify)
 
     # With verbose flag, DEBUG messages should appear
-    debug_messages = [
-        record for record in caplog.records if record.levelno == logging.DEBUG
-    ]
+    debug_messages = [record for record in caplog.records if record.levelno == logging.DEBUG]
     # Should have debug messages about config loading
     assert any("Loading" in record.message for record in debug_messages)
 
@@ -451,7 +464,5 @@ def test_normal_flag_shows_info_logs(cli, caplog, file_to_modify):
         cli.run(file_to_modify)
 
     # Normal operation should show INFO logs like "Selected codemods:"
-    info_messages = [
-        record for record in caplog.records if record.levelno == logging.INFO
-    ]
+    info_messages = [record for record in caplog.records if record.levelno == logging.INFO]
     assert any("Selected codemods:" in record.message for record in info_messages)
