@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import logging
 import os
+from unittest.mock import patch
 
 import pytest
 
 from refine import __version__
+from refine.exc import InvalidConfigError
+from refine.exc import RefineSystemExit
+from refine.processor import ParallelTransformResult
 
 
 def test_help(cli, capsys):
@@ -123,3 +128,330 @@ def test_codemods_path_extend_extends_config(cli, file_to_modify):
     exitcode = cli.run("--codemods-path-extend=codemod-2", file_to_modify)
     assert exitcode == 0
     assert cli.config.codemod_paths == ["codemod-1", "codemod-2"]
+
+
+# Tests for hide_progress config override
+def test_hide_progress_cli_flag_overrides_config_false(cli, file_to_modify):
+    """
+    Test that --hide-progress CLI flag overrides config when config has hide_progress=False.
+    """
+    cli.with_config(hide_progress=False)
+    exitcode = cli.run("--hide-progress", file_to_modify)
+    assert exitcode == 0
+    assert cli.config.hide_progress is True
+
+
+def test_hide_progress_cli_flag_overrides_config_true(cli, file_to_modify):
+    """
+    Test that --hide-progress CLI flag overrides config when config has hide_progress=True.
+    """
+    cli.with_config(hide_progress=True)
+    exitcode = cli.run("--hide-progress", file_to_modify)
+    assert exitcode == 0
+    assert cli.config.hide_progress is True
+
+
+def test_hide_progress_cli_flag_with_default_config(cli, file_to_modify):
+    """
+    Test that --hide-progress CLI flag works with default config (hide_progress=False).
+    """
+    exitcode = cli.run("--hide-progress", file_to_modify)
+    assert exitcode == 0
+    assert cli.config.hide_progress is True
+
+
+def test_hide_progress_config_without_cli_flag(cli, file_to_modify):
+    """
+    Test that config hide_progress setting is preserved when no CLI flag is provided.
+    """
+    cli.with_config(hide_progress=True)
+    exitcode = cli.run(file_to_modify)
+    assert exitcode == 0
+    assert cli.config.hide_progress is True
+
+
+def test_hide_progress_default_without_config_or_flag(cli, file_to_modify):
+    """
+    Test that hide_progress defaults to False when neither config nor CLI flag is set.
+    """
+    exitcode = cli.run(file_to_modify)
+    assert exitcode == 0
+    assert cli.config.hide_progress is False
+
+
+# Tests for other config overrides
+def test_fail_fast_cli_flag_overrides_config(cli, file_to_modify):
+    """
+    Test that --fail-fast CLI flag overrides config.
+    """
+    cli.with_config(fail_fast=False)
+    exitcode = cli.run("--fail-fast", file_to_modify)
+    assert exitcode == 0
+    assert cli.config.fail_fast is True
+
+
+def test_fail_fast_config_without_cli_flag(cli, file_to_modify):
+    """
+    Test that config fail_fast setting is preserved when no CLI flag is provided.
+    """
+    cli.with_config(fail_fast=True)
+    exitcode = cli.run(file_to_modify)
+    assert exitcode == 0
+    assert cli.config.fail_fast is True
+
+
+def test_respect_gitignore_cli_flag_overrides_config(cli, file_to_modify):
+    """
+    Test that --respect-gitignore CLI flag works correctly.
+    """
+    cli.with_config(respect_gitignore=False)
+    exitcode = cli.run("--respect-gitignore", file_to_modify)
+    assert exitcode == 0
+
+
+def test_multiple_cli_flag_overrides(cli, file_to_modify):
+    """
+    Test that multiple CLI flags can override config simultaneously.
+    """
+    cli.with_config(hide_progress=False, fail_fast=False)
+    exitcode = cli.run("--hide-progress", "--fail-fast", file_to_modify)
+    assert exitcode == 0
+    assert cli.config.hide_progress is True
+    assert cli.config.fail_fast is True
+
+
+# Tests for system exits and error handling
+def test_no_codemods_selected_system_exit(cli, caplog, file_to_modify):
+    """
+    Test that CLI exits with status 1 when no codemods are selected.
+    """
+    # Exclude all available codemods
+    cli.with_config(exclude=["codemod-1", "codemod-2", "codemod-3"])
+
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run(file_to_modify)
+
+    assert exitcode == 1
+    assert "No codemods selected. Exiting." in caplog.text
+
+
+def test_invalid_codemod_selected_system_exit(cli, caplog, file_to_modify):
+    """
+    Test that CLI exits with status 1 when invalid codemod is selected.
+    """
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run("--select=invalid-codemod", file_to_modify)
+
+    assert exitcode == 1
+    assert "Invalid codemods selected: invalid-codemod" in caplog.text
+
+
+def test_invalid_codemod_excluded_system_exit(cli, caplog, file_to_modify):
+    """
+    Test that CLI exits with status 1 when invalid codemod is excluded.
+    """
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run("--exclude=invalid-codemod", file_to_modify)
+
+    assert exitcode == 1
+    assert "Invalid codemods excluded: invalid-codemod" in caplog.text
+
+
+def test_invalid_codemod_select_extend_system_exit(cli, caplog, file_to_modify):
+    """
+    Test that CLI exits with status 1 when invalid codemod is in select extend.
+    """
+    cli.with_config(select=["codemod-1"])
+
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run("--select-extend=invalid-codemod", file_to_modify)
+
+    assert exitcode == 1
+    assert "Invalid codemods select extend: invalid-codemod" in caplog.text
+
+
+def test_invalid_codemod_exclude_extend_system_exit(cli, caplog, file_to_modify):
+    """
+    Test that CLI exits with status 1 when invalid codemod is in exclude extend.
+    """
+    cli.with_config(exclude=["codemod-1"])
+
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run("--exclude-extend=invalid-codemod", file_to_modify)
+
+    assert exitcode == 1
+    assert "Invalid codemods exclude extend: invalid-codemod" in caplog.text
+
+
+def test_invalid_codemod_path_system_exit(cli, caplog, file_to_modify):
+    """
+    Test that CLI exits with status 1 when invalid codemod path is provided.
+    """
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run("--codemods-path=invalid-path", file_to_modify)
+
+    assert exitcode == 1
+    assert "Codemod path invalid-path is not a directory" in caplog.text
+
+
+def test_invalid_codemod_path_extend_system_exit(cli, caplog, file_to_modify):
+    """
+    Test that CLI exits with status 1 when invalid codemod path extend is provided.
+    """
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run("--codemods-path-extend=invalid-path", file_to_modify)
+
+    assert exitcode == 1
+    assert "Codemod path invalid-path is not a directory" in caplog.text
+
+
+def test_file_outside_repo_root_system_exit(cli, caplog, tmp_path):
+    """
+    Test that CLI exits with status 1 when file is outside repo root.
+    """
+    # Create a file outside the current working directory (repo root)
+    external_file = tmp_path.parent / "external_file.py"
+    external_file.write_text("print('external')")
+
+    with caplog.at_level("ERROR"):
+        exitcode = cli.run(str(external_file))
+
+    assert exitcode == 1
+    assert "is not inside the repo root" in caplog.text
+
+
+# Tests for processor exception handling
+@pytest.mark.parametrize(
+    ("exception", "expected_code", "expected_message"),
+    [
+        (
+            pytest.param(
+                Exception("Invalid configuration"),
+                1,
+                "Invalid configuration",
+                id="InvalidConfigError",
+            )
+        ),
+        (pytest.param(SystemExit(42), 42, None, id="SystemExit-int")),
+        (pytest.param(SystemExit(None), 1, None, id="SystemExit-None")),
+        (
+            pytest.param(
+                SystemExit("error message"), 1, "error message", id="SystemExit-string"
+            )
+        ),
+        (pytest.param(KeyboardInterrupt(), 1, None, id="KeyboardInterrupt")),
+    ],
+)
+def test_processor_exceptions(
+    cli, caplog, file_to_modify, exception, expected_code, expected_message
+):
+    """
+    Test that CLI handles various processor exceptions correctly.
+    """
+    # Convert the generic Exception to InvalidConfigError for the first test case
+    if isinstance(exception, Exception) and not isinstance(
+        exception, (SystemExit, KeyboardInterrupt)
+    ):
+        exception = InvalidConfigError(str(exception))
+
+    with patch("refine.cli.Processor") as mock_processor:
+        if isinstance(exception, InvalidConfigError):
+            # Exception during processor creation
+            mock_processor.side_effect = exception
+        else:
+            # Exception during processing
+            mock_processor_instance = mock_processor.return_value
+            mock_processor_instance.process.side_effect = exception
+
+        if expected_message and isinstance(exception, InvalidConfigError):
+            with caplog.at_level("ERROR"):
+                exitcode = cli.run(file_to_modify)
+            assert expected_message in caplog.text
+        else:
+            exitcode = cli.run(file_to_modify)
+
+        assert exitcode == expected_code
+
+
+def test_processor_refine_system_exit(cli, file_to_modify):
+    """
+    Test that CLI handles RefineSystemExit correctly.
+    """
+    with patch("refine.cli.Processor") as mock_processor:
+        mock_processor_instance = mock_processor.return_value
+        mock_processor_instance.process.side_effect = RefineSystemExit(
+            code=42, message="Custom exit message"
+        )
+
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 42
+
+
+def test_processing_failures_system_exit(cli, file_to_modify):
+    """
+    Test that CLI exits with status 1 when processor reports failures.
+    """
+    with patch("refine.cli.Processor") as mock_processor:
+        mock_processor_instance = mock_processor.return_value
+        mock_processor_instance.process.return_value = ParallelTransformResult(
+            successes=0, failures=1, warnings=0, skips=0, changed=0
+        )
+
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 1
+
+
+def test_successful_processing_system_exit(cli, file_to_modify):
+    """
+    Test that CLI exits with status 0 when processing is successful.
+    """
+    exitcode = cli.run(file_to_modify)
+    assert exitcode == 0
+
+
+# Tests for logging configuration
+def test_quiet_flag_suppresses_info_logs(cli, caplog, file_to_modify):
+    """
+    Test that --quiet flag suppresses INFO level logs.
+    """
+    with caplog.at_level(logging.INFO):
+        cli.run("--quiet", file_to_modify)
+
+    # With quiet flag, INFO messages should not appear in logs
+    info_messages = [
+        record for record in caplog.records if record.levelno == logging.INFO
+    ]
+    # The quiet flag should suppress most INFO logs, but some might still appear from setup
+    # The key test is that normal processing INFO logs are suppressed
+    assert len(info_messages) == 0 or all(
+        "Selected codemods:" not in msg.message for msg in info_messages
+    )
+
+
+def test_verbose_flag_shows_debug_logs(cli, caplog, file_to_modify):
+    """
+    Test that --verbose flag enables DEBUG level logs.
+    """
+    with caplog.at_level(logging.DEBUG):
+        cli.run("--verbose", file_to_modify)
+
+    # With verbose flag, DEBUG messages should appear
+    debug_messages = [
+        record for record in caplog.records if record.levelno == logging.DEBUG
+    ]
+    # Should have debug messages about config loading
+    assert any("Loading" in record.message for record in debug_messages)
+
+
+def test_normal_flag_shows_info_logs(cli, caplog, file_to_modify):
+    """
+    Test that normal operation (no --quiet or --verbose) shows INFO logs.
+    """
+    with caplog.at_level(logging.INFO):
+        cli.run(file_to_modify)
+
+    # Normal operation should show INFO logs like "Selected codemods:"
+    info_messages = [
+        record for record in caplog.records if record.levelno == logging.INFO
+    ]
+    assert any("Selected codemods:" in record.message for record in info_messages)

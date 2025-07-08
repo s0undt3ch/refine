@@ -74,6 +74,11 @@ class Config(msgspec.Struct, kw_only=True, frozen=True):
     List of glob path patterns to exclude from processing. Note that the full path is checked against the glob.
     """
 
+    hide_progress: bool = False
+    """
+    Whether to hide the progress bar.
+    """
+
     __remaining_config__: dict[str, Any] = msgspec.field(default_factory=dict)
 
     @classmethod

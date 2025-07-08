@@ -1,0 +1,7 @@
+# Extend the Ruff configuration from the main pyproject.toml
+# This allows us to keep the main configuration in one place and only override specific settings here.
+extend = "../pyproject.toml"
+
+# Ruff configuration specific to tests
+[lint.pylint]
+max-args = 10  # pytest fixtures can add up

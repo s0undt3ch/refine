@@ -101,7 +101,7 @@ class Processor:
         """
         _files = sorted({str(fpath) for fpath in files})
         total = len(_files)
-        progress = Progress(enabled=True, total=total)
+        progress = Progress(enabled=self.config.hide_progress is False, total=total)
         chunk_size = 4
         jobs = min(
             self.config.process_pool_size,

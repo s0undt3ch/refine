@@ -59,6 +59,8 @@ class CLI:
             logging.getLogger("py_walk").setLevel(logging.INFO)
 
         self.config = self._load_config(args.config)
+        if args.hide_progress:
+            self.config = msgspec.structs.replace(self.config, hide_progress=True)
 
         if args.codemod_paths:
             self.config.codemod_paths.clear()
@@ -173,6 +175,13 @@ class CLI:
         except InvalidConfigError as exc:
             log.error(str(exc))  # noqa: TRY400
             self.parser.exit(status=1)
+
+        self._process_files()
+
+    def _process_files(self) -> NoReturn:
+        """
+        Process the files with the selected codemods.
+        """
         try:
             result: ParallelTransformResult = self.processor.process(self.files)
             if result.failures:
@@ -224,6 +233,12 @@ class CLI:
             action="store_true",
             default=False,
             help="Enable verbose output.",
+        )
+        verbosity_group.add_argument(
+            "--hide-progress",
+            action="store_true",
+            default=False,
+            help="Hide the progress bar.",
         )
         parser.add_argument(
             "--fail-fast",

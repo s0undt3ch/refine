@@ -18,6 +18,7 @@ def valid_config():
             "/path/to/codemod2",
         ],
         "process_pool_size": 4,
+        "hide_progress": False,
     }
 
 
@@ -37,13 +38,16 @@ def test_config_from_dict_valid(valid_config):
     assert config.exclude == ["codemod3"]
     assert config.codemod_paths == ["/path/to/codemod1", "/path/to/codemod2"]
     assert config.process_pool_size == 4
+    assert config.hide_progress is False
 
 
 def test_config_from_dict_invalid(invalid_config):
     """Test loading an invalid configuration dictionary."""
     with pytest.raises(msgspec.ValidationError) as exc_info:
         Config.from_dict(invalid_config)
-    assert "Invalid configuration: Expected `array`, got `int` - at `$.select`" in str(exc_info.value)
+    assert "Invalid configuration: Expected `array`, got `int` - at `$.select`" in str(
+        exc_info.value
+    )
 
 
 def test_config_from_default_file(tmp_path, valid_config):
@@ -55,6 +59,7 @@ def test_config_from_default_file(tmp_path, valid_config):
         exclude = ["codemod3"]
         codemod_paths = ["/path/to/codemod1", "/path/to/codemod2"]
         process_pool_size = 4
+        hide_progress = true
         """,
         encoding="utf-8",
     )
@@ -63,6 +68,8 @@ def test_config_from_default_file(tmp_path, valid_config):
     assert config.exclude == valid_config["exclude"]
     assert config.codemod_paths == valid_config["codemod_paths"]
     assert config.process_pool_size == valid_config["process_pool_size"]
+    assert valid_config["hide_progress"] is False
+    assert config.hide_progress is True
 
 
 def test_config_from_default_file_invalid(tmp_path):
@@ -89,6 +96,7 @@ def test_config_from_pyproject_file(tmp_path, valid_config):
         exclude = ["codemod3"]
         codemod_paths = ["/path/to/codemod1", "/path/to/codemod2"]
         process_pool_size = 4
+        hide_progress = true
         """,
         encoding="utf-8",
     )
@@ -97,6 +105,8 @@ def test_config_from_pyproject_file(tmp_path, valid_config):
     assert config.exclude == valid_config["exclude"]
     assert config.codemod_paths == valid_config["codemod_paths"]
     assert config.process_pool_size == valid_config["process_pool_size"]
+    assert valid_config["hide_progress"] is False
+    assert config.hide_progress is True
 
 
 def test_config_from_pyproject_file_invalid(tmp_path):
