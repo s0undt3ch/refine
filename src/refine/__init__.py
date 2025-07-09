@@ -13,3 +13,9 @@ except ImportError:  # pragma: no cover
         __version__ = version("re-code")
 
 __all__ = ["__version__"]
+
+with contextlib.suppress(ImportError):  # pragma: no cover
+    # Register pytest rewrite for better error messages in tests
+    import pytest
+
+    pytest.register_assert_rewrite("refine.testing")
