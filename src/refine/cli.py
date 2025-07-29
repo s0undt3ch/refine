@@ -66,6 +66,8 @@ class CLI:
             config_overrides["hide_progress"] = True
         if args.respect_gitignore:
             config_overrides["respect_gitignore"] = True
+        if args.process_pool_size:
+            config_overrides["process_pool_size"] = args.process_pool_size
 
         if args.codemod_paths:
             self.config.codemod_paths.clear()
@@ -226,6 +228,12 @@ class CLI:
             action="store_true",
             default=False,
             help="Respect .gitignore files when searching for files to process.",
+        )
+        parser.add_argument(
+            "--process-pool-size",
+            type=int,
+            default=None,
+            help="Number of processes to use for parallel processing. Defaults to the number of available CPUs.",
         )
         verbosity_group = parser.add_mutually_exclusive_group()
         verbosity_group.add_argument(

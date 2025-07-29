@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 import os
+import textwrap
+from unittest.mock import call
 from unittest.mock import patch
 
 import pytest
@@ -334,12 +336,12 @@ def test_invalid_codemod_path_extend_system_exit(cli, caplog, file_to_modify):
     assert "Codemod path invalid-path is not a directory" in caplog.text
 
 
-def test_file_outside_repo_root_system_exit(cli, caplog, tmp_path):
+def test_file_outside_repo_root_system_exit(cli, caplog):
     """
     Test that CLI exits with status 1 when file is outside repo root.
     """
     # Create a file outside the current working directory (repo root)
-    external_file = tmp_path.parent / "external_file.py"
+    external_file = cli.cwd.parent / "external_file.py"
     external_file.write_text("print('external')")
 
     with caplog.at_level("ERROR"):
@@ -466,3 +468,69 @@ def test_normal_flag_shows_info_logs(cli, caplog, file_to_modify):
     # Normal operation should show INFO logs like "Selected codemods:"
     info_messages = [record for record in caplog.records if record.levelno == logging.INFO]
     assert any("Selected codemods:" in record.message for record in info_messages)
+
+
+def test_process_pool_size_cli_flag_overrides_config(cli, file_to_modify):
+    """
+    Test that --process-pool-size CLI flag overrides config.
+    """
+    cli.with_config(process_pool_size=1)
+    assert cli._load_config(cli.cwd / ".refine.toml").process_pool_size == 1
+    exitcode = cli.run("--process-pool-size=2", file_to_modify)
+    assert exitcode == 0
+    assert cli.config.process_pool_size == 2
+
+
+def test_config_loading_from_pyproject_toml(cli, file_to_modify):
+    """
+    Test that config is loaded from pyproject.toml when available.
+    """
+    default_config = cli.default_config()
+    assert default_config.hide_progress is False
+    assert default_config.fail_fast is False
+    pyproject_toml = cli.cwd / "pyproject.toml"
+    pyproject_toml.write_text(
+        textwrap.dedent(
+            """
+            [tool.refine]
+            hide_progress = true
+            fail_fast = true
+            """
+        )
+    )
+
+    exitcode = cli.run(file_to_modify)
+    assert exitcode == 0
+    assert cli.config.hide_progress is True
+    assert cli.config.fail_fast is True
+
+
+def test_config_loading_default_when_no_files(cli, file_to_modify):
+    """
+    Test that default config is loaded when no config files exist.
+    """
+    exitcode = cli.run(file_to_modify)
+    assert exitcode == 0
+    # Should have default values
+    assert cli.config.hide_progress is False
+    assert cli.config.fail_fast is False
+
+
+def test_quiet_flag_sets_log_level(cli, file_to_modify):
+    """
+    Test that --quiet flag sets logging level to ERROR.
+    """
+    with patch("logging.getLogger") as mock_get_logger:
+        mock_logger = mock_get_logger.return_value
+        cli.run("--quiet", file_to_modify)
+        mock_logger.setLevel.assert_called_with(logging.ERROR)
+
+
+def test_verbose_flag_sets_log_level(cli, file_to_modify):
+    """
+    Test that --verbose flag sets logging level to DEBUG.
+    """
+    with patch("logging.getLogger") as mock_get_logger:
+        mock_logger = mock_get_logger.return_value
+        cli.run("--verbose", file_to_modify)
+        assert mock_logger.setLevel.call_args_list == [call(logging.DEBUG), call(logging.INFO)]
