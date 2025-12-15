@@ -131,7 +131,7 @@ jobs:
           uv build
 
       - name: Upload artifacts to GitHub
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: release-artifacts
           path: dist/*
