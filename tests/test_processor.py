@@ -48,15 +48,16 @@ def test_write_file_exception(tmp_path, subtests):
     processor = Processor(config=config, registry=registry, codemods=codemods)
 
     with subtests.test("Failing behaviour"):
-        # Patch the file-writing operation to raise an exception
-        with patch("tempfile.NamedTemporaryFile") as mock_tempfile:
-            mock_tempfile.return_value.__enter__.return_value.write.side_effect = Exception("Write error")
+        # Patch the atomic replace to raise, simulating a failure while finalizing the write.
+        with patch("refine.processor.os.replace", side_effect=Exception("Write error")):
             # We are not interested in seeing the output
             with patch("refine.processor._print_parallel_result", MagicMock()):
                 processor.process([tmp_file_path])
 
         # Ensure the file's content remains unchanged after the exception
         assert tmp_file_path.read_text() == TEST_FILE_PATH.read_text()
+        # And that no stray temporary file was left behind
+        assert not list(tmp_path.glob("*.refine-tmp"))
 
     # Just for the sake of completeness, what if we don't raise an exception?
     with subtests.test("Non-failing behaviour"):
