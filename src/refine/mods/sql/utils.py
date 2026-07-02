@@ -47,7 +47,7 @@ SQL_RE = re.compile(
 #: in the file text is enough to warrant a parse.
 RAW_SQL_HINT_RE = re.compile(
     r"\bselect\s|\bdelete\s+from\s|\binsert\s+into\s|\bupdate\s.*\bset\s|\bexists\s*\(",
-    re.IGNORECASE,
+    re.IGNORECASE | re.DOTALL,
 )
 
 
