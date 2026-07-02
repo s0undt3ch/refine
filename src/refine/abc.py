@@ -4,7 +4,6 @@ Abstract base classes for defining codemod types and their configurations.
 
 from __future__ import annotations
 
-import fnmatch
 import inspect
 from abc import ABC
 from collections.abc import Sequence
@@ -21,7 +20,6 @@ import libcst.matchers as m
 import msgspec
 from libcst import MetadataDependent
 from libcst.codemod import CodemodContext
-from libcst.codemod import SkipFile
 from libcst.codemod import VisitorBasedCodemodCommand
 from libcst.codemod.visitors import AddImportsVisitor
 from libcst.codemod.visitors import RemoveImportsVisitor
@@ -73,12 +71,6 @@ class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[CodemodConfigType]):
         return super().__new__(cls)
 
     def __init__(self, context: CodemodContext, config: CodemodConfigType):
-        for pattern in config.exclude:
-            if TYPE_CHECKING:
-                assert context.filename is not None
-            if fnmatch.fnmatch(context.filename, pattern):
-                error_msg = f"Excluded by pattern '{pattern}' defined in the '{self.NAME}' codemod configuration ."
-                raise SkipFile(error_msg)
         super().__init__(context)
         self.config = config
         self._add_imports: set[AddRemoveImport] = set()

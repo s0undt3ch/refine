@@ -6,6 +6,7 @@ A fair chunk of this module just piggybacks on what libCST does, we just adapt t
 
 from __future__ import annotations
 
+import fnmatch
 import itertools
 import logging
 import multiprocessing
@@ -205,6 +206,20 @@ class Processor:
                 continue
             applicable = []
             for codemod in self.codemods:
+                codemod_config = self.codemod_configs[codemod.NAME]
+                excluded = False
+                for pattern in codemod_config.exclude:
+                    if fnmatch.fnmatch(filename, pattern):
+                        log.debug(
+                            "Skipping %s on %s: excluded by pattern %r",
+                            codemod.NAME,
+                            os.path.relpath(filename, self.config.repo_root),
+                            pattern,
+                        )
+                        excluded = True
+                        break
+                if excluded:
+                    continue
                 try:
                     wanted = codemod.should_process(source, filename)
                 except Exception:

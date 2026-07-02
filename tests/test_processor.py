@@ -172,3 +172,37 @@ def test_gated_out_files_are_never_parsed(tmp_path, monkeypatch):
     assert result.failures == 0
     assert result.successes == 1  # gated-out counts as a clean success
     assert parse_calls == []
+
+
+def test_config_excluded_file_is_never_parsed(tmp_path, monkeypatch):
+    target = tmp_path / "flags.py"
+    target.write_text('parser.add_argument("--dry_run")\n')
+
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["cli-dashes-over-underscores"]))
+
+    parse_calls = []
+    real_parse = libcst.parse_module
+
+    def counting_parse(*args, **kwargs):
+        parse_calls.append(args)
+        return real_parse(*args, **kwargs)
+
+    monkeypatch.setattr("refine.processor.cst.parse_module", counting_parse)
+
+    config = Config.from_dict(
+        {
+            "repo_root": str(tmp_path),
+            "process_pool_size": 1,
+            "hide_progress": True,
+            "cli-dashes-over-underscores": {"exclude": ["*flags.py"]},
+        }
+    )
+    processor = Processor(config=config, registry=registry, codemods=codemods)
+    result = processor.process([target])
+
+    assert result.failures == 0
+    assert parse_calls == []
+    # File untouched
+    assert target.read_text() == 'parser.add_argument("--dry_run")\n'
