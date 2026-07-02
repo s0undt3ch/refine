@@ -39,6 +39,7 @@ from libcst.codemod._runner import TransformSuccess
 from libcst.helpers import calculate_module_and_package
 from libcst.metadata import FullRepoManager
 
+from refine.abc import _PRISTINE_TREE_KEY
 from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
 from refine.exc import InvalidConfigError
@@ -365,6 +366,7 @@ class Processor:
             # Run the transform, bail if we failed or if we aren't formatting code
             try:
                 input_tree = cst.parse_module(old_code)
+                context.scratch[_PRISTINE_TREE_KEY] = input_tree
                 output_tree = input_tree
                 for codemod_name in work.codemod_names:
                     codemod = self.codemods_by_name[codemod_name]
