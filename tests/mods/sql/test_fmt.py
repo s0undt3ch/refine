@@ -4,20 +4,22 @@ import pathlib
 
 import pytest
 
+from refine.exc import InvalidConfigError
 from refine.mods.sql.fmt import FormatSQL
 from refine.mods.sql.fmt import FormatSQLConfig
 from refine.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "fmt"
+SQRUFF_FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "fmt-sqruff"
 
 
 def _get_case_id(case: Modcase) -> str:
     return case.name
 
 
-def _get_cases() -> list[Modcase]:
+def _get_cases(files_path: pathlib.Path, config: FormatSQLConfig) -> list[Modcase]:
     cases = []
-    for path in FILES_PATH.glob("*.py"):
+    for path in files_path.glob("*.py"):
         if ".updated." in path.name:
             # We don't want to collect the .updated files
             continue
@@ -25,19 +27,34 @@ def _get_cases() -> list[Modcase]:
             Modcase(
                 path=path,
                 codemod=FormatSQL,
-                codemod_config=FormatSQLConfig(),
+                codemod_config=config,
             )
         )
     return cases
 
 
-@pytest.fixture(params=_get_cases(), ids=_get_case_id)
+@pytest.fixture(
+    params=_get_cases(FILES_PATH, FormatSQLConfig(backend="sqlfluff", dialect="mysql")),
+    ids=_get_case_id,
+)
 def fmt_case(request) -> Modcase:
+    return request.param
+
+
+@pytest.fixture(
+    params=_get_cases(SQRUFF_FILES_PATH, FormatSQLConfig(backend="sqruff", dialect="mysql")),
+    ids=_get_case_id,
+)
+def fmt_sqruff_case(request) -> Modcase:
     return request.param
 
 
 def test_format_sql(fmt_case: Modcase):
     fmt_case.assert_codemod()
+
+
+def test_format_sql_sqruff(fmt_sqruff_case: Modcase):
+    fmt_sqruff_case.assert_codemod()
 
 
 def test_should_process_true_for_sql_text():
@@ -53,3 +70,16 @@ def test_should_process_false_without_sql_keywords():
 def test_should_process_true_for_multiline_update_set():
     src = 'QUERY = """\nupdate foo\nset bar = 1\nwhere baz = 2\n"""\n'
     assert FormatSQL.should_process(src, "x.py") is True
+
+
+def test_default_backend_is_sqruff():
+    assert FormatSQLConfig().backend == "sqruff"
+
+
+def test_sqlfluff_backend_is_accepted():
+    assert FormatSQLConfig(backend="sqlfluff").backend == "sqlfluff"
+
+
+def test_unknown_backend_is_rejected():
+    with pytest.raises(InvalidConfigError):
+        FormatSQLConfig(backend="handwriting")
