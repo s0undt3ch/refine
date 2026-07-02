@@ -33,19 +33,21 @@ jobs:
 
     steps:
       - name: Check For Admin Permission
-        uses: actions-cool/check-user-permission@v2
+        uses: actions-cool/check-user-permission@c21884f3dda18dafc2f8b402fe807ccc9ec1aa5e # v2
         with:
           require: admin
           username: ${{ github.triggering_actor }}
 
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
 
       - name: Cleanup Release Tag
+        env:
+          RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
         run: |
-          echo "RELEASE_TAG=$(echo '${{ inputs.release_tag }}' | sed 's/^v//')" >> "$GITHUB_ENV"
+          echo "RELEASE_TAG=${RELEASE_TAG_INPUT#v}" >> "$GITHUB_ENV"
 
       - name: Check if tag already exists
         run: |
@@ -54,45 +56,15 @@ jobs:
             exit 1
           fi
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Install Python
-        uses: actions/setup-python@v6
+      - name: Set up mise
+        uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d # v4.2.0
         with:
-          python-version: "3.12"
-
-      - name: Get Python version checksum
-        id: python-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(python --version --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Get UV version checksum
-        id: uv-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(uv --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Set up cache
-        uses: actions/cache@v5
-        with:
-          path: .venv
-          key: >-
-            venv|
-            ${{ runner.os }}|
-            pre-commit|
-            ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
-            ${{ steps.uv-version-checksum.outputs.version-sha256sum }}|
-            ${{ hashFiles('**/uv.lock') }}
+          cache: true
+          cache_key_prefix: mise|release|${{ runner.os }}|${{ runner.arch }}
 
       - name: Generate changelog for GH release
         id: git-cliff
-        uses: orhun/git-cliff-action@v4
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
         with:
           config: cliff.toml
           args: --unreleased --strip all
@@ -105,7 +77,7 @@ jobs:
           tail -n +3 .release-changes.md > .final-release-notes.md
 
       - name: Update CHANGELOG.md
-        uses: orhun/git-cliff-action@v4
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
         with:
           config: cliff.toml
           args: --verbose --unreleased --tag '${{ env.RELEASE_TAG }}' --prepend CHANGELOG.md
@@ -131,13 +103,13 @@ jobs:
           uv build
 
       - name: Upload artifacts to GitHub
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: release-artifacts
           path: dist/*
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v3.0.0
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
@@ -149,7 +121,7 @@ jobs:
 
       - name: Publish to PyPI (trusted publishing)
         if: ${{ inputs.dry_run != true }}
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
         with:
           print-hash: true
 

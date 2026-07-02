@@ -1,0 +1,74 @@
+name: Setup Virtualenv
+description: >-
+  Install the repo tooling via mise (Python, uv, ruff, actionlint, prek, ...)
+  and sync the project virtualenv. Tool versions come solely from mise.toml, so
+  there is a single source of truth and nothing to drift.
+
+inputs:
+  python-version:
+    default: ""
+    description: >-
+      Python version to use. Overrides the version pinned in mise.toml via
+      MISE_PYTHON_VERSION. Leave empty (the default) to inherit mise.toml's
+      pin; pass a concrete version (e.g. "3.12") from a matrix entry.
+  cache-prefix:
+    required: true
+    description: "Prefix mixed into the mise / .venv cache keys (e.g. tests, docs)."
+  cache-seed:
+    default: "1"
+    description: "Bumpable seed mixed into every cache key. Bump to invalidate all caches."
+  uv-sync-args:
+    default: "--all-extras --dev"
+    description: "Arguments passed to `uv sync` (e.g. `--group docs`)."
+  mise-version:
+    default: ""
+    description: >-
+      Version of mise to install via jdx/mise-action (e.g. "v2026.5.18"). Leave
+      empty (the default) to install the latest release — mise-action resolves
+      it via the GitHub API. Do NOT pass "latest" literally; that builds a
+      .../download/latest/... URL that 404s.
+
+runs:
+  using: composite
+  steps:
+    # Export MISE_PYTHON_VERSION to $GITHUB_ENV *before* `Set up mise` runs, so
+    # the override applies to every subsequent step (uv sync, tests, ...) and
+    # not only the mise-action step. Without this, mise re-resolves to
+    # mise.toml's `python = ...` pin in later steps and the venv ends up on the
+    # wrong CPython.
+    - name: Export MISE_PYTHON_VERSION
+      if: inputs.python-version != ''
+      shell: bash
+      env:
+        PYTHON_VERSION: ${{ inputs.python-version }}
+      run: echo "MISE_PYTHON_VERSION=$PYTHON_VERSION" >> "$GITHUB_ENV"
+
+    - name: Set up mise
+      uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d # v4.2.0
+      env:
+        # Belt-and-braces: also pass via the step env so the override takes
+        # effect even when the previous step is skipped (empty python-version).
+        MISE_PYTHON_VERSION: ${{ inputs.python-version }}
+      with:
+        version: ${{ inputs.mise-version }}
+        cache: true
+        cache_key_prefix: mise|${{ inputs.cache-seed }}|${{ inputs.mise-version }}|${{ runner.os }}|${{ runner.arch }}|${{ inputs.cache-prefix }}
+
+    # Tool versions are pinned in mise.toml, so key the .venv cache on the files
+    # that determine its contents. No runtime version probing (which would need
+    # `sha256sum`, absent on macOS runners).
+    - name: Set up .venv cache
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+      with:
+        path: .venv
+        key: >-
+          venv|${{ inputs.cache-seed }}|${{ runner.os }}|${{ runner.arch }}|${{ inputs.cache-prefix }}|${{ inputs.python-version }}|${{ hashFiles('mise.toml', 'uv.lock', 'pyproject.toml') }}
+
+    - name: Install Python dependencies
+      shell: bash
+      env:
+        UV_SYNC_ARGS: ${{ inputs.uv-sync-args }}
+      # Intentionally unquoted: the args string is split into separate uv flags.
+      # It comes from a workflow input (not untrusted user data), and routing it
+      # through env avoids `${{ }}` interpolation into the shell.
+      run: uv sync $UV_SYNC_ARGS
