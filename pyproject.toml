@@ -19,7 +19,7 @@ readme = "README.md"
 license = "Apache-2.0"
 dynamic = ["version"]
 dependencies = [
-    "libcst<1.8.0",
+    "libcst>=1.8.0,<1.9.0",
     "sqlfluff>=4.2,<5",
     "sqruff>=0.38",
     "py-walk>=0.3.3",
