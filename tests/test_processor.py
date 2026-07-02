@@ -206,3 +206,57 @@ def test_config_excluded_file_is_never_parsed(tmp_path, monkeypatch):
     assert parse_calls == []
     # File untouched
     assert target.read_text() == 'parser.add_argument("--dry_run")\n'
+
+
+def test_second_run_hits_cache_and_skips_parsing(tmp_path, monkeypatch):
+    target = tmp_path / "sql.py"
+    target.write_text('QUERY = "SELECT a FROM b"\n')
+
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["cli-dashes-over-underscores"]))
+
+    config = Config.from_dict({"repo_root": str(tmp_path), "process_pool_size": 1, "hide_progress": True})
+
+    # First run: processes (or gates) the file and records it clean.
+    Processor(config=config, registry=registry, codemods=codemods).process([target])
+    assert (tmp_path / ".refine_cache" / "cache.msgpack").exists()
+
+    parse_calls = []
+    real_parse = libcst.parse_module
+
+    def counting_parse(*args, **kwargs):
+        parse_calls.append(args)
+        return real_parse(*args, **kwargs)
+
+    monkeypatch.setattr("refine.processor.cst.parse_module", counting_parse)
+
+    gate_calls = []
+    orig_gate = codemods[0].should_process
+
+    def counting_gate(source, filename):
+        gate_calls.append(filename)
+        return orig_gate(source, filename)
+
+    monkeypatch.setattr(codemods[0], "should_process", counting_gate)
+
+    result = Processor(config=config, registry=registry, codemods=codemods).process([target])
+    assert result.failures == 0
+    assert result.successes == 1
+    assert parse_calls == []
+    assert gate_calls == []
+
+
+def test_no_cache_config_disables_cache(tmp_path):
+    target = tmp_path / "plain.py"
+    target.write_text("x = 1\n")
+
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["cli-dashes-over-underscores"]))
+
+    config = Config.from_dict(
+        {"repo_root": str(tmp_path), "process_pool_size": 1, "hide_progress": True, "cache": False}
+    )
+    Processor(config=config, registry=registry, codemods=codemods).process([target])
+    assert not (tmp_path / ".refine_cache").exists()

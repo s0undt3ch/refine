@@ -192,6 +192,23 @@ def test_fail_fast_functionality(cli, file_to_modify, subtests):
         assert cli.config.fail_fast is False
 
 
+def test_no_cache_functionality(cli, file_to_modify, subtests):
+    """
+    Test all --no-cache CLI flag and config functionality using subtests.
+    """
+    with subtests.test("CLI flag overrides config when config has cache=True (default)"):
+        cli.with_config()  # Reset to default config
+        exitcode = cli.run("--no-cache", file_to_modify)
+        assert exitcode == 0
+        assert cli.config.cache is False
+
+    with subtests.test("Config setting is preserved when no CLI flag is provided"):
+        cli.with_config()  # Reset to default config
+        exitcode = cli.run(file_to_modify)
+        assert exitcode == 0
+        assert cli.config.cache is True
+
+
 def test_respect_gitignore_functionality(cli, file_to_modify, subtests):
     """
     Test that --respect-gitignore CLI flag works correctly.

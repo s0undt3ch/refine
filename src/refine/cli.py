@@ -68,6 +68,8 @@ class CLI:
             config_overrides["respect_gitignore"] = True
         if args.process_pool_size:
             config_overrides["process_pool_size"] = args.process_pool_size
+        if args.no_cache:
+            config_overrides["cache"] = False
 
         if args.codemod_paths:
             self.config.codemod_paths.clear()
@@ -262,6 +264,12 @@ class CLI:
             action="store_true",
             default=False,
             help="Exit as soon as possible on the first processing error",
+        )
+        parser.add_argument(
+            "--no-cache",
+            action="store_true",
+            default=False,
+            help="Do not read or write the run cache.",
         )
         parser.add_argument(
             "--list-codemods",

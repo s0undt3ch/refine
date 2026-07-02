@@ -39,9 +39,12 @@ from libcst.codemod._runner import TransformSuccess
 from libcst.helpers import calculate_module_and_package
 from libcst.metadata import FullRepoManager
 
+from refine import __version__
 from refine.abc import _PRISTINE_TREE_KEY
 from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
+from refine.cache import Cache
+from refine.cache import compute_context_key
 from refine.exc import InvalidConfigError
 from refine.exc import RefineSystemExit
 
@@ -185,6 +188,20 @@ class Processor:
         self.codemod_configs = codemod_configs
         self.codemods_by_name = {codemod.NAME: codemod for codemod in codemods}
 
+        self.cache: Cache | None = None
+        if config.cache:
+            cache_dir = Path(config.cache_dir)
+            if not cache_dir.is_absolute():
+                cache_dir = Path(config.repo_root) / cache_dir
+            self.cache = Cache.load(
+                cache_dir,
+                compute_context_key(
+                    refine_version=__version__,
+                    codemods=codemods,
+                    codemod_configs=codemod_configs,
+                ),
+            )
+
     def _build_work(self, files: list[str]) -> Iterator[_Work | ExecutionResult]:
         """
         Read each file once in the parent and decide which codemods apply.
@@ -205,6 +222,15 @@ class Processor:
                     ),
                 )
                 continue
+
+            if self.cache is not None and self.cache.is_clean(filename, source):
+                yield ExecutionResult(
+                    filename=filename,
+                    changed=False,
+                    transform_result=TransformSuccess(warning_messages=[], code=source),
+                )
+                continue
+
             applicable = []
             for codemod in self.codemods:
                 codemod_config = self.codemod_configs[codemod.NAME]
@@ -229,6 +255,8 @@ class Processor:
                 if wanted:
                     applicable.append(codemod.NAME)
             if not applicable:
+                if self.cache is not None:
+                    self.cache.mark_clean(filename, source)
                 yield ExecutionResult(
                     filename=filename,
                     changed=False,
@@ -294,48 +322,53 @@ class Processor:
 
         tally = _ResultTally()
 
-        if not work_items:
-            # Every file was gated out before parsing: nothing to dispatch,
-            # so we skip pool construction entirely (jobs would be 0 here,
-            # but that must not raise: the original file list wasn't empty).
-            try:
+        try:
+            if not work_items:
+                # Every file was gated out before parsing: nothing to dispatch,
+                # so we skip pool construction entirely (jobs would be 0 here,
+                # but that must not raise: the original file list wasn't empty).
                 for result in pre_results:
+                    self._mark_clean_if_unchanged(result)
                     if tally.account(
                         result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast
                     ):
                         break
-            finally:
-                progress.clear()
-        else:
-            pool_impl: partial[Pool] | type[DummyPool]
-            if len(work_items) == 1 or jobs == 1:
-                # Simple case, we should not pay for process overhead.
-                # Let's just use a dummy synchronous pool.
-                jobs = 1
-                pool_impl = DummyPool
             else:
-                # No maxtasksperchild: workers live for the whole run instead of
-                # being killed and re-spawned (and re-importing everything) every
-                # few tasks.
-                pool_impl = partial(_get_pool_context().Pool)
+                pool_impl: partial[Pool] | type[DummyPool]
+                if len(work_items) == 1 or jobs == 1:
+                    # Simple case, we should not pay for process overhead.
+                    # Let's just use a dummy synchronous pool.
+                    jobs = 1
+                    pool_impl = DummyPool
+                else:
+                    # No maxtasksperchild: workers live for the whole run instead of
+                    # being killed and re-spawned (and re-importing everything) every
+                    # few tasks.
+                    pool_impl = partial(_get_pool_context().Pool)
 
-            with pool_impl(processes=jobs) as p:
-                try:
+                with pool_impl(processes=jobs) as p:
                     for result in itertools.chain(
                         pre_results,
                         p.imap_unordered(
                             partial(self._process_path, metadata_manager), work_items, chunksize=chunk_size
                         ),
                     ):
+                        self._mark_clean_if_unchanged(result)
                         if tally.account(
                             result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast
                         ):
                             break
-                finally:
-                    progress.clear()
+        finally:
+            progress.clear()
+            if self.cache is not None:
+                self.cache.dump()
 
         # Return whether there was one or more failure.
         return tally.as_result()
+
+    def _mark_clean_if_unchanged(self, result: ExecutionResult) -> None:
+        if self.cache is not None and isinstance(result.transform_result, TransformSuccess) and not result.changed:
+            self.cache.mark_clean(result.filename, result.transform_result.code)
 
     def _process_path(self, metadata_manager: FullRepoManager | None, work: _Work) -> ExecutionResult:
         filename = work.filename
