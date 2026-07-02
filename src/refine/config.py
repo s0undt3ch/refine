@@ -79,6 +79,16 @@ class Config(msgspec.Struct, kw_only=True, frozen=True):
     Whether to hide the progress bar.
     """
 
+    cache: bool = True
+    """
+    Whether to cache clean results and skip unchanged files on re-runs.
+    """
+
+    cache_dir: str = ".refine_cache"
+    """
+    Directory (relative to ``repo_root`` unless absolute) holding the run cache.
+    """
+
     __remaining_config__: dict[str, Any] = msgspec.field(default_factory=dict)
 
     @classmethod
