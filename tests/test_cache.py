@@ -4,6 +4,8 @@ from refine.cache import Cache
 from refine.cache import compute_context_key
 from refine.mods.cli.flags import CliDashes
 from refine.mods.cli.flags import CliDashesConfig
+from refine.mods.sql.fmt import FormatSQL
+from refine.mods.sql.fmt import FormatSQLConfig
 
 
 def test_roundtrip(tmp_path):
@@ -82,3 +84,26 @@ def test_context_key_changes_with_config():
         codemods=[CliDashes],
         codemod_configs={"cli-dashes-over-underscores": CliDashesConfig()},
     )
+
+
+def test_context_key_changes_with_referenced_config_file_contents(tmp_path):
+    sqlfluff_config = tmp_path / ".sqlfluff"
+    sqlfluff_config.write_text("[sqlfluff]\nmax_line_length = 80\n")
+
+    config = FormatSQLConfig(sqlfluff_config_file=str(sqlfluff_config))
+    key_before = compute_context_key(
+        refine_version="1.0",
+        codemods=[FormatSQL],
+        codemod_configs={"sqlfmt": config},
+    )
+
+    # Editing the file's contents in place (path string unchanged) must
+    # invalidate the cache context key.
+    sqlfluff_config.write_text("[sqlfluff]\nmax_line_length = 120\n")
+    key_after = compute_context_key(
+        refine_version="1.0",
+        codemods=[FormatSQL],
+        codemod_configs={"sqlfmt": config},
+    )
+
+    assert key_before != key_after

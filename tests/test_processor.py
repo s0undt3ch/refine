@@ -13,6 +13,7 @@ import pytest
 from refine.config import Config
 from refine.exc import RefineSystemExit
 from refine.mods.cli.flags import CliDashes
+from refine.mods.sql import sqruff_backend
 from refine.processor import Processor
 from refine.processor import _compute_jobs
 from refine.processor import _get_pool_context
@@ -260,3 +261,36 @@ def test_no_cache_config_disables_cache(tmp_path):
     )
     Processor(config=config, registry=registry, codemods=codemods).process([target])
     assert not (tmp_path / ".refine_cache").exists()
+
+
+def test_process_pool_size_zero_with_work_raises(tmp_path):
+    target = tmp_path / "plain.py"
+    target.write_text("parser.add_argument('--dry_run')\n")
+
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["cli-dashes-over-underscores"]))
+
+    config = Config.from_dict({"repo_root": str(tmp_path), "process_pool_size": 0, "hide_progress": True})
+    processor = Processor(config=config, registry=registry, codemods=codemods)
+    with pytest.raises(RefineSystemExit):
+        processor.process([target])
+
+
+def test_warned_results_are_not_cached(tmp_path, monkeypatch):
+    monkeypatch.setattr(sqruff_backend, "format_sql", lambda *_args, **_kwargs: None)
+
+    target = tmp_path / "sql.py"
+    target.write_text('QUERY = "SELECT a FROM b"\n')
+
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["sqlfmt"]))
+    config = Config.from_dict({"repo_root": str(tmp_path), "process_pool_size": 1, "hide_progress": True})
+
+    result = Processor(config=config, registry=registry, codemods=codemods).process([target])
+    assert result.warnings > 0
+
+    # Second run must NOT be a cache hit: the gate/codemod must run again (warn again).
+    result2 = Processor(config=config, registry=registry, codemods=codemods).process([target])
+    assert result2.warnings > 0

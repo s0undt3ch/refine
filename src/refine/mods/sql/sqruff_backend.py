@@ -43,6 +43,9 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
+#: Maximum time to wait for the sqruff subprocess before giving up on formatting.
+SQRUFF_TIMEOUT_SECONDS = 30
+
 BUNDLED_SQRUFF_CONFIG = Path(__file__).parent / ".sqruff"
 
 _UNPARSABLE_MARKER = "Unparsable section"
@@ -57,6 +60,21 @@ def find_sqruff() -> str | None:
     if candidate.exists():
         return str(candidate)
     return shutil.which("sqruff")
+
+
+def _run_sqruff(binary: str, config_path: Path, query: str) -> subprocess.CompletedProcess[str] | None:
+    try:
+        return subprocess.run(  # noqa: S603 -- `binary` comes from find_sqruff(), not untrusted input
+            [binary, "fix", "--parsing-errors", "--config", str(config_path), "-"],
+            input=query,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=SQRUFF_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        log.debug("sqruff timed out after %s seconds; leaving query unformatted", SQRUFF_TIMEOUT_SECONDS)
+        return None
 
 
 def format_sql(
@@ -89,16 +107,16 @@ def format_sql(
         tmp_config_path = Path(tmp_config.name)
 
     try:
-        proc = subprocess.run(  # noqa: S603 -- `binary` comes from find_sqruff(), not untrusted input
-            [binary, "fix", "--parsing-errors", "--config", str(tmp_config_path), "-"],
-            input=query,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+        proc = _run_sqruff(binary, tmp_config_path, query)
     finally:
         tmp_config_path.unlink(missing_ok=True)
 
+    return _extract_output(proc)
+
+
+def _extract_output(proc: subprocess.CompletedProcess[str] | None) -> str | None:
+    if proc is None:
+        return None
     if _UNPARSABLE_MARKER in proc.stderr:
         log.debug("sqruff could not parse query: %s", proc.stderr)
         return None

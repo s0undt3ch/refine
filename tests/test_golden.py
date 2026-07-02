@@ -44,7 +44,11 @@ def _collect_cases():
             yield pytest.param(original, updated, codemod_name, id=f"{codemod_name}/{original.stem}")
 
 
-@pytest.mark.parametrize(("original", "updated", "codemod_name"), list(_collect_cases()))
+_CASES = list(_collect_cases())
+assert _CASES, "golden corpus collected zero cases"
+
+
+@pytest.mark.parametrize(("original", "updated", "codemod_name"), _CASES)
 def test_golden_end_to_end(tmp_path, original, updated, codemod_name):
     target = tmp_path / original.name
     target.write_text(_dedent(original))
