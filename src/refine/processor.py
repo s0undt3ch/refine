@@ -6,6 +6,7 @@ A fair chunk of this module just piggybacks on what libCST does, we just adapt t
 
 from __future__ import annotations
 
+import concurrent.futures
 import contextlib
 import fnmatch
 import itertools
@@ -17,12 +18,16 @@ import shutil
 import sys
 import tempfile
 import traceback
+from collections.abc import Callable
+from collections.abc import Iterable
 from collections.abc import Iterator
 from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import ParamSpec
+from typing import TypeVar
 
 import libcst as cst
 import msgspec
@@ -31,7 +36,6 @@ from libcst.codemod import SkipFile
 from libcst.codemod._cli import ExecutionResult
 from libcst.codemod._cli import Progress
 from libcst.codemod._cli import print_execution_result
-from libcst.codemod._dummy_pool import DummyPool
 from libcst.codemod._runner import SkipReason
 from libcst.codemod._runner import TransformExit
 from libcst.codemod._runner import TransformFailure
@@ -50,8 +54,6 @@ from refine.exc import InvalidConfigError
 from refine.exc import RefineSystemExit
 
 if TYPE_CHECKING:
-    from multiprocessing.pool import Pool
-
     from libcst.metadata.base_provider import ProviderT
 
     from refine.config import Config
@@ -80,6 +82,34 @@ def _compute_jobs(*, configured_pool_size: int, total_files: int, chunk_size: in
     if "PRE_COMMIT" in env:
         jobs = min(jobs, PRE_COMMIT_MAX_JOBS)
     return jobs
+
+
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
+
+
+class _SyncExecutor(concurrent.futures.Executor):
+    """
+    Synchronous :class:`concurrent.futures.Executor`.
+
+    Runs submitted callables inline. Used for the single-job case so we do not
+    pay process/thread overhead, and so refine owns this path instead of
+    depending on libCST's private ``_dummy_pool`` module (removed in 1.8).
+    """
+
+    def submit(
+        self,
+        fn: Callable[_P, _R],
+        /,
+        *args: _P.args,
+        **kwargs: _P.kwargs,
+    ) -> concurrent.futures.Future[_R]:
+        future: concurrent.futures.Future[_R] = concurrent.futures.Future()
+        try:
+            future.set_result(fn(*args, **kwargs))
+        except BaseException as exc:  # match stdlib pool workers: surface the error at result()
+            future.set_exception(exc)
+        return future
 
 
 class _Work(msgspec.Struct, frozen=True):
@@ -328,41 +358,30 @@ class Processor:
         tally = _ResultTally()
 
         try:
-            if not work_items:
-                # Every file was gated out before parsing: nothing to dispatch,
-                # so we skip pool construction entirely (jobs would be 0 here,
-                # but that must not raise: the original file list wasn't empty).
-                for result in pre_results:
-                    self._mark_clean_if_unchanged(result)
-                    if tally.account(
-                        result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast
-                    ):
-                        break
-            else:
-                pool_impl: partial[Pool] | type[DummyPool]
+            # Account the already-decided (gated-out / cached) results first: they
+            # need no dispatch, and letting fail_fast trip here avoids opening a
+            # pool at all.
+            stop = self._account_results(pre_results, progress, tally)
+            if work_items and not stop:
+                pool_impl: Callable[[], concurrent.futures.Executor]
                 if len(work_items) == 1 or jobs == 1:
                     # Simple case, we should not pay for process overhead.
-                    # Let's just use a dummy synchronous pool.
+                    # Let's just use a synchronous executor.
                     jobs = 1
-                    pool_impl = DummyPool
+                    pool_impl = _SyncExecutor
+                elif getattr(sys, "_is_gil_enabled", lambda: True)():
+                    # No max_tasks_per_child: workers live for the whole run instead
+                    # of being killed and re-spawned (re-importing everything) every
+                    # few tasks. The forkserver context preloads refine.processor.
+                    pool_impl = partial(
+                        concurrent.futures.ProcessPoolExecutor,
+                        max_workers=jobs,
+                        mp_context=_get_pool_context(),
+                    )
                 else:
-                    # No maxtasksperchild: workers live for the whole run instead of
-                    # being killed and re-spawned (and re-importing everything) every
-                    # few tasks.
-                    pool_impl = partial(_get_pool_context().Pool)
-
-                with pool_impl(processes=jobs) as p:
-                    for result in itertools.chain(
-                        pre_results,
-                        p.imap_unordered(
-                            partial(self._process_path, metadata_manager), work_items, chunksize=chunk_size
-                        ),
-                    ):
-                        self._mark_clean_if_unchanged(result)
-                        if tally.account(
-                            result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast
-                        ):
-                            break
+                    # Free-threaded CPython: processes buy us nothing, use threads.
+                    pool_impl = partial(concurrent.futures.ThreadPoolExecutor, max_workers=jobs)
+                self._run_pool(pool_impl, jobs, work_items, metadata_manager, progress, tally)
         finally:
             progress.clear()
             if self.cache is not None:
@@ -370,6 +389,68 @@ class Processor:
 
         # Return whether there was one or more failure.
         return tally.as_result()
+
+    def _account_results(self, results: Iterable[ExecutionResult], progress: Progress, tally: _ResultTally) -> bool:
+        """
+        Account an iterable of already-computed results.
+
+        Returns True when processing should stop (fail_fast tripped).
+        """
+        for result in results:
+            self._mark_clean_if_unchanged(result)
+            if tally.account(result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast):
+                return True
+        return False
+
+    def _run_pool(
+        self,
+        pool_impl: Callable[[], concurrent.futures.Executor],
+        jobs: int,
+        work_items: list[_Work],
+        metadata_manager: FullRepoManager | None,
+        progress: Progress,
+        tally: _ResultTally,
+    ) -> None:
+        """
+        Dispatch ``work_items`` across the executor, accounting results as they complete.
+
+        Keeps at most ``jobs`` tasks in flight (rather than materialising a future
+        per file up front) so ``fail_fast`` can stop before submitting further work
+        and memory stays bounded regardless of the number of files. This preserves
+        the lazy-stop semantics of libCST 1.7's ``DummyPool.imap_unordered``.
+        """
+        remaining = iter(work_items)
+        stop = False
+        with pool_impl() as executor:
+            in_flight = {
+                executor.submit(self._process_path, metadata_manager, work)
+                for work in itertools.islice(remaining, jobs)
+            }
+            try:
+                while in_flight:
+                    done, in_flight = concurrent.futures.wait(in_flight, return_when=concurrent.futures.FIRST_COMPLETED)
+                    for future in done:
+                        result = future.result()
+                        self._mark_clean_if_unchanged(result)
+                        if tally.account(
+                            result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast
+                        ):
+                            stop = True
+                            break
+                    if stop:
+                        break
+                    # Refill the window with as many new items as just completed.
+                    in_flight.update(
+                        executor.submit(self._process_path, metadata_manager, work)
+                        for work in itertools.islice(remaining, len(done))
+                    )
+            finally:
+                if stop:
+                    # cancel_futures drops not-yet-started work; the enclosing
+                    # ``with`` then shuts down waiting for already-running futures,
+                    # so their atomic writes finish cleanly (safer than the old
+                    # Pool.terminate(), which could strand a .refine-tmp).
+                    executor.shutdown(cancel_futures=True)
 
     def _mark_clean_if_unchanged(self, result: ExecutionResult) -> None:
         if (
