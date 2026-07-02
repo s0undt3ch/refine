@@ -122,7 +122,7 @@ class Processor:
             chunk_size=chunk_size,
             env=os.environ,
         )
-        if jobs < 1 and total > 0:
+        if jobs < 1:
             error = "Must have at least one job to process!"
             raise RefineSystemExit(code=1, message=error)
 
