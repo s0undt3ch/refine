@@ -4,9 +4,7 @@ Abstract base classes for defining codemod types and their configurations.
 
 from __future__ import annotations
 
-import inspect
 from abc import ABC
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
@@ -18,14 +16,10 @@ from typing import TypeVar
 import libcst as cst
 import libcst.matchers as m
 import msgspec
-from libcst import MetadataDependent
 from libcst.codemod import CodemodContext
 from libcst.codemod import VisitorBasedCodemodCommand
 from libcst.codemod.visitors import AddImportsVisitor
 from libcst.codemod.visitors import RemoveImportsVisitor
-from libcst.metadata import ProviderT
-from libcst.metadata import QualifiedNameProvider
-from libcst.metadata import ScopeProvider
 
 AddRemoveImport: TypeAlias = tuple[str, str | None, str | None]
 
@@ -52,22 +46,14 @@ class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[CodemodConfigType]):
     NAME: ClassVar[str]
     CONFIG_CLS: ClassVar[type[BaseConfig]]
     PRIORITY: ClassVar[int] = 0
-    METADATA_DEPENDENCIES: ClassVar[Sequence[ProviderT]] = (QualifiedNameProvider, ScopeProvider)
 
     def __new__(cls, *_: Any, **__: Any) -> Self:
         """
         Make sure this class is not instantiated directly.
-
-        Additionally, collect all metadata dependencies from the class and its superclasses.
         """
         if cls is BaseCodemod:
             error_msg = "BaseCodemod cannot be instantiated directly."
             raise TypeError(error_msg)
-        dependencies: set[ProviderT] = set()
-        for c in inspect.getmro(cls):
-            if issubclass(c, MetadataDependent):
-                dependencies.update(c.METADATA_DEPENDENCIES)
-        cls.METADATA_DEPENDENCIES = tuple(dependencies)
         return super().__new__(cls)
 
     def __init__(self, context: CodemodContext, config: CodemodConfigType):
@@ -143,7 +129,6 @@ class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[CodemodConfigType]):
             updated_node = updated_node.visit(add_imports_visitor)
 
         if self._remove_imports:
-            self.get_metadata(QualifiedNameProvider, original_node)
             for module, obj, asname in self._remove_imports:
                 RemoveImportsVisitor.remove_unused_import(self.context, module=module, obj=obj, asname=asname)
 

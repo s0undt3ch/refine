@@ -280,12 +280,16 @@ class Processor:
             for dependency in codemod.get_inherited_dependencies():
                 inherited_dependencies.add(dependency)
 
-        metadata_manager = FullRepoManager(
-            self.config.repo_root,
-            _files,
-            list(inherited_dependencies),
-        )
-        metadata_manager.resolve_cache()
+        metadata_manager: FullRepoManager | None = None
+        if any(getattr(provider, "gen_cache", None) for provider in inherited_dependencies):
+            # Only providers with a gen_cache (e.g. FullyQualifiedNameProvider,
+            # TypeInferenceProvider) need repo-wide cache resolution.
+            metadata_manager = FullRepoManager(
+                self.config.repo_root,
+                _files,
+                list(inherited_dependencies),
+            )
+            metadata_manager.resolve_cache()
 
         tally = _ResultTally()
 
@@ -332,7 +336,7 @@ class Processor:
         # Return whether there was one or more failure.
         return tally.as_result()
 
-    def _process_path(self, metadata_manager: FullRepoManager, work: _Work) -> ExecutionResult:
+    def _process_path(self, metadata_manager: FullRepoManager | None, work: _Work) -> ExecutionResult:
         filename = work.filename
         # determine the module and package name for this file
         try:

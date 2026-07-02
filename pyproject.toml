@@ -132,6 +132,7 @@ ignore = [
   "N802",     # Function name `leave_Xyz` should be lowercase
 ]
 "src/refine/abc.py" = [
+  "ARG002",   #  Unused method argument
   "ARG003",   #  Unused class method argument
 ]
 "src/refine/processor.py" = [

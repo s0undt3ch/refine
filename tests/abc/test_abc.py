@@ -5,9 +5,12 @@ import pathlib
 import libcst as cst
 import pytest
 from libcst.metadata import QualifiedNameProvider
+from libcst.metadata import WhitespaceInclusivePositionProvider
 
 from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
+from refine.mods.cli.flags import CliDashes
+from refine.mods.sql.fmt import FormatSQL
 from refine.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files"
@@ -85,3 +88,15 @@ def test_add_remove_imports(add_remove_imports_case: Modcase):
 
 def test_should_process_defaults_to_true():
     assert BaseCodemod.should_process("anything", "x.py") is True
+
+
+def test_base_codemod_declares_no_metadata_dependencies():
+    assert tuple(BaseCodemod.METADATA_DEPENDENCIES) == ()
+
+
+def test_codemod_gets_exactly_declared_dependencies():
+    assert set(FormatSQL.get_inherited_dependencies()) == {WhitespaceInclusivePositionProvider}
+
+
+def test_codemod_without_declarations_gets_none():
+    assert set(CliDashes.get_inherited_dependencies()) == set()
