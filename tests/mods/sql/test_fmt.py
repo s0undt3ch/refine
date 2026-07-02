@@ -14,51 +14,31 @@ from refine.mods.sql.fmt import SqlBackend
 from refine.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "fmt"
-SQRUFF_FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "fmt-sqruff"
+
+# Shared input files; the expected output for each lives in a per-backend
+# subdirectory (``fmt/sqlfluff/`` and ``fmt/sqruff/``).
+SQL_INPUTS = sorted(path for path in FILES_PATH.glob("*.py") if not path.stem.endswith(".updated"))
 
 
-def _get_case_id(case: Modcase) -> str:
-    return case.name
+@pytest.fixture(params=[SqlBackend.SQLFLUFF, SqlBackend.SQRUFF], ids=lambda backend: backend.value)
+def fmt_sql_config(request: pytest.FixtureRequest) -> FormatSQLConfig:
+    return FormatSQLConfig(backend=request.param, dialect="mysql")
 
 
-def _get_cases(files_path: pathlib.Path, config: FormatSQLConfig) -> list[Modcase]:
-    cases = []
-    for path in files_path.glob("*.py"):
-        if ".updated." in path.name:
-            # We don't want to collect the .updated files
-            continue
-        cases.append(
-            Modcase(
-                path=path,
-                codemod=FormatSQL,
-                codemod_config=config,
-            )
-        )
-    return cases
-
-
-@pytest.fixture(
-    params=_get_cases(FILES_PATH, FormatSQLConfig(backend=SqlBackend.SQLFLUFF, dialect="mysql")),
-    ids=_get_case_id,
-)
-def fmt_case(request) -> Modcase:
-    return request.param
-
-
-@pytest.fixture(
-    params=_get_cases(SQRUFF_FILES_PATH, FormatSQLConfig(backend=SqlBackend.SQRUFF, dialect="mysql")),
-    ids=_get_case_id,
-)
-def fmt_sqruff_case(request) -> Modcase:
-    return request.param
+@pytest.fixture(params=SQL_INPUTS, ids=lambda path: path.stem)
+def fmt_case(request: pytest.FixtureRequest, fmt_sql_config: FormatSQLConfig) -> Modcase:
+    input_path: pathlib.Path = request.param
+    expected_path = FILES_PATH / fmt_sql_config.backend.value / f"{input_path.stem}.updated.py"
+    return Modcase(
+        path=input_path,
+        updated_path=expected_path,
+        codemod=FormatSQL,
+        codemod_config=fmt_sql_config,
+    )
 
 
 def test_format_sql(fmt_case: Modcase):
     fmt_case.assert_codemod()
-
-
-def test_format_sql_sqruff(fmt_sqruff_case: Modcase):
-    fmt_sqruff_case.assert_codemod()
 
 
 def test_should_process_true_for_sql_text():

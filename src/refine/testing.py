@@ -28,6 +28,10 @@ class Modcase:
     path: Path
     codemod: type[BaseCodemod] = field(repr=False)
     codemod_config: BaseConfig = field(repr=False)
+    #: Path to the expected output. Defaults to ``<path stem>.updated.py`` next
+    #: to ``path``; set it explicitly to keep a shared input file while sourcing
+    #: the expected output from elsewhere (e.g. a per-backend directory).
+    updated_path: Path | None = None
     name: str = field(init=False)
     original: str = field(init=False, repr=False)
     updated: str = field(init=False, repr=False)
@@ -37,7 +41,7 @@ class Modcase:
         self.name = self.path.stem
         log.debug("Populating ModCase.original from: %s", self.path)
         self.original = self._dedent_contents(self.path)
-        updated_path = self.path.with_stem(f"{self.path.stem}.updated")
+        updated_path = self.updated_path or self.path.with_stem(f"{self.path.stem}.updated")
         log.debug("Populating ModCase.updated from: %s", updated_path)
         self.updated = self._dedent_contents(updated_path)
         self.require_changes = self.original != self.updated
