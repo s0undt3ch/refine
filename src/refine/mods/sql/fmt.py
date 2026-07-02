@@ -23,6 +23,7 @@ from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
 from refine.exc import InvalidConfigError
 
+from .utils import RAW_SQL_HINT_RE
 from .utils import cst_module_has_query_strings
 from .utils import is_sql_query
 
@@ -77,6 +78,12 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
     CONFIG_CLS = FormatSQLConfig
 
     METADATA_DEPENDENCIES = (WhitespaceInclusivePositionProvider,)
+
+    @classmethod
+    def should_process(cls, source: str, filename: str) -> bool:
+        # If no SQL-looking text exists anywhere in the raw source there is
+        # nothing for this codemod to do — skip the parse entirely.
+        return RAW_SQL_HINT_RE.search(source) is not None
 
     def visit_Module(self, mod: cst.Module) -> bool:
         # Let's just check if there's any SQL like query in the source code

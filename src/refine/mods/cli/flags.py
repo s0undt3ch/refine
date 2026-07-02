@@ -17,6 +17,7 @@ function call.
 from __future__ import annotations
 
 import logging
+import re
 from typing import cast
 
 import libcst as cst
@@ -42,6 +43,13 @@ class CliDashes(BaseCodemod):
 
     NAME = "cli-dashes-over-underscores"
     CONFIG_CLS = CliDashesConfig
+
+    _GATE_RE = re.compile(r"--\w+_\w")
+
+    @classmethod
+    def should_process(cls, source: str, filename: str) -> bool:
+        # The codemod only ever rewrites string args matching --xxx_yyy.
+        return cls._GATE_RE.search(source) is not None
 
     @m.leave(m.Arg(value=m.SimpleString()))
     def leave_simple_string_arg(self, original: cst.Arg, updated: cst.Arg) -> cst.Arg:

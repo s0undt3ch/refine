@@ -81,3 +81,7 @@ def test_remove_imports(remove_imports_case: Modcase):
 
 def test_add_remove_imports(add_remove_imports_case: Modcase):
     add_remove_imports_case.assert_codemod()
+
+
+def test_should_process_defaults_to_true():
+    assert BaseCodemod.should_process("anything", "x.py") is True
