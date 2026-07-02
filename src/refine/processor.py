@@ -14,6 +14,7 @@ import shutil
 import sys
 import tempfile
 import traceback
+from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
@@ -49,6 +50,18 @@ if TYPE_CHECKING:
     from refine.registry import Registry
 
 log = logging.getLogger(__name__)
+
+#: Number of processes any single refine invocation may use when running under
+#: pre-commit. pre-commit can launch several refine processes concurrently
+#: (require_serial: false in old hook configs), so each one must stay small.
+PRE_COMMIT_MAX_JOBS = 2
+
+
+def _compute_jobs(*, configured_pool_size: int, total_files: int, chunk_size: int, env: Mapping[str, str]) -> int:
+    jobs = min(configured_pool_size, (total_files + chunk_size - 1) // chunk_size)
+    if "PRE_COMMIT" in env:
+        jobs = min(jobs, PRE_COMMIT_MAX_JOBS)
+    return jobs
 
 
 @dataclass(frozen=True)
@@ -103,11 +116,13 @@ class Processor:
         total = len(_files)
         progress = Progress(enabled=self.config.hide_progress is False, total=total)
         chunk_size = 4
-        jobs = min(
-            self.config.process_pool_size,
-            (len(_files) + chunk_size - 1) // chunk_size,
+        jobs = _compute_jobs(
+            configured_pool_size=self.config.process_pool_size,
+            total_files=total,
+            chunk_size=chunk_size,
+            env=os.environ,
         )
-        if jobs < 1:
+        if jobs < 1 and total > 0:
             error = "Must have at least one job to process!"
             raise RefineSystemExit(code=1, message=error)
 

@@ -10,6 +10,7 @@ import pytest
 
 from refine.mods.cli.flags import CliDashes
 from refine.processor import Processor
+from refine.processor import _compute_jobs
 
 log = logging.getLogger(__name__)
 
@@ -59,3 +60,25 @@ def test_write_file_exception(tmp_path, subtests):
         assert tmp_file_path.read_text() != TEST_FILE_PATH.read_text()
         # They should however match the updated file contents
         assert tmp_file_path.read_text() == TEST_FILE_UPDATED_PATH.read_text()
+
+
+def test_compute_jobs_caps_to_chunked_file_count():
+    assert _compute_jobs(configured_pool_size=8, total_files=4, chunk_size=4, env={}) == 1
+    assert _compute_jobs(configured_pool_size=8, total_files=17, chunk_size=4, env={}) == 5
+
+
+def test_compute_jobs_caps_to_configured_pool_size():
+    assert _compute_jobs(configured_pool_size=2, total_files=100, chunk_size=4, env={}) == 2
+
+
+def test_compute_jobs_pre_commit_env_caps_pool():
+    assert _compute_jobs(configured_pool_size=8, total_files=100, chunk_size=4, env={"PRE_COMMIT": "1"}) == 2
+
+
+def test_compute_jobs_pre_commit_env_does_not_raise_floor():
+    # A single chunk of work stays a single job even under pre-commit
+    assert _compute_jobs(configured_pool_size=8, total_files=3, chunk_size=4, env={"PRE_COMMIT": "1"}) == 1
+
+
+def test_compute_jobs_zero_files_returns_zero():
+    assert _compute_jobs(configured_pool_size=8, total_files=0, chunk_size=4, env={}) == 0
