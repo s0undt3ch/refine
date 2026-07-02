@@ -6,6 +6,7 @@ This codemod uses the [sqlfluff](https://docs.sqlfluff.com) python package to fo
 
 from __future__ import annotations
 
+import enum
 import logging
 import pathlib
 import textwrap
@@ -40,6 +41,16 @@ BUILNTIN_SQLFLUFF_CONFIG_FILE = pathlib.Path(__file__).parent / ".sqlfluff"
 SUPPORTED_SQLFLUFF_DIALECTS: tuple[str, ...] = tuple(dialect.label for dialect in sqlfluff.list_dialects())
 
 
+class SqlBackend(enum.StrEnum):
+    """The available SQL formatting backends."""
+
+    SQRUFF = "sqruff"
+    """The fast, Rust-based ``sqruff`` backend (default)."""
+
+    SQLFLUFF = "sqlfluff"
+    """The pure-Python ``sqlfluff`` backend."""
+
+
 class FormatSQLConfig(BaseConfig, frozen=True):
     """
     Configuration for the SQL Formatting codemod.
@@ -48,7 +59,7 @@ class FormatSQLConfig(BaseConfig, frozen=True):
     dialect: str = "ansi"
     """The SQL dialect to use when formatting the SQL queries."""
 
-    backend: str = "sqruff"
+    backend: SqlBackend = SqlBackend.SQRUFF
     """The formatting backend: ``sqruff`` (fast, default) or ``sqlfluff``."""
 
     sqlfluff_config_file: str = str(BUILNTIN_SQLFLUFF_CONFIG_FILE)
@@ -69,9 +80,6 @@ class FormatSQLConfig(BaseConfig, frozen=True):
         """
         This method can implement additional codemod initialization.
         """
-        if self.backend not in ("sqruff", "sqlfluff"):
-            error_msg = f"Unsupported sqlfmt backend: {self.backend}. Choose 'sqruff' or 'sqlfluff'."
-            raise InvalidConfigError(error_msg)
         if not pathlib.Path(self.sqlfluff_config_file).exists():
             error_msg = f"SQLFluff config file not found: {self.sqlfluff_config_file}"
             raise InvalidConfigError(error_msg)
@@ -203,7 +211,7 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
 
         query = utils.remove_leading_whitespace(query)
 
-        if self.config.backend == "sqruff":
+        if self.config.backend == SqlBackend.SQRUFF:
             formated = self.__format_sql_sqruff(query, indent=indent)
         else:
             formated = self.__format_sql_sqlfluff(query, indent=indent)

@@ -3,13 +3,14 @@ from __future__ import annotations
 import pathlib
 
 import libcst as cst
+import msgspec
 import pytest
 from libcst.codemod import CodemodContext
 
-from refine.exc import InvalidConfigError
 from refine.mods.sql import sqruff_backend
 from refine.mods.sql.fmt import FormatSQL
 from refine.mods.sql.fmt import FormatSQLConfig
+from refine.mods.sql.fmt import SqlBackend
 from refine.testing import Modcase
 
 FILES_PATH = pathlib.Path(__file__).parent.resolve() / "files" / "fmt"
@@ -37,7 +38,7 @@ def _get_cases(files_path: pathlib.Path, config: FormatSQLConfig) -> list[Modcas
 
 
 @pytest.fixture(
-    params=_get_cases(FILES_PATH, FormatSQLConfig(backend="sqlfluff", dialect="mysql")),
+    params=_get_cases(FILES_PATH, FormatSQLConfig(backend=SqlBackend.SQLFLUFF, dialect="mysql")),
     ids=_get_case_id,
 )
 def fmt_case(request) -> Modcase:
@@ -45,7 +46,7 @@ def fmt_case(request) -> Modcase:
 
 
 @pytest.fixture(
-    params=_get_cases(SQRUFF_FILES_PATH, FormatSQLConfig(backend="sqruff", dialect="mysql")),
+    params=_get_cases(SQRUFF_FILES_PATH, FormatSQLConfig(backend=SqlBackend.SQRUFF, dialect="mysql")),
     ids=_get_case_id,
 )
 def fmt_sqruff_case(request) -> Modcase:
@@ -76,16 +77,18 @@ def test_should_process_true_for_multiline_update_set():
 
 
 def test_default_backend_is_sqruff():
-    assert FormatSQLConfig().backend == "sqruff"
+    assert FormatSQLConfig().backend is SqlBackend.SQRUFF
 
 
 def test_sqlfluff_backend_is_accepted():
-    assert FormatSQLConfig(backend="sqlfluff").backend == "sqlfluff"
+    assert msgspec.convert({"backend": "sqlfluff"}, FormatSQLConfig).backend is SqlBackend.SQLFLUFF
 
 
 def test_unknown_backend_is_rejected():
-    with pytest.raises(InvalidConfigError):
-        FormatSQLConfig(backend="handwriting")
+    # Validation happens at the deserialization boundary Processor uses to build
+    # codemod configs; Processor surfaces this ValidationError as an InvalidConfigError.
+    with pytest.raises(msgspec.ValidationError):
+        msgspec.convert({"backend": "handwriting"}, FormatSQLConfig)
 
 
 def test_backend_failure_warns_and_leaves_query_unchanged(monkeypatch):
@@ -93,7 +96,7 @@ def test_backend_failure_warns_and_leaves_query_unchanged(monkeypatch):
 
     source = 'QUERY = "SELECT a FROM b"\n'
     context = CodemodContext(filename="x.py")
-    mod = FormatSQL(context=context, config=FormatSQLConfig(backend="sqruff"))
+    mod = FormatSQL(context=context, config=FormatSQLConfig(backend=SqlBackend.SQRUFF))
     mod.transform_module(cst.parse_module(source))
 
     assert context.warnings, "backend failure must surface via context.warnings"
