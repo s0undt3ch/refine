@@ -5,6 +5,9 @@ Abstract base classes for defining codemod types and their configurations.
 from __future__ import annotations
 
 from abc import ABC
+from collections.abc import Generator
+from contextlib import contextmanager
+from dataclasses import replace
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import ClassVar
@@ -22,6 +25,9 @@ from libcst.codemod.visitors import AddImportsVisitor
 from libcst.codemod.visitors import RemoveImportsVisitor
 
 AddRemoveImport: TypeAlias = tuple[str, str | None, str | None]
+
+_SHARED_WRAPPER_KEY = "__refine_shared_wrapper__"
+_PRISTINE_TREE_KEY = "__refine_pristine_tree__"
 
 
 class BaseConfig(msgspec.Struct, kw_only=True, frozen=True, forbid_unknown_fields=True):
@@ -116,6 +122,36 @@ class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[CodemodConfigType]):
         multiple times, and, we pass the [context][libcst.codemod.CodemodContext] when actually updating the imports.
         """
         self._remove_imports.add((module, obj, asname))
+
+    @contextmanager
+    def _handle_metadata_reference(self, module: cst.Module) -> Generator[cst.Module, None, None]:
+        """
+        Reuse one MetadataWrapper per file across all chained codemods.
+
+        libcst's default builds a fresh deep-copying wrapper per codemod per
+        file. We keep the wrapper in ``context.scratch`` and only rebuild it
+        when the tree object actually changed. The deep copy is skipped only
+        for the pristine parser output (guaranteed duplicate-free); rebuilt
+        wrappers for transformed trees keep libcst's safety copy.
+        """
+        oldwrapper = self.context.wrapper
+        wrapper: cst.MetadataWrapper | None = self.context.scratch.get(_SHARED_WRAPPER_KEY)
+        if wrapper is None or wrapper.module is not module:
+            metadata_manager = self.context.metadata_manager
+            filename = self.context.filename
+            if metadata_manager is not None and filename:
+                cache = metadata_manager.get_cache_for_path(filename)
+            else:
+                cache = {}
+            pristine = self.context.scratch.get(_PRISTINE_TREE_KEY)
+            wrapper = cst.MetadataWrapper(module, unsafe_skip_copy=module is pristine, cache=cache)
+            self.context.scratch[_SHARED_WRAPPER_KEY] = wrapper
+        with self.resolve(wrapper):
+            self.context = replace(self.context, wrapper=wrapper)
+            try:
+                yield wrapper.module
+            finally:
+                self.context = replace(self.context, wrapper=oldwrapper)
 
     @m.leave(m.Module())
     def _update_imports(self, original_node: cst.Module, updated_node: cst.Module) -> cst.Module:

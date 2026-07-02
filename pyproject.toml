@@ -173,6 +173,10 @@ ignore = [
 "tests/abc/__init__.py" = [
   "A005",     # Module `abc` shadows a Python standard-library module
 ]
+"tests/abc/test_abc.py" = [
+  "ARG002",   # Unused method argument (libcst visitor signatures)
+  "N802",     # Function name `visit_Xyz`/`leave_Xyz` should be lowercase
+]
 
 [tool.ruff.lint.pydocstyle]
 # Use Google-style docstrings.
