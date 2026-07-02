@@ -66,6 +66,72 @@ All notable changes to this project will be documented in this file.
 - *(pre-commit)* Migrate hooks to s0undt3ch/pre-commit-hooks, pin tooling via mise, add Renovate
 - Provision all jobs via mise (jdx/mise-action)
 - Start testing under Python 3.14
+- *(release)* Update changelog for 0.14.0 release
+
+## [0.14.0](https://github.com/s0undt3ch/refine/releases/tag/0.14.0) - 2026-07-02
+
+### 🚀 Features
+
+- *(cache)* Add content-hash run cache module
+- *(cache)* Skip unchanged files on re-runs; add --no-cache
+- *(sqlfmt)* Add sqruff invocation backend
+- *(sqlfmt)* [**breaking**] Default to the sqruff backend, keep sqlfluff opt-in
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update dependency sqlfluff to v4 [security]
+- *(processor)* Preserve error exit for zero-file runs
+- *(pre-commit)* Run refine serially, it manages its own process pool
+- *(bench)* Fresh pre-commit copy, --select passthrough, surface subprocess failures
+- *(gates)* Eliminate gate false negatives; extract result tally
+- *(sqlfmt)* Surface backend formatting failures via codemod warnings
+- Address final review findings (cache poisoning, sqruff timeout, config-content cache key)
+- *(processor)* Make the atomic file write Windows-safe
+
+### 💼 Other
+
+- *(deps)* Bump actions/checkout from 4 to 5
+- *(deps)* Bump actions/setup-python from 5 to 6
+- *(deps)* Bump softprops/action-gh-release from 2.2.2 to 2.3.3
+- *(deps)* Bump softprops/action-gh-release from 2.3.3 to 2.3.4
+- *(deps)* Bump astral-sh/setup-uv from 6 to 7
+- *(deps)* Bump actions/upload-artifact from 4 to 5
+- *(deps)* Bump actions/checkout from 5 to 6
+- *(deps)* Bump softprops/action-gh-release from 2.3.4 to 2.5.0
+- *(deps)* Bump actions/cache from 4 to 5
+- *(deps)* Bump actions/upload-artifact from 5 to 6
+- *(deps)* Bump actions/upload-artifact from 6 to 7
+- *(deps)* Bump softprops/action-gh-release from 2.5.0 to 3.0.0
+- *(deps)* Bump the uv group across 1 directory with 4 updates
+- Drop the removed UP038 ruff rule from ignore list
+- *(deps)* Bump libcst to >=1.8.0,<1.9.0
+
+### 🚜 Refactor
+
+- *(sqlfmt)* Type backend as a StrEnum
+- *(processor)* Replace multiprocessing.Pool with concurrent.futures
+
+### ⚡ Performance
+
+- *(processor)* Cap pool size under pre-commit and extract job sizing
+- *(processor)* Use forkserver pool without per-chunk worker churn
+- Gate files on raw text before parsing; dispatch only real work to the pool
+- Evaluate codemod exclude patterns before reading or parsing files
+- [**breaking**] Resolve exactly the metadata each codemod declares
+- Share one MetadataWrapper per file across chained codemods
+
+### 🧪 Testing
+
+- Add end-to-end golden parity test over fixture corpus
+- Add benchmark harness for full/rerun/pre-commit scenarios
+- *(sqlfmt)* Share SQL fixture inputs across backends
+- Drop the benchmark harness from the tree
+
+### ⚙️ Miscellaneous Tasks
+
+- *(pre-commit)* Migrate hooks to s0undt3ch/pre-commit-hooks, pin tooling via mise, add Renovate
+- Provision all jobs via mise (jdx/mise-action)
+- Start testing under Python 3.14
 
 ## [0.13.1](https://github.com/s0undt3ch/refine/releases/tag/0.13.1) - 2025-07-29
 
