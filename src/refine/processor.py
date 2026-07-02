@@ -6,6 +6,7 @@ A fair chunk of this module just piggybacks on what libCST does, we just adapt t
 
 from __future__ import annotations
 
+import contextlib
 import fnmatch
 import itertools
 import logging
@@ -458,14 +459,27 @@ class Processor:
                 )
             if new_code != old_code:
                 try:
-                    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8") as wfh:
-                        wfh.write(new_code)
-                        # Ensure all data is written to disk
-                        wfh.flush()
-                        os.fsync(wfh.fileno())
-                        # Since the writing was successful, copy the temporary file over the file
-                        # we want to change
-                        shutil.copyfile(wfh.name, filename)
+                    # Write to a temporary file in the target's own directory, then
+                    # atomically replace the target. Keeping the temp file on the same
+                    # filesystem keeps ``os.replace`` atomic, and closing the handle
+                    # before the replace is required on Windows (an open temp file
+                    # cannot be replaced there).
+                    target_dir = os.path.dirname(filename) or "."
+                    tmp_fd, tmp_path = tempfile.mkstemp(dir=target_dir, suffix=".refine-tmp")
+                    try:
+                        with os.fdopen(tmp_fd, mode="w", encoding="utf-8") as wfh:
+                            wfh.write(new_code)
+                            # Ensure all data is written to disk
+                            wfh.flush()
+                            os.fsync(wfh.fileno())
+                        # Preserve the original file's permission bits before replacing it.
+                        shutil.copymode(filename, tmp_path)
+                        os.replace(tmp_path, filename)
+                    except BaseException:
+                        # Never leave a stray temporary file behind on failure.
+                        with contextlib.suppress(OSError):
+                            os.unlink(tmp_path)
+                        raise
                 except Exception as exc:
                     return ExecutionResult(
                         filename=filename,
