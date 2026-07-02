@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import subprocess
+
 import pytest
 
 from refine.mods.sql import sqruff_backend
@@ -49,3 +51,12 @@ def test_config_dir_overrides_bundled_config(tmp_path):
 def test_find_sqruff_returns_a_path():
     binary = sqruff_backend.find_sqruff()
     assert binary is not None
+
+
+def test_timeout_returns_none(monkeypatch):
+    def raise_timeout(*args, **kwargs):
+        raise subprocess.TimeoutExpired(cmd="sqruff", timeout=sqruff_backend.SQRUFF_TIMEOUT_SECONDS)
+
+    monkeypatch.setattr(subprocess, "run", raise_timeout)
+    result = sqruff_backend.format_sql("select a from t", dialect="ansi", max_line_length=120)
+    assert result is None

@@ -90,6 +90,12 @@ class FormatSQLConfig(BaseConfig, frozen=True):
             )
             raise InvalidConfigError(error_msg)
 
+    def cache_key_paths(self) -> list[str]:
+        paths = [self.sqlfluff_config_file]
+        if self.sqruff_config_file is not None:
+            paths.append(self.sqruff_config_file)
+        return paths
+
 
 class FormatSQL(BaseCodemod[FormatSQLConfig]):
     """

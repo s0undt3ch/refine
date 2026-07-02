@@ -249,8 +249,9 @@ class Processor:
                     continue
                 try:
                     wanted = codemod.should_process(source, filename)
-                except Exception:
+                except Exception as exc:
                     # Gates must fail open: never silently skip work.
+                    log.warning("Gate %s failed on %s; processing the file: %s", codemod.NAME, filename, exc)
                     wanted = True
                 if wanted:
                     applicable.append(codemod.NAME)
@@ -303,6 +304,9 @@ class Processor:
             chunk_size=chunk_size,
             env=os.environ,
         )
+        if work_items and jobs < 1:
+            error = "Must have at least one job to process!"
+            raise RefineSystemExit(code=1, message=error)
 
         inherited_dependencies: set[ProviderT] = set()
         for codemod in self.codemods:
@@ -367,7 +371,12 @@ class Processor:
         return tally.as_result()
 
     def _mark_clean_if_unchanged(self, result: ExecutionResult) -> None:
-        if self.cache is not None and isinstance(result.transform_result, TransformSuccess) and not result.changed:
+        if (
+            self.cache is not None
+            and isinstance(result.transform_result, TransformSuccess)
+            and not result.changed
+            and not result.transform_result.warning_messages
+        ):
             self.cache.mark_clean(result.filename, result.transform_result.code)
 
     def _process_path(self, metadata_manager: FullRepoManager | None, work: _Work) -> ExecutionResult:

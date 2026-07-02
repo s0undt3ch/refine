@@ -47,7 +47,17 @@ def compute_context_key(
         source_file = inspect.getsourcefile(codemod)
         if source_file and Path(source_file).exists():
             hasher.update(Path(source_file).read_bytes())
-        hasher.update(msgspec.json.encode(codemod_configs[codemod.NAME]))
+        codemod_config = codemod_configs[codemod.NAME]
+        hasher.update(msgspec.json.encode(codemod_config))
+        for cache_key_path in codemod_config.cache_key_paths():
+            path = Path(cache_key_path)
+            try:
+                hasher.update(path.read_bytes())
+            except OSError:
+                # Missing file: config validation already errors on this
+                # elsewhere; fall back to hashing the path string so the key
+                # is still deterministic.
+                hasher.update(cache_key_path.encode())
     return hasher.hexdigest()
 
 

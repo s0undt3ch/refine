@@ -40,6 +40,16 @@ class BaseConfig(msgspec.Struct, kw_only=True, frozen=True, forbid_unknown_field
     List of glob patterns to exclude paths from being processed.
     """
 
+    def cache_key_paths(self) -> list[str]:
+        """
+        Paths of external files whose CONTENTS affect this codemod's output.
+
+        The run cache hashes these files' bytes into its context key so
+        editing them invalidates cached results. Override in configs that
+        reference external configuration files.
+        """
+        return []
+
 
 CodemodConfigType = TypeVar("CodemodConfigType", bound=BaseConfig)
 
