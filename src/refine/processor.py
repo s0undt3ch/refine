@@ -57,6 +57,16 @@ log = logging.getLogger(__name__)
 PRE_COMMIT_MAX_JOBS = 2
 
 
+def _get_pool_context() -> multiprocessing.context.BaseContext:
+    if sys.platform == "win32":
+        return multiprocessing.get_context("spawn")
+    context = multiprocessing.get_context("forkserver")
+    # Import the heavy modules once in the forkserver parent; every worker
+    # forks from it instead of re-importing per process.
+    context.set_forkserver_preload(["refine.processor"])
+    return context
+
+
 def _compute_jobs(*, configured_pool_size: int, total_files: int, chunk_size: int, env: Mapping[str, str]) -> int:
     jobs = min(configured_pool_size, (total_files + chunk_size - 1) // chunk_size)
     if "PRE_COMMIT" in env:
@@ -136,9 +146,10 @@ class Processor:
             jobs = 1
             pool_impl = DummyPool
         else:
-            pool_impl = partial(multiprocessing.Pool, maxtasksperchild=chunk_size)
-            # Warm the parser, pre-fork.
-            cst.parse_module("")
+            # No maxtasksperchild: workers live for the whole run instead of
+            # being killed and re-spawned (and re-importing everything) every
+            # few tasks.
+            pool_impl = partial(_get_pool_context().Pool)
 
         inherited_dependencies: set[ProviderT] = set()
         for codemod in self.codemods:
