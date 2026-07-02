@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
+from refine.exc import RefineSystemExit
 from refine.mods.cli.flags import CliDashes
 from refine.processor import Processor
 from refine.processor import _compute_jobs
@@ -82,3 +83,17 @@ def test_compute_jobs_pre_commit_env_does_not_raise_floor():
 
 def test_compute_jobs_zero_files_returns_zero():
     assert _compute_jobs(configured_pool_size=8, total_files=0, chunk_size=4, env={}) == 0
+
+
+def test_process_zero_files_raises():
+    config = MagicMock()
+    config.repo_root = "."
+    config.process_pool_size = 1
+    config.hide_progress = True
+    config.__remaining_config__ = {}
+
+    registry = MagicMock()
+    codemods = [CliDashes]
+    processor = Processor(config=config, registry=registry, codemods=codemods)
+    with pytest.raises(RefineSystemExit):
+        processor.process([])
