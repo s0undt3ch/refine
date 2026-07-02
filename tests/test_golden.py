@@ -21,9 +21,19 @@ from refine.registry import Registry
 TESTS_DIR = Path(__file__).parent
 
 CORPUS = [
-    # (fixture directory, codemod name)
-    (TESTS_DIR / "mods" / "cli" / "files" / "flags", "cli-dashes-over-underscores"),
-    (TESTS_DIR / "mods" / "sql" / "files" / "fmt", "sqlfmt"),
+    # (input directory, codemod name, expected-output directory)
+    (
+        TESTS_DIR / "mods" / "cli" / "files" / "flags",
+        "cli-dashes-over-underscores",
+        TESTS_DIR / "mods" / "cli" / "files" / "flags",
+    ),
+    # The sqlfmt inputs are shared; this golden gate exercises the sqlfluff
+    # backend, so it reads the expected output from the sqlfluff subdirectory.
+    (
+        TESTS_DIR / "mods" / "sql" / "files" / "fmt",
+        "sqlfmt",
+        TESTS_DIR / "mods" / "sql" / "files" / "fmt" / "sqlfluff",
+    ),
 ]
 
 
@@ -34,11 +44,11 @@ def _dedent(path: Path) -> str:
 
 
 def _collect_cases():
-    for fixture_dir, codemod_name in CORPUS:
-        for original in sorted(fixture_dir.glob("*.py")):
+    for input_dir, codemod_name, expected_dir in CORPUS:
+        for original in sorted(input_dir.glob("*.py")):
             if original.stem.endswith(".updated"):
                 continue
-            updated = original.with_stem(f"{original.stem}.updated")
+            updated = expected_dir / f"{original.stem}.updated.py"
             if not updated.exists():
                 continue
             yield pytest.param(original, updated, codemod_name, id=f"{codemod_name}/{original.stem}")
