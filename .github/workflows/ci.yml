@@ -11,56 +11,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
-      - name: Install Python
-        uses: actions/setup-python@v6
+      - name: Set up mise & virtualenv
+        uses: ./.github/actions/setup-virtualenv
         with:
-          python-version: 3.11
-
-      - name: Install Package dependencies
-        run: |
-          pip install pre-commit
-
-      - name: Get Python version checksum
-        id: python-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(python --version --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Get Pre-Commit version checksum
-        id: pre-commit-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(pre-commit --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Set up cache
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/pre-commit
-          key: >-
-            venv|
-            ${{ runner.os }}|
-            pre-commit|
-            ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
-            ${{ steps.pre-commit-version-checksum.outputs.version-sha256sum }}|
-            ${{ hashFiles('**/uv.lock') }}
-
-      - name: Install Pre-commit Hooks
-        env:
-          PRE_COMMIT_COLOR: always
-        run: |
-          pre-commit install --install-hooks
+          cache-prefix: pre-commit
 
       - name: Run Pre-commit
-        env:
-          PRE_COMMIT_COLOR: always
         run: |
-          pre-commit run --show-diff-on-failure --color=always --all-files
+          prek run --show-diff-on-failure --color=always --all-files
 
   tests:
     name: Test
@@ -83,52 +43,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Install Python
-        uses: actions/setup-python@v6
+      - name: Set up mise & virtualenv
+        uses: ./.github/actions/setup-virtualenv
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install System Dependencies
-        if: ${{ contains(runner.os, 'mac') }}
-        run: |
-           brew install coreutils
-
-      - name: Get Python version checksum
-        id: python-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(python --version --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Get UV version checksum
-        id: uv-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(uv --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Set up cache
-        uses: actions/cache@v5
-        with:
-          path: .venv
-          key: >-
-            venv|
-            ${{ runner.os }}|
-            tests|
-            ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
-            ${{ steps.uv-version-checksum.outputs.version-sha256sum }}|
-            ${{ hashFiles('**/uv.lock') }}
-
-      - name: Install Dependencies
-        run: |
-          uv sync --all-extras --dev
+          cache-prefix: tests
 
       - name: Run Tests
         run: |
@@ -152,53 +73,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-
-      - name: Install Python
-        uses: actions/setup-python@v6
+      - name: Set up mise & virtualenv
+        uses: ./.github/actions/setup-virtualenv
         with:
-          python-version: "3.11"
-
-      - name: Get Python version checksum
-        id: python-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(python --version --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Get UV version checksum
-        id: uv-version-checksum
-        shell: bash
-        run: |
-          VERSION_SHA256SUM=$(uv --version | sha256sum | cut -d ' ' -f 1)
-          echo "VERSION_SHA256SUM=$VERSION_SHA256SUM"
-          echo "version-sha256sum=$VERSION_SHA256SUM" >> "$GITHUB_OUTPUT"
-
-      - name: Set up cache
-        uses: actions/cache@v5
-        with:
-          path: .venv
-          key: >-
-            venv|
-            ${{ runner.os }}|
-            docs|
-            ${{ steps.python-version-checksum.outputs.version-sha256sum }}|
-            ${{ steps.uv-version-checksum.outputs.version-sha256sum }}|
-            ${{ hashFiles('**/uv.lock') }}
-
-      - name: Install Dependencies
-        run: |
-          uv sync --group docs
+          cache-prefix: docs
+          uv-sync-args: --group docs
 
       - name: Build MkDocs site
         run: uv run mkdocs build
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
