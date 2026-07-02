@@ -123,14 +123,6 @@ ignore = [
   "PLR0913",  # Too many arguments in function definition
   "PLR0915",  # Too many statements
 ]
-"src/refine/mods/*.py" = [
-  "ARG002",   #  Unused method argument
-  "ARG003",   #  Unused class method argument
-  "D100",     # Missing docstring in public module
-  "D101",     # Missing docstring in public class
-  "D102",     # Missing docstring in public method
-  "N802",     # Function name `leave_Xyz` should be lowercase
-]
 "src/refine/mods/**/*.py" = [
   "ARG002",   #  Unused method argument
   "ARG003",   #  Unused class method argument
@@ -147,7 +139,6 @@ ignore = [
   "BLE001",   # Do not catch blind exception: `Exception`
   "PLR0913",  # Too many arguments in function definition"
   "PLR0911",  # Too many return statements (7 > 6)"
-  "PLR0915",  # Too many statements
 ]
 "src/refine/testing.py" = [
   "D101",     # Missing docstring in public class

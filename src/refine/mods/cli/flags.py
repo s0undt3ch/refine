@@ -44,7 +44,7 @@ class CliDashes(BaseCodemod):
     NAME = "cli-dashes-over-underscores"
     CONFIG_CLS = CliDashesConfig
 
-    _GATE_RE = re.compile(r"--\w+_\w")
+    _GATE_RE = re.compile(r"--\S*_")
 
     @classmethod
     def should_process(cls, source: str, filename: str) -> bool:

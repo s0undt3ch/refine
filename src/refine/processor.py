@@ -101,6 +101,62 @@ class ParallelTransformResult:
     changed: int
 
 
+class _ResultTally:
+    """
+    Accumulates per-file processing outcomes for a single :meth:`Processor.process` run.
+    """
+
+    def __init__(self) -> None:
+        self.successes: int = 0
+        self.failures: int = 0
+        self.warnings: int = 0
+        self.skips: int = 0
+        self.changed: int = 0
+
+    def account(self, result: ExecutionResult, progress: Progress, *, repo_root: str, fail_fast: bool) -> bool:
+        """
+        Update the running counters for one result.
+
+        Returns True when processing should stop (fail_fast tripped).
+        """
+        # Print an execution result, keep track of failures
+        _print_parallel_result(
+            result,
+            progress,
+            repo_root=repo_root,
+            unified_diff=False,
+            show_changed=True,
+            show_successes=False,
+            hide_generated=True,
+            hide_blacklisted=True,
+        )
+        progress.print(self.successes + self.failures + self.skips)
+
+        if isinstance(result.transform_result, TransformFailure):
+            self.failures += 1
+        elif isinstance(result.transform_result, TransformSuccess):
+            self.successes += 1
+            if result.changed:
+                self.changed += 1
+        elif isinstance(result.transform_result, (TransformExit, TransformSkip)):
+            self.skips += 1
+
+        if isinstance(result.transform_result, TransformFailure) and fail_fast:
+            return True
+
+        self.warnings += len(result.transform_result.warning_messages)
+        return False
+
+    def as_result(self) -> ParallelTransformResult:
+        return ParallelTransformResult(
+            successes=self.successes,
+            failures=self.failures,
+            skips=self.skips,
+            warnings=self.warnings,
+            changed=self.changed,
+        )
+
+
 class Processor:
     """
     Refine codemod processor.
@@ -216,46 +272,7 @@ class Processor:
         )
         metadata_manager.resolve_cache()
 
-        successes: int = 0
-        failures: int = 0
-        warnings: int = 0
-        skips: int = 0
-        changed: int = 0
-
-        def _account(result: ExecutionResult) -> bool:
-            """
-            Update the running counters for one result.
-
-            Returns True when processing should stop (fail_fast tripped).
-            """
-            nonlocal successes, failures, warnings, skips, changed
-            # Print an execution result, keep track of failures
-            _print_parallel_result(
-                result,
-                progress,
-                repo_root=self.config.repo_root,
-                unified_diff=False,
-                show_changed=True,
-                show_successes=False,
-                hide_generated=True,
-                hide_blacklisted=True,
-            )
-            progress.print(successes + failures + skips)
-
-            if isinstance(result.transform_result, TransformFailure):
-                failures += 1
-            elif isinstance(result.transform_result, TransformSuccess):
-                successes += 1
-                if result.changed:
-                    changed += 1
-            elif isinstance(result.transform_result, (TransformExit, TransformSkip)):
-                skips += 1
-
-            if isinstance(result.transform_result, TransformFailure) and self.config.fail_fast:
-                return True
-
-            warnings += len(result.transform_result.warning_messages)
-            return False
+        tally = _ResultTally()
 
         if not work_items:
             # Every file was gated out before parsing: nothing to dispatch,
@@ -263,7 +280,9 @@ class Processor:
             # but that must not raise: the original file list wasn't empty).
             try:
                 for result in pre_results:
-                    if _account(result):
+                    if tally.account(
+                        result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast
+                    ):
                         break
             finally:
                 progress.clear()
@@ -288,15 +307,15 @@ class Processor:
                             partial(self._process_path, metadata_manager), work_items, chunksize=chunk_size
                         ),
                     ):
-                        if _account(result):
+                        if tally.account(
+                            result, progress, repo_root=self.config.repo_root, fail_fast=self.config.fail_fast
+                        ):
                             break
                 finally:
                     progress.clear()
 
         # Return whether there was one or more failure.
-        return ParallelTransformResult(
-            successes=successes, failures=failures, skips=skips, warnings=warnings, changed=changed
-        )
+        return tally.as_result()
 
     def _process_path(self, metadata_manager: FullRepoManager, work: _Work) -> ExecutionResult:
         filename = work.filename

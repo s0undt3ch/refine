@@ -48,3 +48,8 @@ def test_should_process_true_for_sql_text():
 def test_should_process_false_without_sql_keywords():
     src = "def add(a, b):\n    return a + b\n"
     assert FormatSQL.should_process(src, "x.py") is False
+
+
+def test_should_process_true_for_multiline_update_set():
+    src = 'QUERY = """\nupdate foo\nset bar = 1\nwhere baz = 2\n"""\n'
+    assert FormatSQL.should_process(src, "x.py") is True

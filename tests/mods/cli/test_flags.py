@@ -46,3 +46,11 @@ def test_should_process_true_for_underscore_flag():
 
 def test_should_process_false_without_underscore_flags():
     assert CliDashes.should_process('parser.add_argument("--dry-run")\n', "x.py") is False
+
+
+def test_should_process_true_for_leading_underscore_flag():
+    assert CliDashes.should_process('parser.add_argument("--_debug")\n', "x.py") is True
+
+
+def test_should_process_true_for_trailing_underscore_flag():
+    assert CliDashes.should_process('parser.add_argument("--verbose_")\n', "x.py") is True
