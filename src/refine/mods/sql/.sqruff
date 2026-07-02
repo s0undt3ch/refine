@@ -1,0 +1,57 @@
+[sqruff]
+dialect = ansi
+templater = placeholder
+max_line_length = 120
+
+[sqruff:templater:placeholder]
+param_style = pyformat
+
+[sqruff:indentation]
+allow_implicit_indents = True
+indented_joins = True
+tab_space_size = 4
+indent_unit = space
+
+# The default configuration for capitalisation rules is "consistent"
+# which will auto-detect the setting from the rest of the file. This
+# is less desirable in a new project and you may find this (slightly
+# more strict) setting more useful.
+# Typically we find users rely on syntax highlighting rather than
+# capitalisation to distinguish between keywords and identifiers.
+# Clearly, if your organisation has already settled on uppercase
+# formatting for any of these syntax elements then set them to "upper".
+# See https://stackoverflow.com/questions/608196/why-should-i-capitalize-my-sql-keywords-is-there-a-good-reason
+[sqruff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+[sqruff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+[sqruff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+[sqruff:rules:capitalisation.literals]
+capitalisation_policy = lower
+[sqruff:rules:capitalisation.types]
+extended_capitalisation_policy = lower
+
+# --- Dropped/unsupported relative to src/refine/mods/sql/.sqlfluff ---
+#
+# - `[sqlfluff] processes = -1`: sqruff's CLI has no `processes` config key
+#   (it is not multi-process the way sqlfluff is); dropped, no equivalent.
+#
+# - `[sqlfluff:rules:aliasing.length] min_alias_length = 3` (rule AL06):
+#   sqruff implements AL06, but it is *not* auto-fixable in sqruff 0.38 --
+#   `sqruff fix` leaves it as a reported-but-unfixed violation, which makes
+#   the process exit non-zero even though the query was otherwise handled
+#   correctly. Since format_sql() treats a non-zero exit as "sqruff could
+#   not fix this query" (see sqruff_backend.py), enabling this rule would
+#   make format_sql() spuriously return None for extremely common SQL
+#   (e.g. any table aliased to a single letter like `t`). Dropped to keep
+#   the exit-code-based success signal meaningful. Verified via spike:
+#   `select t.a from tablename as t` with this rule enabled fixes to
+#   the same text but exits 1 solely because of the unfixed AL06 finding.
+#
+# - `[sqlfluff:rules:convention.not_equal] preferred_not_equal_style = c_style`
+#   (rule CV01): CV01 exists in sqruff but is not part of its default
+#   enabled rule set (only reachable via `rules = all`), and enabling
+#   `rules = all` in sqruff 0.38 triggers a Rust panic in an unrelated
+#   rule (crates/lib/src/rules/convention/cv05.rs) on ordinary input,
+#   crashing the whole fix. Dropped as unsupported in this sqruff version.
