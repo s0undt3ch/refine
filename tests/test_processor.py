@@ -3,21 +3,26 @@ from __future__ import annotations
 import logging
 import pathlib
 import shutil
+import sys
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 
+from refine.config import Config
 from refine.exc import RefineSystemExit
 from refine.mods.cli.flags import CliDashes
 from refine.processor import Processor
 from refine.processor import _compute_jobs
+from refine.processor import _get_pool_context
+from refine.registry import Registry
 
 log = logging.getLogger(__name__)
 
 TESTS_DIR = pathlib.Path(__file__).parent.resolve()
 TEST_FILE_PATH = TESTS_DIR / "mods/cli/files/flags/annotated-function.py"
 TEST_FILE_UPDATED_PATH = TESTS_DIR / "mods/cli/files/flags/annotated-function.updated.py"
+FIXTURES = TESTS_DIR / "mods" / "cli" / "files" / "flags"
 
 
 @pytest.mark.skip_on_windows
@@ -97,3 +102,46 @@ def test_process_zero_files_raises():
     processor = Processor(config=config, registry=registry, codemods=codemods)
     with pytest.raises(RefineSystemExit):
         processor.process([])
+
+
+def test_pool_context_platform_selection():
+    ctx = _get_pool_context()
+    if sys.platform == "win32":
+        assert ctx.get_start_method() == "spawn"
+    else:
+        assert ctx.get_start_method() == "forkserver"
+
+
+def _fixture_pairs():
+    for path in sorted(FIXTURES.glob("*.py")):
+        if path.stem.endswith(".updated"):
+            continue
+        updated = path.with_stem(f"{path.stem}.updated")
+        if updated.exists():
+            yield path, updated
+
+
+def test_pooled_run_matches_dummy_pool_run(tmp_path):
+    # Lay out >4 copies of fixture files so the real multiprocessing pool engages.
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["cli-dashes-over-underscores"]))
+    assert codemods
+
+    work_files = []
+    expected = {}
+    for i in range(3):  # 3 copies of each fixture -> well over one chunk
+        for original, updated in _fixture_pairs():
+            target = tmp_path / f"copy{i}" / original.name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(original, target)
+            work_files.append(target)
+            expected[target] = updated.read_text()
+
+    config = Config.from_dict({"repo_root": str(tmp_path), "process_pool_size": 2, "hide_progress": True})
+    processor = Processor(config=config, registry=registry, codemods=codemods)
+    result = processor.process(work_files)
+
+    assert result.failures == 0
+    for target, expected_content in expected.items():
+        assert target.read_text() == expected_content, f"mismatch for {target}"
