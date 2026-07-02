@@ -295,3 +295,36 @@ def test_warned_results_are_not_cached(tmp_path, monkeypatch):
     # Second run must NOT be a cache hit: the gate/codemod must run again (warn again).
     result2 = Processor(config=config, registry=registry, codemods=codemods).process([target])
     assert result2.warnings > 0
+
+
+@pytest.mark.skip_on_windows
+def test_fail_fast_stops_before_later_files(tmp_path):
+    # process_pool_size=1 -> jobs=1 -> _SyncExecutor, so work items run in a
+    # deterministic (sorted) order. _files is sorted, so "aaa_broken.py" is
+    # processed before "zzz_valid.py". Both pass the cli-dashes gate (they
+    # contain a "--foo_bar" flag), so both are dispatched rather than gated out.
+    broken = tmp_path / "aaa_broken.py"
+    broken.write_text('parser.add_argument("--dry_run"\n')  # missing ")" -> parse failure
+    valid = tmp_path / "zzz_valid.py"
+    valid.write_text('parser.add_argument("--dry_run")\n')  # would become "--dry-run"
+
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["cli-dashes-over-underscores"]))
+
+    config = Config.from_dict(
+        {
+            "repo_root": str(tmp_path),
+            "process_pool_size": 1,
+            "hide_progress": True,
+            "fail_fast": True,
+            "cache": False,
+        }
+    )
+    with patch("refine.processor._print_parallel_result", MagicMock()):
+        result = Processor(config=config, registry=registry, codemods=codemods).process([broken, valid])
+
+    assert result.failures == 1
+    assert result.changed == 0
+    # fail_fast stopped before the valid file was transformed/written.
+    assert valid.read_text() == 'parser.add_argument("--dry_run")\n'
