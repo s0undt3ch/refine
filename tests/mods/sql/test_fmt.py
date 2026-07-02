@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import pathlib
 
+import libcst as cst
 import pytest
+from libcst.codemod import CodemodContext
 
 from refine.exc import InvalidConfigError
+from refine.mods.sql import sqruff_backend
 from refine.mods.sql.fmt import FormatSQL
 from refine.mods.sql.fmt import FormatSQLConfig
 from refine.testing import Modcase
@@ -83,3 +86,15 @@ def test_sqlfluff_backend_is_accepted():
 def test_unknown_backend_is_rejected():
     with pytest.raises(InvalidConfigError):
         FormatSQLConfig(backend="handwriting")
+
+
+def test_backend_failure_warns_and_leaves_query_unchanged(monkeypatch):
+    monkeypatch.setattr(sqruff_backend, "format_sql", lambda *_args, **_kwargs: None)
+
+    source = 'QUERY = "SELECT a FROM b"\n'
+    context = CodemodContext(filename="x.py")
+    mod = FormatSQL(context=context, config=FormatSQLConfig(backend="sqruff"))
+    mod.transform_module(cst.parse_module(source))
+
+    assert context.warnings, "backend failure must surface via context.warnings"
+    assert any("could not format" in w for w in context.warnings)
