@@ -7,6 +7,7 @@ import sys
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import libcst
 import pytest
 
 from refine.config import Config
@@ -145,3 +146,29 @@ def test_pooled_run_matches_dummy_pool_run(tmp_path):
     assert result.failures == 0
     for target, expected_content in expected.items():
         assert target.read_text() == expected_content, f"mismatch for {target}"
+
+
+def test_gated_out_files_are_never_parsed(tmp_path, monkeypatch):
+    target = tmp_path / "plain.py"
+    target.write_text("def add(a, b):\n    return a + b\n")
+
+    registry = Registry()
+    registry.load([])
+    codemods = list(registry.codemods(select_codemods=["sqlfmt"]))
+
+    parse_calls = []
+    real_parse = libcst.parse_module
+
+    def counting_parse(*args, **kwargs):
+        parse_calls.append(args)
+        return real_parse(*args, **kwargs)
+
+    monkeypatch.setattr("refine.processor.cst.parse_module", counting_parse)
+
+    config = Config.from_dict({"repo_root": str(tmp_path), "process_pool_size": 1, "hide_progress": True})
+    processor = Processor(config=config, registry=registry, codemods=codemods)
+    result = processor.process([target])
+
+    assert result.failures == 0
+    assert result.successes == 1  # gated-out counts as a clean success
+    assert parse_calls == []

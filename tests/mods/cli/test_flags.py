@@ -38,3 +38,11 @@ def dash_case(request) -> Modcase:
 
 def test_cli_flags(dash_case: Modcase):
     dash_case.assert_codemod()
+
+
+def test_should_process_true_for_underscore_flag():
+    assert CliDashes.should_process('parser.add_argument("--dry_run")\n', "x.py") is True
+
+
+def test_should_process_false_without_underscore_flags():
+    assert CliDashes.should_process('parser.add_argument("--dry-run")\n', "x.py") is False

@@ -38,3 +38,13 @@ def fmt_case(request) -> Modcase:
 
 def test_format_sql(fmt_case: Modcase):
     fmt_case.assert_codemod()
+
+
+def test_should_process_true_for_sql_text():
+    src = 'QUERY = "SELECT name FROM users WHERE id = 1"\n'
+    assert FormatSQL.should_process(src, "x.py") is True
+
+
+def test_should_process_false_without_sql_keywords():
+    src = "def add(a, b):\n    return a + b\n"
+    assert FormatSQL.should_process(src, "x.py") is False

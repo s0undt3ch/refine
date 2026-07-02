@@ -42,6 +42,15 @@ SQL_RE = re.compile(
 )
 
 
+#: Cheap raw-source hint used by the pre-parse gate. Deliberately broader
+#: than SQL_RE (which anchors at string starts): any SQL keyword anywhere
+#: in the file text is enough to warrant a parse.
+RAW_SQL_HINT_RE = re.compile(
+    r"\bselect\s|\bdelete\s+from\s|\binsert\s+into\s|\bupdate\s.*\bset\s|\bexists\s*\(",
+    re.IGNORECASE,
+)
+
+
 def is_sql_query(node: cst.CSTNode) -> bool:
     return match_sql_query(node) is not None
 

@@ -108,6 +108,17 @@ class BaseCodemod(VisitorBasedCodemodCommand, ABC, Generic[CodemodConfigType]):
             assert doc is not None
         return doc.strip().splitlines()[0].strip()
 
+    @classmethod
+    def should_process(cls, source: str, filename: str) -> bool:
+        """
+        Cheap raw-text gate called BEFORE the file is parsed.
+
+        Return ``False`` only when this codemod provably cannot change the
+        file (false positives are fine, false negatives are forbidden).
+        The default is to always process.
+        """
+        return True
+
     def add_import(self, module: str, obj: str | None = None, asname: str | None = None) -> None:
         """
         Schedule an import to be added to the updated module, if not already present.
