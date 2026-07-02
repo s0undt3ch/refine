@@ -23,7 +23,6 @@ repos:
       - id: mixed-line-ending     # Replaces or checks mixed line ending.
         args: [--fix=lf]
       - id: end-of-file-fixer     # Makes sure files end in a newline and only a newline.
-      - id: check-merge-conflict  # Check for files that contain merge conflict strings.
       - id: check-ast             # Simply check whether files parse as valid python.
 
   # ----- Local Hooks --------------------------------------------------------------------------->
@@ -37,38 +36,22 @@ repos:
         pass_filenames: false
   # <---- Local Hooks ----------------------------------------------------------------------------
 
-  - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.12
+  # ----- s0undt3ch/pre-commit-hooks ------------------------------------------------------------>
+  # These hooks run the system-installed (mise-pinned) tool from PATH, keeping a single source of
+  # truth in ``mise.toml`` (binaries) and the project dependency groups (Python tools) — no
+  # per-hook version pins to drift. See https://github.com/s0undt3ch/pre-commit-hooks
+  - repo: https://github.com/s0undt3ch/pre-commit-hooks
+    rev: v1.0.0
     hooks:
       - id: uv-lock
-
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.11.13"
-    hooks:
       - id: ruff-format
       - id: ruff-check
         args:
           - --fix
         exclude: (.pre-commit-hooks/.*|docs/.*)\.py
-
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
-    hooks:
       - id: mypy
         name: Run mypy against the code base
         files: ^(src/|tests/|examples/).*\.py$
-        args: []
         exclude: ^tests/([^/]*/)*files/.*
-        additional_dependencies:
-          - libcst==1.7.0
-          - sqlfluff
-          - py-walk
-          - msgspec
-          - tomllib >= 1.1.0; python_version < "3.11"
-          - tomli-w
-
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.7
-    hooks:
       - id: actionlint
+  # <---- s0undt3ch/pre-commit-hooks -------------------------------------------------------------

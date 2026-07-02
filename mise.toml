@@ -1,0 +1,13 @@
+[tools]
+python = "3.11.11"
+actionlint = "1.7.12"
+shellcheck = "0.11.0"
+prek = "0.4.5"
+ruff = "0.15.17"
+uv = "0.11.25"
+
+[env]
+'_'.python.venv = {path = ".venv", create = true, uv_create_args = ['--seed']}
+
+[settings]
+python.uv_venv_auto = true
