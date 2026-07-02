@@ -59,7 +59,7 @@ def test_golden_end_to_end(tmp_path, original, updated, codemod_name):
             "repo_root": str(tmp_path),
             "process_pool_size": 1,
             "hide_progress": True,
-            "sqlfmt": {"dialect": "mysql"},
+            "sqlfmt": {"backend": "sqlfluff", "dialect": "mysql"},
         }
     )
     processor = Processor(config=config, registry=registry, codemods=codemods)

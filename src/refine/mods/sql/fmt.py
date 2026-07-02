@@ -22,6 +22,7 @@ from refine import utils
 from refine.abc import BaseCodemod
 from refine.abc import BaseConfig
 from refine.exc import InvalidConfigError
+from refine.mods.sql import sqruff_backend
 
 from .utils import RAW_SQL_HINT_RE
 from .utils import cst_module_has_query_strings
@@ -47,9 +48,19 @@ class FormatSQLConfig(BaseConfig, frozen=True):
     dialect: str = "ansi"
     """The SQL dialect to use when formatting the SQL queries."""
 
+    backend: str = "sqruff"
+    """The formatting backend: ``sqruff`` (fast, default) or ``sqlfluff``."""
+
     sqlfluff_config_file: str = str(BUILNTIN_SQLFLUFF_CONFIG_FILE)
     """
     The path to a sqlfluff configuration file.
+
+    If not provided, a default, opionated, configuration will be used.
+    """
+
+    sqruff_config_file: str | None = None
+    """
+    The path to a ``.sqruff`` configuration file.
 
     If not provided, a default, opionated, configuration will be used.
     """
@@ -58,9 +69,20 @@ class FormatSQLConfig(BaseConfig, frozen=True):
         """
         This method can implement additional codemod initialization.
         """
+        if self.backend not in ("sqruff", "sqlfluff"):
+            error_msg = f"Unsupported sqlfmt backend: {self.backend}. Choose 'sqruff' or 'sqlfluff'."
+            raise InvalidConfigError(error_msg)
         if not pathlib.Path(self.sqlfluff_config_file).exists():
             error_msg = f"SQLFluff config file not found: {self.sqlfluff_config_file}"
             raise InvalidConfigError(error_msg)
+        if self.sqruff_config_file is not None:
+            sqruff_config_path = pathlib.Path(self.sqruff_config_file)
+            if not sqruff_config_path.exists():
+                error_msg = f"Sqruff config file not found: {self.sqruff_config_file}"
+                raise InvalidConfigError(error_msg)
+            if sqruff_config_path.name != ".sqruff":
+                error_msg = f"Sqruff config file must be named '.sqruff', got: {self.sqruff_config_file}"
+                raise InvalidConfigError(error_msg)
         if self.dialect not in SUPPORTED_SQLFLUFF_DIALECTS:
             error_msg = (
                 f"Unsupported SQL dialect: {self.dialect}. Supported dialects are: "
@@ -169,27 +191,21 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
         return get_simple_config(config_path=str(self.config.sqlfluff_config_file))
 
     def __format_sql(self, query: str, indent: int) -> str:
-        # We want a copy of the config so that we can modify it
-        config = self.__get_sqlfluff_config().copy()
         starting_newline: str = (query.startswith("\n") and "\n") or ""
         if starting_newline:
             query = query[1:]
 
         query = utils.remove_leading_whitespace(query)
 
-        # Since we will need to indent code, and still want sqlfluff to respect it's max width setting
-        config.set_value("max_linelength", config.get("max_line_length") - indent)
+        if self.config.backend == "sqruff":
+            formated = self.__format_sql_sqruff(query, indent=indent)
+        else:
+            formated = self.__format_sql_sqlfluff(query, indent=indent)
+        if formated is None:
+            # Backend could not fix the query: leave it untouched and warn.
+            log.warning("sqlfmt(%s) could not format a query; leaving it unchanged", self.config.backend)
+            formated = query.rstrip()
 
-        formated = (
-            sqlfluff.api.fix(
-                query,
-                dialect="mysql",
-                config=config,
-                fix_even_unparsable=False,
-            )
-            # Remove the ending newline
-            .rstrip()
-        )
         if "\n" not in formated:
             # If the query is a single line, we don't need to indent it
             log.debug("Formatted SQL Query >>>>>>>>>%s<<<<<<<<<<<<<<", formated)
@@ -203,3 +219,32 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
             indent_query += "\n"
         log.debug("Indented SQL Query >>>>>>>>>\n%s\n<<<<<<<<<<<<<<", indent_query)
         return indent_query
+
+    def __format_sql_sqlfluff(self, query: str, indent: int) -> str | None:
+        # We want a copy of the config so that we can modify it
+        config = self.__get_sqlfluff_config().copy()
+        # Since we will need to indent code, and still want sqlfluff to respect
+        # its max width setting
+        config.set_value("max_linelength", config.get("max_line_length") - indent)
+        return (
+            sqlfluff.api.fix(
+                query,
+                dialect=self.config.dialect,
+                config=config,
+                fix_even_unparsable=False,
+            )
+            # Remove the ending newline
+            .rstrip()
+        )
+
+    def __format_sql_sqruff(self, query: str, indent: int) -> str | None:
+        max_line_length = self.__get_sqlfluff_config().get("max_line_length") - indent
+        config_dir = None
+        if self.config.sqruff_config_file is not None:
+            config_dir = pathlib.Path(self.config.sqruff_config_file).parent
+        return sqruff_backend.format_sql(
+            query,
+            dialect=self.config.dialect,
+            max_line_length=max_line_length,
+            config_dir=config_dir,
+        )
