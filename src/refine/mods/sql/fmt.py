@@ -203,7 +203,7 @@ class FormatSQL(BaseCodemod[FormatSQLConfig]):
             formated = self.__format_sql_sqlfluff(query, indent=indent)
         if formated is None:
             # Backend could not fix the query: leave it untouched and warn.
-            log.warning("sqlfmt(%s) could not format a query; leaving it unchanged", self.config.backend)
+            self.warn(f"sqlfmt({self.config.backend}) could not format a query; leaving it unchanged")
             formated = query.rstrip()
 
         if "\n" not in formated:
