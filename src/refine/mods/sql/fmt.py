@@ -15,9 +15,7 @@ from typing import TYPE_CHECKING
 from typing import cast
 
 import libcst as cst
-import sqlfluff.api
 from libcst.metadata import WhitespaceInclusivePositionProvider
-from sqlfluff.api.simple import get_simple_config
 
 from refine import utils
 from refine.abc import BaseCodemod
@@ -29,11 +27,16 @@ from .utils import RAW_SQL_HINT_RE
 from .utils import cst_module_has_query_strings
 from .utils import is_sql_query
 
+# Quiet sqlfluff's logging *before* importing it: sqlfluff emits INFO logs at
+# import time (e.g. "Rust extensions are not available. Using PyLexer.") that
+# would otherwise leak into refine's output.
+logging.getLogger("sqlfluff").setLevel(logging.WARNING)
+
+import sqlfluff.api  # noqa: E402
+from sqlfluff.api.simple import get_simple_config  # noqa: E402
+
 if TYPE_CHECKING:
     from sqlfluff.core import FluffConfig
-
-# Quiet down sqlfluff logs during tests
-logging.getLogger("sqlfluff").setLevel(logging.WARNING)
 
 log = logging.getLogger(__name__)
 
