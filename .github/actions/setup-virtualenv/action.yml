@@ -58,7 +58,7 @@ runs:
     # that determine its contents. No runtime version probing (which would need
     # `sha256sum`, absent on macOS runners).
     - name: Set up .venv cache
-      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
       with:
         path: .venv
         key: >-
