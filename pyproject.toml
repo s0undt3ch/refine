@@ -14,7 +14,7 @@ template = "# Version attribute defined and written at build time\n\n__version__
 name = "refine"
 description = "Polishing and improving codebases automatically"
 authors = [{ name = "Pedro Algarvio", email = "pedro@algarvio.me" }]
-requires-python = ">3.11,<4"
+requires-python = ">=3.11,<4"
 readme = "README.md"
 license = "Apache-2.0"
 dynamic = ["version"]
