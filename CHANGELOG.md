@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.14.1](https://github.com/s0undt3ch/refine/releases/tag/0.14.1) - 2026-07-06
+
+### 🐛 Bug Fixes
+
+- *(sqlfmt)* Suppress sqlfluff import-time INFO logging
+
+### 💼 Other
+
+- Allow Python 3.11.0 in requires-python
+
 ## [0.14.0](https://github.com/s0undt3ch/refine/releases/tag/0.14.0) - 2026-07-02
 
 ### 🚀 Features
