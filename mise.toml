@@ -1,10 +1,10 @@
 [tools]
 python = "3.11.11"
 actionlint = "1.7.12"
-gh = "2.95.0"
+gh = "2.96.0"
 shellcheck = "0.11.0"
-prek = "0.4.5"
-ruff = "0.15.17"
+prek = "0.4.10"
+ruff = "0.15.22"
 uv = "0.11.30"
 
 [env]
