@@ -41,7 +41,7 @@ repos:
   # truth in ``mise.toml`` (binaries) and the project dependency groups (Python tools) — no
   # per-hook version pins to drift. See https://github.com/s0undt3ch/pre-commit-hooks
   - repo: https://github.com/s0undt3ch/pre-commit-hooks
-    rev: v1.0.0
+    rev: v1.1.0
     hooks:
       - id: pin-github-actions
       - id: uv-lock
