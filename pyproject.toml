@@ -47,7 +47,7 @@ dev = [
     "pytest-subtests>=0.15,<0.16",
     "pytest-skip-markers>=1.5.2,<2",
     "tomli-w>=1.2.0",
-    "mypy>=1.16,<2",
+    "mypy>=2.3,<3",
 ]
 docs = [
     "mkdocs",
