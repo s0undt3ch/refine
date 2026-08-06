@@ -141,6 +141,7 @@ ignore = [
   "BLE001",   # Do not catch blind exception: `Exception`
   "PLR0913",  # Too many arguments in function definition"
   "PLR0911",  # Too many return statements (7 > 6)"
+  "PLR0917",  # Too many positional arguments (6 > 5)"
 ]
 "src/refine/testing.py" = [
   "D101",     # Missing docstring in public class
