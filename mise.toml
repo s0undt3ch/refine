@@ -5,7 +5,7 @@ gh = "2.97.0"
 shellcheck = "0.11.0"
 prek = "0.4.14"
 ruff = "0.16.3"
-uv = "0.12.3"
+uv = "0.12.13"
 
 [env]
 '_'.python.venv = {path = ".venv", create = true, uv_create_args = ['--seed']}
