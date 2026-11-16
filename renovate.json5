@@ -63,6 +63,15 @@
       matchDepNames: ["python", "uv"],
       addLabels: ["dependencies:python"],
     },
+    {
+      // The project supports Python 3.11 (requires-python >=3.11), and
+      // mise.toml pins the dev interpreter to that floor. Patch bumps only.
+      description: "Keep the mise Python pin on its minor version",
+      matchManagers: ["mise"],
+      matchDepNames: ["python"],
+      matchUpdateTypes: ["major", "minor"],
+      enabled: false,
+    },
 
     // ---- Grouping to cut PR noise ----
     {
