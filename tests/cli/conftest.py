@@ -4,7 +4,6 @@ import os
 import pathlib
 from collections.abc import Iterator
 from contextlib import contextmanager
-from dataclasses import dataclass
 from typing import Any
 from typing import Self
 from unittest.mock import patch
@@ -12,6 +11,7 @@ from unittest.mock import patch
 import pytest
 import tomli_w
 
+from refine.abc import BaseCodemod
 from refine.cli import CLI as OriginalCLI  # noqa: N811
 from refine.config import Config
 from refine.processor import ParallelTransformResult
@@ -56,24 +56,18 @@ class CLI(OriginalCLI):
         return Config()
 
 
-@dataclass
-class MockedCodemod:
-    NAME: str
-    description: str
-    PRIORITY: int = 0
-
-    def get_short_description(self) -> str:
-        return self.description
-
-
 @pytest.fixture
-def codemods():
+def codemods() -> list[type[BaseCodemod]]:
     """
-    Mocked codemods for testing purposes.
+    Real codemod classes, kept out of the registry's entry points so listings stay predictable.
     """
     return [
-        MockedCodemod(NAME=name, description=f"Example codemod description for {name}")
-        for name in ("codemod-1", "codemod-2", "codemod-3")
+        type(
+            f"Codemod{index}",
+            (BaseCodemod,),
+            {"__doc__": f"Example codemod description for codemod-{index}", "NAME": f"codemod-{index}"},
+        )
+        for index in (1, 2, 3)
     ]
 
 
@@ -130,3 +124,13 @@ def file_to_modify(cli: CLI) -> pathlib.Path:
     with open(file_path, "w") as f:
         f.write("print('Hello, World!')")
     return file_path
+
+
+@pytest.fixture
+def real_cli(tmp_path: pathlib.Path) -> CLI:
+    """
+    CLI instance with the real registry and processor, nothing patched.
+    """
+    cli_cwd = tmp_path / "cli-cwd"
+    cli_cwd.mkdir()
+    return CLI(cli_cwd)

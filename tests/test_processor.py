@@ -37,13 +37,10 @@ def test_write_file_exception(tmp_path, subtests):
     tmp_file_path = tmp_path / TEST_FILE_PATH.name
     shutil.copyfile(TEST_FILE_PATH, tmp_file_path)
 
-    # Mock configuration and registry objects
-    config = MagicMock()
-    config.repo_root = tmp_path
-    config.process_pool_size = 1
-    config.__remaining_config__ = {}
-
-    registry = MagicMock()
+    config = Config.from_dict(
+        {"repo_root": str(tmp_path), "process_pool_size": 1, "hide_progress": True, "cache": False}
+    )
+    registry = Registry()
     codemods = [CliDashes]
     processor = Processor(config=config, registry=registry, codemods=codemods)
 
@@ -94,13 +91,8 @@ def test_compute_jobs_zero_files_returns_zero():
 
 
 def test_process_zero_files_raises():
-    config = MagicMock()
-    config.repo_root = "."
-    config.process_pool_size = 1
-    config.hide_progress = True
-    config.__remaining_config__ = {}
-
-    registry = MagicMock()
+    config = Config.from_dict({"repo_root": ".", "process_pool_size": 1, "hide_progress": True, "cache": False})
+    registry = Registry()
     codemods = [CliDashes]
     processor = Processor(config=config, registry=registry, codemods=codemods)
     with pytest.raises(RefineSystemExit):
