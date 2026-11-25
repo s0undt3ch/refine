@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import itertools
 import sys
 import textwrap
@@ -13,10 +12,6 @@ import pytest
 # Make sure the assertion we do in refine/testing.py gets rewritten by pytest for proper visualization
 # of assertion failures
 pytest.register_assert_rewrite("refine.testing")
-
-# tests/tools/ needs the toolr venv: `toolr project venv run -- pytest tests/tools/`
-if importlib.util.find_spec("toolr") is None:
-    collect_ignore = ["tools"]
 
 
 @pytest.fixture

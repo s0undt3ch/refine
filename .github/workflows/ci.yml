@@ -41,11 +41,6 @@ jobs:
 
       - name: Set up ToolR
         uses: s0undt3ch/ToolR@90681fa0fbfa1bbe0e3fe93424beee3fa25e828e # v0.37.0
-        with:
-          sync-args: --group dev
-
-      - name: Test the CI tools
-        run: toolr project venv run --no-sync -- pytest tests/tools/
 
       - name: Generate Build Matrix
         id: generate-build-matrix

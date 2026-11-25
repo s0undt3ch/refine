@@ -12,11 +12,5 @@ dependencies = [
     "packaging",
 ]
 
-[dependency-groups]
-dev = [
-    "pytest",
-    "pytest-clarity",
-]
-
 [tool.toolr]
 venv-location = "cache"
