@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.15.0](https://github.com/s0undt3ch/refine/releases/tag/0.15.0) - 2026-11-25
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update dependency libcst to >=1.9.0,<1.10.0
+- *(registry)* Load codemod paths without `load_module` on Python 3.15
+- *(registry)* Roll back `sys.modules` when a codemod module fails to load
+- *(release)* Fail the release when the actor is not an admin
+
+### 🚜 Refactor
+
+- *(tools)* Simplify `ci generate-build-matrix`
+
+### 🧪 Testing
+
+- Stop mocking the code under test
+- *(sql)* Update sqruff golden files for sqruff 0.44.0
+- Run `tests/tools/` in the main test suite
+- Ignore a caller's `FORCE_COLOR` in tests
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ruff)* Ignore CPY001 (missing copyright notice)
+- *(ruff)* Ignore PLR0917 on processor.py's _run_pool
+- *(renovate)* Keep mise Python pin on 3.11 minor
+- Switch to jactionlint and stop duplicate CI runs
+- Trim the PR test matrix and harden CI jobs
+- Build the test matrix with `toolr ci generate-build-matrix`
+- Stop forcing colour output in CI
+- Key the CI concurrency group on the PR number
+- Follow ToolR's `setup-virtualenv` pattern
+
 ## [0.14.1](https://github.com/s0undt3ch/refine/releases/tag/0.14.1) - 2026-07-06
 
 ### 🐛 Bug Fixes
