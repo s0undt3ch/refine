@@ -14,6 +14,16 @@ import pytest
 pytest.register_assert_rewrite("refine.testing")
 
 
+@pytest.fixture(autouse=True)
+def _no_forced_colour(monkeypatch: pytest.MonkeyPatch) -> None:
+    """
+    Keep a caller's ``FORCE_COLOR`` out of the output tests assert on.
+
+    CI sets it, and on Python 3.14+ argparse then colours ``--help``.
+    """
+    monkeypatch.delenv("FORCE_COLOR", raising=False)
+
+
 @pytest.fixture
 def codemod_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[Path]:
     """
