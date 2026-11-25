@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import os
 import textwrap
-from unittest.mock import call
 from unittest.mock import patch
 
 import pytest
@@ -394,7 +393,7 @@ def test_processor_exceptions(cli, caplog, file_to_modify, exception, expected_c
     if isinstance(exception, Exception) and not isinstance(exception, (SystemExit, KeyboardInterrupt)):
         exception = InvalidConfigError(str(exception))
 
-    with patch("refine.cli.Processor") as mock_processor:
+    with patch("refine.cli.Processor", autospec=True) as mock_processor:
         if isinstance(exception, InvalidConfigError):
             # Exception during processor creation
             mock_processor.side_effect = exception
@@ -417,7 +416,7 @@ def test_processor_refine_system_exit(cli, file_to_modify):
     """
     Test that CLI handles RefineSystemExit correctly.
     """
-    with patch("refine.cli.Processor") as mock_processor:
+    with patch("refine.cli.Processor", autospec=True) as mock_processor:
         mock_processor_instance = mock_processor.return_value
         mock_processor_instance.process.side_effect = RefineSystemExit(code=42, message="Custom exit message")
 
@@ -429,7 +428,7 @@ def test_processing_failures_system_exit(cli, file_to_modify):
     """
     Test that CLI exits with status 1 when processor reports failures.
     """
-    with patch("refine.cli.Processor") as mock_processor:
+    with patch("refine.cli.Processor", autospec=True) as mock_processor:
         mock_processor_instance = mock_processor.return_value
         mock_processor_instance.process.return_value = ParallelTransformResult(
             successes=0, failures=1, warnings=0, skips=0, changed=0
@@ -533,21 +532,31 @@ def test_config_loading_default_when_no_files(cli, file_to_modify):
     assert cli.config.fail_fast is False
 
 
-def test_quiet_flag_sets_log_level(cli, file_to_modify):
+@pytest.fixture
+def restore_log_levels():
     """
-    Test that --quiet flag sets logging level to ERROR.
+    Put back the root and ``py_walk`` log levels that ``--quiet``/``--verbose`` change.
     """
-    with patch("logging.getLogger") as mock_get_logger:
-        mock_logger = mock_get_logger.return_value
-        cli.run("--quiet", file_to_modify)
-        mock_logger.setLevel.assert_called_with(logging.ERROR)
+    loggers = [logging.getLogger(), logging.getLogger("py_walk")]
+    levels = [logger.level for logger in loggers]
+    yield
+    for logger, level in zip(loggers, levels, strict=True):
+        logger.setLevel(level)
 
 
-def test_verbose_flag_sets_log_level(cli, file_to_modify):
-    """
-    Test that --verbose flag sets logging level to DEBUG.
-    """
-    with patch("logging.getLogger") as mock_get_logger:
-        mock_logger = mock_get_logger.return_value
-        cli.run("--verbose", file_to_modify)
-        assert mock_logger.setLevel.call_args_list == [call(logging.DEBUG), call(logging.INFO)]
+def test_quiet_flag_sets_root_log_level_to_error(cli, file_to_modify, restore_log_levels):
+    cli.run("--quiet", file_to_modify)
+
+    assert logging.getLogger().level == logging.ERROR
+
+
+def test_verbose_flag_sets_root_log_level_to_debug(cli, file_to_modify, restore_log_levels):
+    cli.run("--verbose", file_to_modify)
+
+    assert logging.getLogger().level == logging.DEBUG
+
+
+def test_verbose_flag_keeps_py_walk_at_info(cli, file_to_modify, restore_log_levels):
+    cli.run("--verbose", file_to_modify)
+
+    assert logging.getLogger("py_walk").level == logging.INFO
