@@ -48,9 +48,8 @@ dev = [
     "pytest-skip-markers>=1.5.2,<2",
     "tomli-w>=1.2.0",
     "mypy>=2.3,<3",
-    # Runs tests/tools/ and type-checks it, as ToolR's own repo does.
+    # tests/tools/ imports the `tools/` commands, so the suite and mypy need toolr.
     "toolr-py>=0.37,<1",
-    "packaging",
 ]
 docs = [
     "mkdocs",

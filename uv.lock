@@ -1509,7 +1509,6 @@ dependencies = [
 dev = [
     { name = "coverage" },
     { name = "mypy" },
-    { name = "packaging" },
     { name = "pytest" },
     { name = "pytest-clarity" },
     { name = "pytest-skip-markers" },
@@ -1539,7 +1538,6 @@ requires-dist = [
 dev = [
     { name = "coverage", specifier = ">=7.6.7,<8" },
     { name = "mypy", specifier = ">=2.3,<3" },
-    { name = "packaging" },
     { name = "pytest", specifier = ">=9.0.3,<10" },
     { name = "pytest-clarity", specifier = ">=1.0.1,<2" },
     { name = "pytest-skip-markers", specifier = ">=1.5.2,<2" },
