@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../../../imgs/refine.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -27,10 +27,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1819,7 +1819,7 @@
   </span>
 
 <a href="#refine.mods.sql.fmt.SqlBackend.SQRUFF" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SQRUFF</span> <span class="o">=</span> <span class="s1">&#39;sqruff&#39;</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SQRUFF</span> <span class="o">=</span> <span class="s1">'sqruff'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1844,7 +1844,7 @@
   </span>
 
 <a href="#refine.mods.sql.fmt.SqlBackend.SQLFLUFF" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SQLFLUFF</span> <span class="o">=</span> <span class="s1">&#39;sqlfluff&#39;</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SQLFLUFF</span> <span class="o">=</span> <span class="s1">'sqlfluff'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1917,7 +1917,7 @@
   </span>
 
 <a href="#refine.mods.sql.fmt.FormatSQLConfig.dialect" class="headerlink" title="Permanent link">&para;</a></h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">dialect</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s1">&#39;ansi&#39;</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">dialect</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></span> <span class="o">=</span> <span class="s1">'ansi'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2045,17 +2045,17 @@
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>src/refine/abc.py</code></summary>
-                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-75">75</a></span>
-<span class="normal"><a href="#__codelineno-0-76">76</a></span>
-<span class="normal"><a href="#__codelineno-0-77">77</a></span>
-<span class="normal"><a href="#__codelineno-0-78">78</a></span>
-<span class="normal"><a href="#__codelineno-0-79">79</a></span>
-<span class="normal"><a href="#__codelineno-0-80">80</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-75"><a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">CodemodContext</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CodemodConfigType</span><span class="p">):</span>
-</span><span id="__span-0-76"><a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-</span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_add_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">__post_codemod_init__</span><span class="p">()</span>
+                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-75">75</a></span>
+<span class="normal"><a href="#refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-76">76</a></span>
+<span class="normal"><a href="#refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-78">78</a></span>
+<span class="normal"><a href="#refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-79">79</a></span>
+<span class="normal"><a href="#refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-80">80</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="refine.mods.sql.fmt.FormatSQL--source--__span-0-75"><a id="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-75" name="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-75"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">CodemodContext</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CodemodConfigType</span><span class="p">):</span>
+</span><span id="refine.mods.sql.fmt.FormatSQL--source--__span-0-76"><a id="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-76" name="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-76"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span id="refine.mods.sql.fmt.FormatSQL--source--__span-0-77"><a id="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-77" name="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-77"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+</span><span id="refine.mods.sql.fmt.FormatSQL--source--__span-0-78"><a id="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-78" name="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-78"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_add_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="refine.mods.sql.fmt.FormatSQL--source--__span-0-79"><a id="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-79" name="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-79"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="refine.mods.sql.fmt.FormatSQL--source--__span-0-80"><a id="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-80" name="refine.mods.sql.fmt.FormatSQL--source--__codelineno-0-80"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">__post_codemod_init__</span><span class="p">()</span>
 </span></code></pre></div></td></tr></table></div>
                   </details>
 
@@ -2187,10 +2187,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["announce.dismiss", "content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.preview", "navigation.instant.progress", "navigation.path", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["announce.dismiss", "content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.preview", "navigation.instant.progress", "navigation.path", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow"], "search": "../../../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>

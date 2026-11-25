@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../imgs/refine.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
     
     
       
@@ -27,10 +27,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1783,23 +1783,23 @@ reference external configuration files.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/refine/abc.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-43">43</a></span>
-<span class="normal"><a href="#__codelineno-0-44">44</a></span>
-<span class="normal"><a href="#__codelineno-0-45">45</a></span>
-<span class="normal"><a href="#__codelineno-0-46">46</a></span>
-<span class="normal"><a href="#__codelineno-0-47">47</a></span>
-<span class="normal"><a href="#__codelineno-0-48">48</a></span>
-<span class="normal"><a href="#__codelineno-0-49">49</a></span>
-<span class="normal"><a href="#__codelineno-0-50">50</a></span>
-<span class="normal"><a href="#__codelineno-0-51">51</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43"></a><span class="k">def</span><span class="w"> </span><span class="nf">cache_key_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45"></a><span class="sd">    Paths of external files whose CONTENTS affect this codemod&#39;s output.</span>
-</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>
-</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a><span class="sd">    The run cache hashes these files&#39; bytes into its context key so</span>
-</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a><span class="sd">    editing them invalidates cached results. Override in configs that</span>
-</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a><span class="sd">    reference external configuration files.</span>
-</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a>    <span class="k">return</span> <span class="p">[]</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-43">43</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-44">44</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-45">45</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-46">46</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-47">47</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-48">48</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-49">49</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-50">50</a></span>
+<span class="normal"><a href="#refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-51">51</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-43"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-43" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-43"></a><span class="k">def</span><span class="w"> </span><span class="nf">cache_key_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-44"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-44" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-44"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-45"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-45" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-45"></a><span class="sd">    Paths of external files whose CONTENTS affect this codemod's output.</span>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-46"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-46" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-46"></a>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-47"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-47" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-47"></a><span class="sd">    The run cache hashes these files' bytes into its context key so</span>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-48"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-48" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-48"></a><span class="sd">    editing them invalidates cached results. Override in configs that</span>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-49"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-49" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-49"></a><span class="sd">    reference external configuration files.</span>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-50"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-50" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-50"></a><span class="sd">    """</span>
+</span><span id="refine.abc.BaseConfig.cache_key_paths--source--__span-0-51"><a id="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-51" name="refine.abc.BaseConfig.cache_key_paths--source--__codelineno-0-51"></a>    <span class="k">return</span> <span class="p">[]</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1843,17 +1843,17 @@ reference external configuration files.</p>
 
                   <details class="mkdocstrings-source">
                     <summary>Source code in <code>src/refine/abc.py</code></summary>
-                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-75">75</a></span>
-<span class="normal"><a href="#__codelineno-0-76">76</a></span>
-<span class="normal"><a href="#__codelineno-0-77">77</a></span>
-<span class="normal"><a href="#__codelineno-0-78">78</a></span>
-<span class="normal"><a href="#__codelineno-0-79">79</a></span>
-<span class="normal"><a href="#__codelineno-0-80">80</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-75"><a id="__codelineno-0-75" name="__codelineno-0-75"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">CodemodContext</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CodemodConfigType</span><span class="p">):</span>
-</span><span id="__span-0-76"><a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span id="__span-0-77"><a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-</span><span id="__span-0-78"><a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_add_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="__span-0-79"><a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-</span><span id="__span-0-80"><a id="__codelineno-0-80" name="__codelineno-0-80"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">__post_codemod_init__</span><span class="p">()</span>
+                    <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#refine.abc.BaseCodemod--source--__codelineno-0-75">75</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod--source--__codelineno-0-76">76</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod--source--__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod--source--__codelineno-0-78">78</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod--source--__codelineno-0-79">79</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod--source--__codelineno-0-80">80</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="refine.abc.BaseCodemod--source--__span-0-75"><a id="refine.abc.BaseCodemod--source--__codelineno-0-75" name="refine.abc.BaseCodemod--source--__codelineno-0-75"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">CodemodContext</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CodemodConfigType</span><span class="p">):</span>
+</span><span id="refine.abc.BaseCodemod--source--__span-0-76"><a id="refine.abc.BaseCodemod--source--__codelineno-0-76" name="refine.abc.BaseCodemod--source--__codelineno-0-76"></a>    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span id="refine.abc.BaseCodemod--source--__span-0-77"><a id="refine.abc.BaseCodemod--source--__codelineno-0-77" name="refine.abc.BaseCodemod--source--__codelineno-0-77"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+</span><span id="refine.abc.BaseCodemod--source--__span-0-78"><a id="refine.abc.BaseCodemod--source--__codelineno-0-78" name="refine.abc.BaseCodemod--source--__codelineno-0-78"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_add_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="refine.abc.BaseCodemod--source--__span-0-79"><a id="refine.abc.BaseCodemod--source--__codelineno-0-79" name="refine.abc.BaseCodemod--source--__codelineno-0-79"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_imports</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">AddRemoveImport</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+</span><span id="refine.abc.BaseCodemod--source--__span-0-80"><a id="refine.abc.BaseCodemod--source--__codelineno-0-80" name="refine.abc.BaseCodemod--source--__codelineno-0-80"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">__post_codemod_init__</span><span class="p">()</span>
 </span></code></pre></div></td></tr></table></div>
                   </details>
 
@@ -1895,39 +1895,39 @@ custom description.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/refine/abc.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-87"> 87</a></span>
-<span class="normal"><a href="#__codelineno-0-88"> 88</a></span>
-<span class="normal"><a href="#__codelineno-0-89"> 89</a></span>
-<span class="normal"><a href="#__codelineno-0-90"> 90</a></span>
-<span class="normal"><a href="#__codelineno-0-91"> 91</a></span>
-<span class="normal"><a href="#__codelineno-0-92"> 92</a></span>
-<span class="normal"><a href="#__codelineno-0-93"> 93</a></span>
-<span class="normal"><a href="#__codelineno-0-94"> 94</a></span>
-<span class="normal"><a href="#__codelineno-0-95"> 95</a></span>
-<span class="normal"><a href="#__codelineno-0-96"> 96</a></span>
-<span class="normal"><a href="#__codelineno-0-97"> 97</a></span>
-<span class="normal"><a href="#__codelineno-0-98"> 98</a></span>
-<span class="normal"><a href="#__codelineno-0-99"> 99</a></span>
-<span class="normal"><a href="#__codelineno-0-100">100</a></span>
-<span class="normal"><a href="#__codelineno-0-101">101</a></span>
-<span class="normal"><a href="#__codelineno-0-102">102</a></span>
-<span class="normal"><a href="#__codelineno-0-103">103</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-87"><a id="__codelineno-0-87" name="__codelineno-0-87"></a><span class="nd">@classmethod</span>
-</span><span id="__span-0-88"><a id="__codelineno-0-88" name="__codelineno-0-88"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_short_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="__span-0-89"><a id="__codelineno-0-89" name="__codelineno-0-89"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-0-90"><a id="__codelineno-0-90" name="__codelineno-0-90"></a><span class="sd">    Return a short description of the codemod.</span>
-</span><span id="__span-0-91"><a id="__codelineno-0-91" name="__codelineno-0-91"></a>
-</span><span id="__span-0-92"><a id="__codelineno-0-92" name="__codelineno-0-92"></a><span class="sd">    This short description is used in the CLI to list available codemods and should be a single line.</span>
-</span><span id="__span-0-93"><a id="__codelineno-0-93" name="__codelineno-0-93"></a>
-</span><span id="__span-0-94"><a id="__codelineno-0-94" name="__codelineno-0-94"></a><span class="sd">    By default, it returns the first line of the class docstring, override this method to provide a</span>
-</span><span id="__span-0-95"><a id="__codelineno-0-95" name="__codelineno-0-95"></a><span class="sd">    custom description.</span>
-</span><span id="__span-0-96"><a id="__codelineno-0-96" name="__codelineno-0-96"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-97"><a id="__codelineno-0-97" name="__codelineno-0-97"></a>    <span class="n">doc</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__doc__</span>
-</span><span id="__span-0-98"><a id="__codelineno-0-98" name="__codelineno-0-98"></a>    <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-99"><a id="__codelineno-0-99" name="__codelineno-0-99"></a>        <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Codemod </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> must have a docstring to be used in the CLI.&quot;</span>
-</span><span id="__span-0-100"><a id="__codelineno-0-100" name="__codelineno-0-100"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
-</span><span id="__span-0-101"><a id="__codelineno-0-101" name="__codelineno-0-101"></a>    <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-</span><span id="__span-0-102"><a id="__codelineno-0-102" name="__codelineno-0-102"></a>        <span class="k">assert</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-0-103"><a id="__codelineno-0-103" name="__codelineno-0-103"></a>    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-87"> 87</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-88"> 88</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-89"> 89</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-90"> 90</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-91"> 91</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-92"> 92</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-93"> 93</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-94"> 94</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-95"> 95</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-96"> 96</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-97"> 97</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-98"> 98</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-99"> 99</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-100">100</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-101">101</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-102">102</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-103">103</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-87"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-87" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-87"></a><span class="nd">@classmethod</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-88"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-88" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-88"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_short_description</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-89"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-89" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-89"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-90"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-90" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-90"></a><span class="sd">    Return a short description of the codemod.</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-91"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-91" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-91"></a>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-92"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-92" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-92"></a><span class="sd">    This short description is used in the CLI to list available codemods and should be a single line.</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-93"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-93" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-93"></a>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-94"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-94" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-94"></a><span class="sd">    By default, it returns the first line of the class docstring, override this method to provide a</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-95"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-95" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-95"></a><span class="sd">    custom description.</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-96"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-96" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-96"></a><span class="sd">    """</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-97"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-97" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-97"></a>    <span class="n">doc</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__doc__</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-98"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-98" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-98"></a>    <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-99"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-99" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-99"></a>        <span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Codemod </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> must have a docstring to be used in the CLI."</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-100"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-100" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-100"></a>        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-101"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-101" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-101"></a>    <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-102"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-102" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-102"></a>        <span class="k">assert</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="refine.abc.BaseCodemod.get_short_description--source--__span-0-103"><a id="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-103" name="refine.abc.BaseCodemod.get_short_description--source--__codelineno-0-103"></a>    <span class="k">return</span> <span class="n">doc</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1959,25 +1959,25 @@ The default is to always process.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/refine/abc.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-105">105</a></span>
-<span class="normal"><a href="#__codelineno-0-106">106</a></span>
-<span class="normal"><a href="#__codelineno-0-107">107</a></span>
-<span class="normal"><a href="#__codelineno-0-108">108</a></span>
-<span class="normal"><a href="#__codelineno-0-109">109</a></span>
-<span class="normal"><a href="#__codelineno-0-110">110</a></span>
-<span class="normal"><a href="#__codelineno-0-111">111</a></span>
-<span class="normal"><a href="#__codelineno-0-112">112</a></span>
-<span class="normal"><a href="#__codelineno-0-113">113</a></span>
-<span class="normal"><a href="#__codelineno-0-114">114</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-105"><a id="__codelineno-0-105" name="__codelineno-0-105"></a><span class="nd">@classmethod</span>
-</span><span id="__span-0-106"><a id="__codelineno-0-106" name="__codelineno-0-106"></a><span class="k">def</span><span class="w"> </span><span class="nf">should_process</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="__span-0-107"><a id="__codelineno-0-107" name="__codelineno-0-107"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-0-108"><a id="__codelineno-0-108" name="__codelineno-0-108"></a><span class="sd">    Cheap raw-text gate called BEFORE the file is parsed.</span>
-</span><span id="__span-0-109"><a id="__codelineno-0-109" name="__codelineno-0-109"></a>
-</span><span id="__span-0-110"><a id="__codelineno-0-110" name="__codelineno-0-110"></a><span class="sd">    Return ``False`` only when this codemod provably cannot change the</span>
-</span><span id="__span-0-111"><a id="__codelineno-0-111" name="__codelineno-0-111"></a><span class="sd">    file (false positives are fine, false negatives are forbidden).</span>
-</span><span id="__span-0-112"><a id="__codelineno-0-112" name="__codelineno-0-112"></a><span class="sd">    The default is to always process.</span>
-</span><span id="__span-0-113"><a id="__codelineno-0-113" name="__codelineno-0-113"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-114"><a id="__codelineno-0-114" name="__codelineno-0-114"></a>    <span class="k">return</span> <span class="kc">True</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-105">105</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-106">106</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-107">107</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-108">108</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-109">109</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-110">110</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-111">111</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-112">112</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-113">113</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.should_process--source--__codelineno-0-114">114</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="refine.abc.BaseCodemod.should_process--source--__span-0-105"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-105" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-105"></a><span class="nd">@classmethod</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-106"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-106" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-106"></a><span class="k">def</span><span class="w"> </span><span class="nf">should_process</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-107"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-107" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-107"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-108"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-108" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-108"></a><span class="sd">    Cheap raw-text gate called BEFORE the file is parsed.</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-109"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-109" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-109"></a>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-110"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-110" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-110"></a><span class="sd">    Return ``False`` only when this codemod provably cannot change the</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-111"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-111" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-111"></a><span class="sd">    file (false positives are fine, false negatives are forbidden).</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-112"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-112" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-112"></a><span class="sd">    The default is to always process.</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-113"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-113" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-113"></a><span class="sd">    """</span>
+</span><span id="refine.abc.BaseCodemod.should_process--source--__span-0-114"><a id="refine.abc.BaseCodemod.should_process--source--__codelineno-0-114" name="refine.abc.BaseCodemod.should_process--source--__codelineno-0-114"></a>    <span class="k">return</span> <span class="kc">True</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2005,23 +2005,23 @@ times, and, we pass the <a class="autorefs autorefs-external" href="https://libc
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/refine/abc.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-116">116</a></span>
-<span class="normal"><a href="#__codelineno-0-117">117</a></span>
-<span class="normal"><a href="#__codelineno-0-118">118</a></span>
-<span class="normal"><a href="#__codelineno-0-119">119</a></span>
-<span class="normal"><a href="#__codelineno-0-120">120</a></span>
-<span class="normal"><a href="#__codelineno-0-121">121</a></span>
-<span class="normal"><a href="#__codelineno-0-122">122</a></span>
-<span class="normal"><a href="#__codelineno-0-123">123</a></span>
-<span class="normal"><a href="#__codelineno-0-124">124</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-116"><a id="__codelineno-0-116" name="__codelineno-0-116"></a><span class="k">def</span><span class="w"> </span><span class="nf">add_import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-117"><a id="__codelineno-0-117" name="__codelineno-0-117"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-0-118"><a id="__codelineno-0-118" name="__codelineno-0-118"></a><span class="sd">    Schedule an import to be added to the updated module, if not already present.</span>
-</span><span id="__span-0-119"><a id="__codelineno-0-119" name="__codelineno-0-119"></a>
-</span><span id="__span-0-120"><a id="__codelineno-0-120" name="__codelineno-0-120"></a><span class="sd">    This method has the same signature as [add_needed_import][libcst.codemod.visitors.AddImportsVisitor],</span>
-</span><span id="__span-0-121"><a id="__codelineno-0-121" name="__codelineno-0-121"></a><span class="sd">    the only major difference is that we won&#39;t duplicate the imports even if you call this method multiple</span>
-</span><span id="__span-0-122"><a id="__codelineno-0-122" name="__codelineno-0-122"></a><span class="sd">    times, and, we pass the [context][libcst.codemod.CodemodContext] when actually updating the imports.</span>
-</span><span id="__span-0-123"><a id="__codelineno-0-123" name="__codelineno-0-123"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-124"><a id="__codelineno-0-124" name="__codelineno-0-124"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_add_imports</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">module</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">asname</span><span class="p">))</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-116">116</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-117">117</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-118">118</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-119">119</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-120">120</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-121">121</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-122">122</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-123">123</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.add_import--source--__codelineno-0-124">124</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="refine.abc.BaseCodemod.add_import--source--__span-0-116"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-116" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-116"></a><span class="k">def</span><span class="w"> </span><span class="nf">add_import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-117"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-117" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-117"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-118"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-118" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-118"></a><span class="sd">    Schedule an import to be added to the updated module, if not already present.</span>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-119"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-119" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-119"></a>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-120"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-120" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-120"></a><span class="sd">    This method has the same signature as [add_needed_import][libcst.codemod.visitors.AddImportsVisitor],</span>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-121"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-121" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-121"></a><span class="sd">    the only major difference is that we won't duplicate the imports even if you call this method multiple</span>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-122"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-122" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-122"></a><span class="sd">    times, and, we pass the [context][libcst.codemod.CodemodContext] when actually updating the imports.</span>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-123"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-123" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-123"></a><span class="sd">    """</span>
+</span><span id="refine.abc.BaseCodemod.add_import--source--__span-0-124"><a id="refine.abc.BaseCodemod.add_import--source--__codelineno-0-124" name="refine.abc.BaseCodemod.add_import--source--__codelineno-0-124"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_add_imports</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">module</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">asname</span><span class="p">))</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2049,23 +2049,23 @@ multiple times, and, we pass the <a class="autorefs autorefs-external" href="htt
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/refine/abc.py</code></summary>
-              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-126">126</a></span>
-<span class="normal"><a href="#__codelineno-0-127">127</a></span>
-<span class="normal"><a href="#__codelineno-0-128">128</a></span>
-<span class="normal"><a href="#__codelineno-0-129">129</a></span>
-<span class="normal"><a href="#__codelineno-0-130">130</a></span>
-<span class="normal"><a href="#__codelineno-0-131">131</a></span>
-<span class="normal"><a href="#__codelineno-0-132">132</a></span>
-<span class="normal"><a href="#__codelineno-0-133">133</a></span>
-<span class="normal"><a href="#__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-126"><a id="__codelineno-0-126" name="__codelineno-0-126"></a><span class="k">def</span><span class="w"> </span><span class="nf">remove_import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-0-127"><a id="__codelineno-0-127" name="__codelineno-0-127"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="__span-0-128"><a id="__codelineno-0-128" name="__codelineno-0-128"></a><span class="sd">    Schedule an import to be removed from the updated module, if present.</span>
-</span><span id="__span-0-129"><a id="__codelineno-0-129" name="__codelineno-0-129"></a>
-</span><span id="__span-0-130"><a id="__codelineno-0-130" name="__codelineno-0-130"></a><span class="sd">    This method has the same signature as [remove_unused_import][libcst.codemod.visitors.RemoveImportsVisitor],</span>
-</span><span id="__span-0-131"><a id="__codelineno-0-131" name="__codelineno-0-131"></a><span class="sd">    the only major difference is that we won&#39;t schedule duplicate import removals even if you call this method</span>
-</span><span id="__span-0-132"><a id="__codelineno-0-132" name="__codelineno-0-132"></a><span class="sd">    multiple times, and, we pass the [context][libcst.codemod.CodemodContext] when actually updating the imports.</span>
-</span><span id="__span-0-133"><a id="__codelineno-0-133" name="__codelineno-0-133"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-0-134"><a id="__codelineno-0-134" name="__codelineno-0-134"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_imports</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">module</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">asname</span><span class="p">))</span>
+              <div class="language-python highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-126">126</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-127">127</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-128">128</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-129">129</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-130">130</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-131">131</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-132">132</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-133">133</a></span>
+<span class="normal"><a href="#refine.abc.BaseCodemod.remove_import--source--__codelineno-0-134">134</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-126"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-126" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-126"></a><span class="k">def</span><span class="w"> </span><span class="nf">remove_import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">asname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-127"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-127" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-127"></a><span class="w">    </span><span class="sd">"""</span>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-128"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-128" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-128"></a><span class="sd">    Schedule an import to be removed from the updated module, if present.</span>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-129"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-129" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-129"></a>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-130"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-130" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-130"></a><span class="sd">    This method has the same signature as [remove_unused_import][libcst.codemod.visitors.RemoveImportsVisitor],</span>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-131"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-131" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-131"></a><span class="sd">    the only major difference is that we won't schedule duplicate import removals even if you call this method</span>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-132"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-132" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-132"></a><span class="sd">    multiple times, and, we pass the [context][libcst.codemod.CodemodContext] when actually updating the imports.</span>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-133"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-133" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-133"></a><span class="sd">    """</span>
+</span><span id="refine.abc.BaseCodemod.remove_import--source--__span-0-134"><a id="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-134" name="refine.abc.BaseCodemod.remove_import--source--__codelineno-0-134"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_imports</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">module</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">asname</span><span class="p">))</span>
 </span></code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2187,10 +2187,10 @@ multiple times, and, we pass the <a class="autorefs autorefs-external" href="htt
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["announce.dismiss", "content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.preview", "navigation.instant.progress", "navigation.path", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["announce.dismiss", "content.code.annotate", "content.code.copy", "content.tabs.link", "navigation.footer", "navigation.indexes", "navigation.instant", "navigation.instant.prefetch", "navigation.instant.preview", "navigation.instant.progress", "navigation.path", "navigation.sections", "navigation.tabs", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow"], "search": "../../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
       
     
   </body>
