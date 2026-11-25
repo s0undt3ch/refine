@@ -53,6 +53,6 @@ repos:
       - id: mypy
         name: Run mypy against the code base
         files: ^(src/|tests/|examples/).*\.py$
-        exclude: ^tests/(([^/]*/)*files/|tools/).*
+        exclude: ^tests/([^/]*/)*files/.*
       - id: jactionlint
   # <---- s0undt3ch/pre-commit-hooks -------------------------------------------------------------
