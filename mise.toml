@@ -1,6 +1,6 @@
 [tools]
 python = "3.11.11"
-actionlint = "1.7.12"
+jactionlint = "2.6.0"
 gh = "2.104.0"
 shellcheck = "0.11.0"
 prek = "0.5.11"
