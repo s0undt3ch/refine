@@ -15,11 +15,7 @@ on:
         default: false
         type: boolean
 
-permissions:
-  contents: write
-  id-token: write
-  packages: write
-
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.repository }}
@@ -30,6 +26,11 @@ jobs:
     name: Publish Release
     runs-on: ubuntu-latest
     environment: release
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
 
     steps:
       - name: Check For Admin Permission
@@ -59,8 +60,7 @@ jobs:
       - name: Set up mise
         uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
-          cache: true
-          cache_key_prefix: mise|release|${{ runner.os }}|${{ runner.arch }}
+          cache: false
 
       - name: Generate changelog for GH release
         id: git-cliff
@@ -109,15 +109,13 @@ jobs:
           path: dist/*
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
-        with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: ${{ env.RELEASE_TAG }}
-          body_path: .final-release-notes.md
-          files: dist/*
-          draft: false
-          prerelease: false
-          make_latest: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$RELEASE_TAG" dist/* \
+            --title "$RELEASE_TAG" \
+            --notes-file .final-release-notes.md \
+            --latest
 
       - name: Publish to PyPI (trusted publishing)
         if: ${{ inputs.dry_run != true }}

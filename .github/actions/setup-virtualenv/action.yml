@@ -1,6 +1,6 @@
 name: Setup Virtualenv
 description: >-
-  Install the repo tooling via mise (Python, uv, ruff, actionlint, prek, ...)
+  Install the repo tooling via mise (Python, uv, ruff, jactionlint, prek, ...)
   and sync the project virtualenv. Tool versions come solely from mise.toml, so
   there is a single source of truth and nothing to drift.
 
@@ -41,7 +41,12 @@ runs:
       shell: bash
       env:
         PYTHON_VERSION: ${{ inputs.python-version }}
-      run: echo "MISE_PYTHON_VERSION=$PYTHON_VERSION" >> "$GITHUB_ENV"
+      run: |
+        if [[ ! "$PYTHON_VERSION" =~ ^[0-9]+(\.[0-9]+){0,2}$ ]]; then
+          echo "::error::Invalid python-version: $PYTHON_VERSION"
+          exit 1
+        fi
+        echo "MISE_PYTHON_VERSION=$PYTHON_VERSION" >> "$GITHUB_ENV"
 
     - name: Set up mise
       uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
@@ -68,7 +73,7 @@ runs:
       shell: bash
       env:
         UV_SYNC_ARGS: ${{ inputs.uv-sync-args }}
-      # Intentionally unquoted: the args string is split into separate uv flags.
-      # It comes from a workflow input (not untrusted user data), and routing it
-      # through env avoids `${{ }}` interpolation into the shell.
-      run: uv sync $UV_SYNC_ARGS
+      # Split the args string into separate uv flags without glob expansion.
+      run: |
+        read -ra args <<< "$UV_SYNC_ARGS"
+        uv sync "${args[@]}"
