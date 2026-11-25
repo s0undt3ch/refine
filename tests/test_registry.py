@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-from unittest.mock import MagicMock
-from unittest.mock import patch
-
 import pytest
 
 from refine.abc import BaseCodemod
@@ -36,36 +32,29 @@ def test_registry_initialization(registry):
     assert registry._codemods == []
 
 
-def test_load_from_entrypoints(registry):
-    """Test loading codemods from entry points."""
-    with patch("refine.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])) as mock_collect:
-        registry.load([])
-        assert registry._codemods == [MockCodemod]
-        mock_collect.assert_called_once()
+BUILTIN_CODEMODS = {"cli-dashes-over-underscores", "sqlfmt"}
 
 
-def test_load_from_path(registry):
-    """Test loading codemods from a specified path."""
-    with (
-        patch("refine.registry.Registry._collect_from_entrypoints", return_value=iter([])),
-        patch("refine.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])) as mock_collect,
-    ):
-        test_path = Path("/some/path")
-        registry.load([test_path])
-        assert registry._codemods == [AnotherCodemod]
-        mock_collect.assert_called_once_with(test_path)
+def test_load_finds_builtin_codemods_from_entrypoints(registry):
+    registry.load([])
+
+    assert {codemod.NAME for codemod in registry.codemods()} == BUILTIN_CODEMODS
 
 
-def test_load_combined_sources(registry):
-    """Test loading codemods from both entry points and paths."""
-    with patch("refine.registry.Registry._collect_from_entrypoints", return_value=iter([MockCodemod])) as mock_entry:
-        with patch("refine.registry.Registry._collect_from_path", return_value=iter([AnotherCodemod])) as mock_path:
-            test_path = Path("/some/path")
-            registry.load([test_path])
-            assert registry._codemods == [AnotherCodemod, MockCodemod]
-            assert registry._codemods[0].PRIORITY < registry._codemods[1].PRIORITY  # Ensure sorting
-            mock_entry.assert_called_once()
-            mock_path.assert_called_once_with(test_path)
+def test_load_adds_codemods_from_search_paths(registry, tmp_path, write_codemod):
+    write_codemod(tmp_path, name="custom")
+
+    registry.load([str(tmp_path)])
+
+    assert {codemod.NAME for codemod in registry.codemods()} == BUILTIN_CODEMODS | {"custom"}
+
+
+def test_load_sorts_codemods_by_priority(registry, tmp_path, write_codemod):
+    write_codemod(tmp_path, name="custom", priority=-1)
+
+    registry.load([str(tmp_path)])
+
+    assert next(registry.codemods()).NAME == "custom"
 
 
 def test_codemods_with_selection(registry):
@@ -89,41 +78,26 @@ def test_codemods_with_exclusion(registry):
     assert selected == [AnotherCodemod, LastCodemod]
 
 
-def test_collect_from_entrypoints(registry):
-    """Test collecting codemods from entry points."""
-    mock_entry = MagicMock()
-    mock_entry.load.return_value = MockCodemod
+def test_collect_from_entrypoints_yields_builtin_codemods(registry):
+    collected = list(registry._collect_from_entrypoints())
 
-    with patch("importlib.metadata.entry_points", return_value=[mock_entry]):
-        collected = list(registry._collect_from_entrypoints())
-        assert collected == [MockCodemod]
+    assert {codemod.NAME for codemod in collected} == BUILTIN_CODEMODS
 
 
-def test_collect_from_path(registry):
-    """Test collecting codemods from a directory path."""
-    mock_file = MagicMock()
-    mock_file.name = "mock_codemod.py"
+def test_collect_from_path_imports_codemod_modules(registry, tmp_path, write_codemod):
+    module_name = write_codemod(tmp_path, name="custom")
 
-    with patch("refine.registry.pathlib.Path.glob", return_value=[mock_file]) as mock_glob:
-        with patch("refine.registry.SourceFileLoader") as mock_loader:
-            mock_loader.return_value.load_module.return_value = MagicMock()
+    collected = list(registry._collect_from_path(str(tmp_path)))
 
-            with patch("inspect.getmembers", return_value=[("MockCodemod", MockCodemod)]):
-                collected = list(registry._collect_from_path(Path("/some/path")))
-
-            assert collected == [MockCodemod]
-            mock_glob.assert_called_once()
-            mock_loader.assert_called_once_with(mock_file.stem, str(mock_file))
+    assert [(cls.NAME, cls.__module__) for cls in collected] == [("custom", module_name)]
 
 
-def test_duplicate_codemod_handling_with_caplog(registry, caplog):
-    """Test handling of duplicate codemod names using caplog."""
-    with patch(
-        "refine.registry.Registry._collect_from_entrypoints",
-        return_value=iter([MockCodemod, MockCodemod]),
-    ):
-        with caplog.at_level("WARNING"):
-            registry.load([])
+def test_load_keeps_builtin_codemod_when_path_codemod_reuses_its_name(registry, tmp_path, write_codemod, caplog):
+    write_codemod(tmp_path, name="sqlfmt")
 
-            assert len(registry._codemods) == 1
-            assert "Already loaded a codemod by the name of mock" in caplog.text
+    with caplog.at_level("WARNING"):
+        registry.load([str(tmp_path)])
+
+    [sqlfmt] = [codemod for codemod in registry.codemods() if codemod.NAME == "sqlfmt"]
+    assert sqlfmt.__module__ == "refine.mods.sql.fmt"
+    assert "Already loaded a codemod by the name of sqlfmt" in caplog.text

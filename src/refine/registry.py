@@ -7,6 +7,7 @@ This holds the information about what codemods are available to be used.
 from __future__ import annotations
 
 import importlib.metadata
+import importlib.util
 import inspect
 import logging
 import operator
@@ -14,7 +15,6 @@ import pathlib
 import sys
 from collections.abc import Iterable
 from collections.abc import Iterator
-from importlib.machinery import SourceFileLoader
 
 from .abc import BaseCodemod
 from .abc import CodemodConfigType
@@ -93,8 +93,12 @@ class Registry:
         if path not in sys.path:
             sys.path.insert(0, path)
         for fpath in pathlib.Path(path).glob("*.py"):
-            loader = SourceFileLoader(fpath.stem, str(fpath))
-            module = loader.load_module()
+            spec = importlib.util.spec_from_file_location(fpath.stem, fpath)
+            if spec is None or spec.loader is None:
+                continue
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[spec.name] = module
+            spec.loader.exec_module(module)
             for _, cls in inspect.getmembers(module, inspect.isclass):
                 if not issubclass(cls, BaseCodemod):
                     # Don't even bother if it's not a subclass of BaseCodemod
