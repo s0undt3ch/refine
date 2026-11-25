@@ -95,10 +95,21 @@ class Registry:
         for fpath in pathlib.Path(path).glob("*.py"):
             spec = importlib.util.spec_from_file_location(fpath.stem, fpath)
             if spec is None or spec.loader is None:
-                continue
+                error_msg = f"Cannot load codemod module from {fpath}"
+                raise ImportError(error_msg)
             module = importlib.util.module_from_spec(spec)
+            # Registered before executing, as a normal import does, so ``@dataclass`` and other
+            # ``sys.modules[cls.__module__]`` lookups work inside the codemod module.
+            previous = sys.modules.get(spec.name)
             sys.modules[spec.name] = module
-            spec.loader.exec_module(module)
+            try:
+                spec.loader.exec_module(module)
+            except BaseException:
+                if previous is None:
+                    sys.modules.pop(spec.name, None)
+                else:
+                    sys.modules[spec.name] = previous
+                raise
             for _, cls in inspect.getmembers(module, inspect.isclass):
                 if not issubclass(cls, BaseCodemod):
                     # Don't even bother if it's not a subclass of BaseCodemod

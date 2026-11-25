@@ -532,18 +532,6 @@ def test_config_loading_default_when_no_files(cli, file_to_modify):
     assert cli.config.fail_fast is False
 
 
-@pytest.fixture
-def restore_log_levels():
-    """
-    Put back the root and ``py_walk`` log levels that ``--quiet``/``--verbose`` change.
-    """
-    loggers = [logging.getLogger(), logging.getLogger("py_walk")]
-    levels = [logger.level for logger in loggers]
-    yield
-    for logger, level in zip(loggers, levels, strict=True):
-        logger.setLevel(level)
-
-
 def test_quiet_flag_sets_root_log_level_to_error(cli, file_to_modify, restore_log_levels):
     cli.run("--quiet", file_to_modify)
 

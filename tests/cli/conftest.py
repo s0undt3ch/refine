@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 import pathlib
 from collections.abc import Iterator
@@ -59,7 +60,8 @@ class CLI(OriginalCLI):
 @pytest.fixture
 def codemods() -> list[type[BaseCodemod]]:
     """
-    Real codemod classes, kept out of the registry's entry points so listings stay predictable.
+    Three minimal codemods. The ``cli`` fixture's registry returns only these, so listings and
+    selections don't depend on the built-in codemods.
     """
     return [
         type(
@@ -106,13 +108,21 @@ def processor(_mock_registry_codemods):
 
 
 @pytest.fixture
-def cli(tmp_path: pathlib.Path, processor) -> CLI:
+def real_cli(tmp_path: pathlib.Path) -> CLI:
     """
-    Create a CLI instance with a temporary directory.
+    CLI instance with the real registry and processor, nothing patched.
     """
     cli_cwd = tmp_path / "cli-cwd"
     cli_cwd.mkdir()
     return CLI(cli_cwd)
+
+
+@pytest.fixture
+def cli(real_cli: CLI, processor) -> CLI:
+    """
+    CLI instance whose registry only knows the ``codemods`` fixture and whose processor is faked.
+    """
+    return real_cli
 
 
 @pytest.fixture
@@ -127,10 +137,12 @@ def file_to_modify(cli: CLI) -> pathlib.Path:
 
 
 @pytest.fixture
-def real_cli(tmp_path: pathlib.Path) -> CLI:
+def restore_log_levels():
     """
-    CLI instance with the real registry and processor, nothing patched.
+    Put back the root and ``py_walk`` log levels that ``--quiet``/``--verbose`` change.
     """
-    cli_cwd = tmp_path / "cli-cwd"
-    cli_cwd.mkdir()
-    return CLI(cli_cwd)
+    loggers = [logging.getLogger(), logging.getLogger("py_walk")]
+    levels = [logger.level for logger in loggers]
+    yield
+    for logger, level in zip(loggers, levels, strict=True):
+        logger.setLevel(level)

@@ -13,41 +13,56 @@ import pytest
 # of assertion failures
 pytest.register_assert_rewrite("refine.testing")
 
-_module_counter = itertools.count()
+
+@pytest.fixture
+def codemod_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[Path]:
+    """
+    Directory to hold codemod modules that the registry loads by path.
+
+    Loading by path adds the directory to ``sys.path`` and the modules to ``sys.modules``. Both are
+    undone on teardown for anything under this test's ``tmp_path``.
+    """
+    monkeypatch.setattr(sys, "path", list(sys.path))
+    yield tmp_path
+    for name, module in list(sys.modules.items()):
+        if str(tmp_path) in str(getattr(module, "__file__", None) or ""):
+            del sys.modules[name]
 
 
 @pytest.fixture
-def write_codemod(monkeypatch: pytest.MonkeyPatch) -> Iterator[Callable[..., str]]:
+def write_codemod(codemod_dir: Path) -> Callable[..., str]:
     """
     Factory writing a real codemod module to disk, as a user's ``codemod_paths`` entry would hold.
 
-    Returns the module name. Each module gets a unique name and is dropped from ``sys.modules`` on
-    teardown, because loading it from a path registers it there.
+    The codemod renames ``x`` to ``x_refined``. ``directory`` must be under ``tmp_path``. Returns the
+    generated module name, which differs from ``codemod_name``.
     """
-    monkeypatch.setattr(sys, "path", list(sys.path))
-    written: list[str] = []
+    module_numbers = itertools.count()
 
-    def _write(directory: Path, *, name: str, priority: int = 0) -> str:
-        module_name = f"refine_test_codemod_{next(_module_counter)}"
+    def _write(directory: Path, *, codemod_name: str, priority: int = 0) -> str:
+        module_name = f"refine_test_codemod_{next(module_numbers)}"
         directory.mkdir(parents=True, exist_ok=True)
         (directory / f"{module_name}.py").write_text(
             textwrap.dedent(
                 f'''
+                import libcst as cst
+
                 from refine.abc import BaseCodemod
 
 
                 class CustomCodemod(BaseCodemod):
-                    """Custom codemod {name}."""
+                    """Custom codemod {codemod_name}."""
 
-                    NAME = {name!r}
+                    NAME = {codemod_name!r}
                     PRIORITY = {priority}
+
+                    def leave_Name(self, original: cst.Name, updated: cst.Name) -> cst.Name:
+                        if updated.value == "x":
+                            return updated.with_changes(value="x_refined")
+                        return updated
                 '''
             )
         )
-        written.append(module_name)
         return module_name
 
-    yield _write
-
-    for module_name in written:
-        sys.modules.pop(module_name, None)
+    return _write
