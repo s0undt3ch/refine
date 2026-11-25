@@ -18,6 +18,8 @@ permissions: {}
 env:
   COLUMNS: 190
   FORCE_COLOR: "1"
+  # Bump to invalidate every mise and .venv cache this workflow uses.
+  CACHE_SEED: "1"
 
 jobs:
   prepare-ci:
@@ -65,10 +67,16 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Load shared env vars
+        # $GITHUB_ENV rejects comment lines, so keep only the assignments.
+        run: sed -n '/^[A-Z]/p' .github/env >> "$GITHUB_ENV"
+
       - name: Set up mise & virtualenv
         uses: ./.github/actions/setup-virtualenv
         with:
           cache-prefix: pre-commit
+          cache-seed: ${{ env.CACHE_SEED }}
+          mise-version: ${{ env.MISE_VERSION }}
 
       - name: Run Pre-commit
         run: |
@@ -102,11 +110,17 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Load shared env vars
+        # $GITHUB_ENV rejects comment lines, so keep only the assignments.
+        run: sed -n '/^[A-Z]/p' .github/env >> "$GITHUB_ENV"
+
       - name: Set up mise & virtualenv
         uses: ./.github/actions/setup-virtualenv
         with:
           python-version: ${{ matrix.python-version }}
           cache-prefix: tests
+          cache-seed: ${{ env.CACHE_SEED }}
+          mise-version: ${{ env.MISE_VERSION }}
 
       - name: Run Tests
         run: |
@@ -140,10 +154,16 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Load shared env vars
+        # $GITHUB_ENV rejects comment lines, so keep only the assignments.
+        run: sed -n '/^[A-Z]/p' .github/env >> "$GITHUB_ENV"
+
       - name: Set up mise & virtualenv
         uses: ./.github/actions/setup-virtualenv
         with:
           cache-prefix: docs
+          cache-seed: ${{ env.CACHE_SEED }}
+          mise-version: ${{ env.MISE_VERSION }}
           uv-sync-args: --group docs
 
       - name: Build MkDocs site

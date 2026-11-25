@@ -37,6 +37,18 @@
     schedule: ["before 6am on the first day of the month"],
   },
 
+  // The mise build every workflow installs has no native manager.
+  customManagers: [
+    {
+      customType: "regex",
+      description: "Track the mise version every workflow installs",
+      managerFilePatterns: ["/^\\.github/env$/"],
+      matchStrings: ["MISE_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"],
+      depNameTemplate: "jdx/mise",
+      datasourceTemplate: "github-releases",
+    },
+  ],
+
   assignees: ["s0undt3ch"],
   labels: ["dependencies"],
 
