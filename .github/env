@@ -1,0 +1,7 @@
+# Shared environment variables for every workflow. Each job that needs them
+# loads this file right after `actions/checkout`. The format is `KEY=VALUE` per
+# line, with no quoting or interpolation; the loader skips comment lines.
+#
+# `MISE_VERSION` sets every workflow's mise install. Renovate bumps it (see the
+# regex manager in renovate.json5).
+MISE_VERSION=v2026.11.14
