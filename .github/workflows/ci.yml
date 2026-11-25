@@ -19,6 +19,38 @@ env:
   FORCE_COLOR: "1"
 
 jobs:
+  prepare-ci:
+    name: Prepare CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      test-matrix: ${{ steps.generate-build-matrix.outputs.test-matrix }}
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up ToolR
+        uses: s0undt3ch/ToolR@90681fa0fbfa1bbe0e3fe93424beee3fa25e828e # v0.37.0
+        with:
+          sync-args: --group dev
+
+      - name: Test the CI tools
+        run: toolr project venv run --no-sync -- pytest tests/tools/
+
+      - name: Generate Build Matrix
+        id: generate-build-matrix
+        run: toolr ci generate-build-matrix
+
   pre-commit:
     name: Pre-commit
     runs-on: ubuntu-latest
@@ -54,31 +86,14 @@ jobs:
       contents: read
 
     needs:
+      - prepare-ci
       - pre-commit
 
     strategy:
       fail-fast: false
+      # Built by `toolr ci generate-build-matrix` (tools/ci.py).
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-latest
-        python-version:
-          - "3.11"
-          - "3.12"
-          - "3.13"
-          - "3.14"
-          - "3.15"
-        # PRs test every Python on Linux but only the oldest and newest on Windows and macOS.
-        exclude: >-
-          ${{ fromJSON(github.event_name == 'pull_request' && '[
-            {"os": "windows-latest", "python-version": "3.12"},
-            {"os": "windows-latest", "python-version": "3.13"},
-            {"os": "windows-latest", "python-version": "3.14"},
-            {"os": "macos-latest", "python-version": "3.12"},
-            {"os": "macos-latest", "python-version": "3.13"},
-            {"os": "macos-latest", "python-version": "3.14"}
-          ]' || '[]') }}
+        include: ${{ fromJSON(needs.prepare-ci.outputs.test-matrix) }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
