@@ -168,12 +168,8 @@ name = "tools"
 version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "packaging" },
     { name = "toolr-py" },
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "packaging" },
-    { name = "toolr-py" },
-]
+requires-dist = [{ name = "toolr-py" }]
