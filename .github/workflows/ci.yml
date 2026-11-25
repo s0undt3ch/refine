@@ -16,6 +16,7 @@ permissions: {}
 
 env:
   COLUMNS: 190
+  FORCE_COLOR: "1"
 
 jobs:
   prepare-ci:
