@@ -151,6 +151,7 @@ ignore = [
 "tools/**/*.py" = [
   "ANN201",   # Missing return type annotation for public function"
   "D104",     # Missing docstring in public package
+  "D417",     # toolr passes `ctx`; `--help` never shows it, so `Args:` skips it
   "FBT001",   # Boolean positional arg in function definition
   "FBT002",   # Boolean default value in function definition
 ]
